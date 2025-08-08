@@ -1,41 +1,61 @@
-import express from 'express'
-import cookieParser from 'cookie-parser'
-import path from 'path'
-import { errorHandler } from './app/middelware/errorhandler.middleware'
-import envConfig from './app/config/env.config'
-import { connectDB } from './app/config/db.connection'
-import basicRouter from './app/routes/basic.route'
+import express from "express";
+import cookieParser from "cookie-parser";
+import path from "path";
+import { errorHandler } from "./app/middelware/errorhandler.middleware";
+import envConfig from "./app/config/env.config";
+import { connectDB } from "./app/config/db.connection";
+import basicRouter from "./app/routes/basic.route";
+import session from "express-session";
+import flash from "connect-flash";
+import bodyParser from "body-parser";
+import authRouter from "./app/routes/auth.route";
 
-const app = express()
-
+const app = express();
 
 //a basic setup that should be done almost always
 
-app.use(express.json())
-app.use(cookieParser())
-app.use(express.urlencoded({extended:true}))
+app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: "yourSecretKey",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash("success_msg");
+  res.locals.error_msg = req.flash("error_msg");
+  res.locals.delete_msg = req.flash("delete_msg");
+  next();
+});
+app.use(
+  bodyParser.urlencoded({
+    limit: "50mb",
+    extended: true,
+    parameterLimit: 2000,
+  })
+);
 
+//if using multer to store files locally uncomment this
 
-//if using multer to store files locally uncomment this 
-
-//app.use(express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //if using ejs as template engine uncomment this , and make sure you have "views" , "public" folder on the root where server.ts is
 
-//app.set("view engine", "ejs");
-//app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
+//Define your routes here ,
 
-//Define your routes here , 
-
-app.use('/any-prefix',basicRouter)
-
-
-
-
+app.use(authRouter);
+app.use("/any-prefix", basicRouter);
 
 //this is the global erro handler middleware , it should always be at the buttom of all rotes
-app.use(errorHandler) 
+app.use(errorHandler);
 
 //Statrt the server
 const startServer = async () => {
