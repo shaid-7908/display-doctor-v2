@@ -4,10 +4,14 @@ import envConfig from "../config/env.config";
 
 export const generateAccessToken = (user: JwtPayload) => {
   return jwt.sign(
-    { email: user.email, id: user.id, role: user.role },
+    {
+      email: user.email,
+      id: user.id,
+      role: user.role,
+    },
     envConfig.JWT_SECRET,
     {
-      expiresIn: "5m",
+      expiresIn: "10s",
     }
   );
 };
@@ -20,4 +24,12 @@ export const generateRefreshToken = (user: JwtPayload) => {
       expiresIn: "7d",
     }
   );
+};
+
+export const verifyAccessToken = (token: string) => {
+  return jwt.verify(token, envConfig.JWT_SECRET);
+};
+
+export const verifyRefreshToken = (token: string) => {
+  return jwt.verify(token, envConfig.JWT_SECRET);
 };
