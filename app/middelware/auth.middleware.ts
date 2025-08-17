@@ -6,6 +6,7 @@ import {
   generateAccessToken,
 } from "../utils/generate.token";
 import { JwtPayload } from "../types/auth.types";
+import STATUS_CODES from "../utils/status.codes";
 
 declare global {
   namespace Express {
@@ -56,3 +57,19 @@ export const authChecker = async (
     }
   }
 };
+
+export const roleChecker = (allowedRoles:string[])=>{
+ return (req:Request,res:Response,next:NextFunction)=>{
+       if(!req.user){
+          return sendError(res,'Login required',null,STATUS_CODES.UNAUTHORIZED)
+       }
+       const userRole = req.user.role
+       if(!userRole){
+        return sendError(res,'No roles found',null,STATUS_CODES.FORBIDDEN)
+       }
+       if(!allowedRoles.includes(userRole)){
+        return sendError(res, "Insufficient permissions",null,STATUS_CODES.FORBIDDEN);
+       }
+       next()
+ }
+}

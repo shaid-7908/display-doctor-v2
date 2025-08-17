@@ -3,7 +3,6 @@ import { asyncHandler } from "../utils/async.hadler";
 import { sendError, sendSuccess } from "../utils/unified.response";
 import STATUS_CODES from "../utils/status.codes";
 import { comparePassword, hashPassword } from "../utils/hash.password";
-import { AdminModel } from "../model/admin.model";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -165,7 +164,7 @@ class AuthController {
       "success_msg",
       `Welcome back, ${user.firstName} ${user.lastName}!`
     );
-    res.redirect("/dashboard");
+    res.redirect("/");
     // return sendSuccess(
     //   res,
     //   `Welcome back, ${user.firstName} ${user.lastName}!`,
@@ -262,7 +261,8 @@ class AuthController {
   });
 
   renderDashboard = asyncHandler(async (req: Request, res: Response) => {
-    res.render("index");
+    const currentUser = req.user;
+    res.render("index",{default_user:currentUser});
   });
 
   logout = asyncHandler(async (req: Request, res: Response) => {

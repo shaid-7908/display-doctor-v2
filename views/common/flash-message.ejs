@@ -1,38 +1,268 @@
-<% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  <%= success_msg %>
-  <button
-    type="button"
-    class="btn-close"
-    data-bs-dismiss="alert"
-    aria-label="Close"
-  ></button>
+<!-- Flash Messages Container -->
+<div class="flash-messages-container">
+  <% if (typeof success_msg !=='undefined' && success_msg.length> 0) { %>
+    <div class="flash-message flash-success" role="alert">
+      <div class="flash-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="flash-content">
+        <div class="flash-title">Success!</div>
+        <div class="flash-text">
+          <%= success_msg %>
+        </div>
+      </div>
+      <button type="button" class="flash-close" data-bs-dismiss="alert" aria-label="Close"
+        onclick="closeFlashMessage(this)">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <% } %>
+
+      <% if (typeof error_msg !=='undefined' && error_msg.length> 0) { %>
+        <div class="flash-message flash-error" role="alert">
+          <div class="flash-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="flash-content">
+            <div class="flash-title">Error!</div>
+            <div class="flash-text">
+              <%= error_msg %>
+            </div>
+          </div>
+          <button type="button" class="flash-close" data-bs-dismiss="alert" aria-label="Close"
+            onclick="closeFlashMessage(this)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %>
+
+          <% if (delete_msg && delete_msg.length> 0) { %>
+            <div class="flash-message flash-danger" role="alert">
+              <div class="flash-icon">
+                <i class="fas fa-trash-alt"></i>
+              </div>
+              <div class="flash-content">
+                <div class="flash-title">Deleted!</div>
+                <div class="flash-text">
+                  <%= delete_msg %>
+                </div>
+              </div>
+              <button type="button" class="flash-close" data-bs-dismiss="alert" aria-label="Close"
+                onclick="closeFlashMessage(this)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <% } %>
 </div>
-<% } %> <% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  <%= error_msg %>
-  <button
-    type="button"
-    class="btn-close"
-    data-bs-dismiss="alert"
-    aria-label="Close"
-  ></button>
-</div>
-<% } %> <% if (delete_msg && delete_msg.length > 0) { %>
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-  <%= delete_msg %>
-  <button
-    type="button"
-    class="btn-close"
-    data-bs-dismiss="alert"
-    aria-label="Close"
-  ></button>
-</div>
-<% } %>
+
+<!-- Flash Messages Styles -->
+<style>
+  .flash-messages-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    width: auto;
+    pointer-events: none;
+  }
+
+  .flash-message {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: slideInRight 0.4s ease-out, fadeOut 0.3s ease-in 4.7s forwards;
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+    min-width: 300px;
+    max-width: 400px;
+  }
+
+  .flash-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: currentColor;
+  }
+
+  .flash-success {
+    background: rgba(28, 200, 138, 0.95);
+    color: white;
+    border-left-color: #1cc88a;
+  }
+
+  .flash-error {
+    background: rgba(231, 74, 59, 0.95);
+    color: white;
+    border-left-color: #e74a3b;
+  }
+
+  .flash-danger {
+    background: rgba(231, 74, 59, 0.95);
+    color: white;
+    border-left-color: #e74a3b;
+  }
+
+  .flash-icon {
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+    margin-top: 0.125rem;
+  }
+
+  .flash-icon i {
+    font-size: 1.25rem;
+    opacity: 0.9;
+  }
+
+  .flash-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .flash-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+  }
+
+  .flash-text {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    opacity: 0.95;
+    word-wrap: break-word;
+  }
+
+  .flash-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    margin-left: 0.75rem;
+    margin-top: 0.125rem;
+    padding: 0.25rem;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flash-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  .flash-message.flash-hiding {
+    animation: fadeOut 0.3s ease-in forwards;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .flash-messages-container {
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      max-width: none;
+    }
+
+    .flash-message {
+      min-width: auto;
+      max-width: none;
+      margin-bottom: 0.75rem;
+    }
+
+    .flash-title {
+      font-size: 0.9rem;
+    }
+
+    .flash-text {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .flash-messages-container {
+      top: 5px;
+      right: 5px;
+      left: 5px;
+    }
+
+    .flash-message {
+      padding: 0.875rem 1rem;
+      border-radius: 12px;
+    }
+  }
+</style>
+
+<!-- Flash Messages JavaScript -->
+<script>
+  function closeFlashMessage(button) {
+    const flashMessage = button.closest('.flash-message');
+    if (flashMessage) {
+      flashMessage.classList.add('flash-hiding');
+      setTimeout(() => {
+        flashMessage.remove();
+      }, 300);
+    }
+  }
+
+  // Auto-hide flash messages after 5 seconds
+  document.addEventListener('DOMContentLoaded', function () {
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(message => {
+      setTimeout(() => {
+        if (message.parentNode) {
+          message.classList.add('flash-hiding');
+          setTimeout(() => {
+            if (message.parentNode) {
+              message.remove();
+            }
+          }, 300);
+        }
+      }, 5000);
+    });
+  });
+</script>
 
 <!-- Bootstrap JS -->
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-  crossorigin="anonymous"
-></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
