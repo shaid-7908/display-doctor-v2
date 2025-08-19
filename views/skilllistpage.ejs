@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Create Skill</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        .selected-categories {
+            min-height: 40px;
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+            padding: 10px;
+            background-color: #f8f9fc;
+        }
+
+        .selected-categories .badge {
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .selected-categories .badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-categories .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .selected-categories .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include("common/sidebar") %>
+            <!-- End of Sidebar -->
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <!-- End of Topbar -->
+
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
+
+                        <!-- Flash Messages -->
+                        <%- include('./common/flash-message') %>
+
+                            <!-- Page Heading -->
+                            <h1 class="h3 mb-4 text-gray-800">All Skills</h1>
+
+                            <!-- Create Skill Form -->
+                            <div class="row">
+
+                                <div class="col">
+
+                                    <!-- Basic Card Example -->
+
+                                    <!-- Skills List Table -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                            <h6 class="m-0 font-weight-bold text-primary">Skills List</h6>
+                                            <div class="input-group" style="width: 300px;">
+                                                <input type="text" class="form-control" id="searchSkillsTable"
+                                                    placeholder="Search skills...">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <a href="/create-skill" class="btn btn-primary btn-sm ml-1 my-2"><i class="fas fa-plus"></i> Create Skill</a>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-striped">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Description</th>
+                                                            <th>Categories</th>
+                                                            <th>Status</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="skillsTableBody">
+                                                        <% skills.forEach(skill => { %>
+                                                            <tr>
+                                                                <td><%= skill.name %></td>
+                                                                <td><%= skill.description %></td>
+                                                                <td><%= skill.categories.map(category => category.name).join(', ') %></td>
+                                                                <td><span class="badge badge-<%= skill.is_active ? 'success' : 'danger' %>"><%= skill.is_active ? 'Active' : 'Inactive' %></span></td>
+                                                                <td>
+                                                                    <a href="/edit-skill/<%= skill._id %>" class="btn btn-primary btn-sm ml-1 my-2">
+                                                                        <i class="fas fa-edit"></i> Edit
+                                                                    </a>
+                                                                    <button class="btn btn-danger btn-sm ml-1" onclick="deleteSkill('${skill._id}')">
+                                                                    <i class="fas fa-trash"></i> Delete
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        <% }) %>
+                                                        <!-- Skills will be loaded here -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <!-- Pagination -->
+                                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                                <div class="text-muted">
+                                                    Showing <span id="showingStart">0</span> to <span
+                                                        id="showingEnd">0</span> of <span id="totalSkills">0</span>
+                                                    skills
+                                                </div>
+                                                <nav aria-label="Skills pagination">
+                                                    <ul class="pagination pagination-sm mb-0" id="skillsPagination">
+                                                        <!-- Pagination will be generated here -->
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                
+
+                            </div>
+
+                    </div>
+                    <!-- /.container-fluid -->
+
+                </div>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2021</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Form submission with jQuery AJAX -->
+    <script>
+        $(document).ready(function () {
+            // Load service categories on page load
+            loadServiceCategories()
+
+
+            // Pagination settings
+            const skillsPerPage = 10;
+            let currentPage = 1;
+            let totalSkills = 0;
+            let allSkills = [];
+            
+
+            // Initialize selected categories array
+            let selectedCategories = [];
+
+            function loadServiceCategories() {
+                $.ajax({
+                    url: '/get-service-categories',
+                    method: 'GET',
+                    dataType: 'json'
+                })
+                    .done(function (categories) {
+                        const categorySelect = $('#categorySelect');
+                        console.log(categories);
+                        categorySelect.empty().append('<option value="">Select a category to add...</option>');
+
+                        categories.data.forEach(function (category) {
+                            if (category.is_active) {
+                                categorySelect.append(`<option value="${category._id}" data-name="${category.name}">${category.name}</option>`);
+                            }
+                        });
+                    })
+                    .fail(function () {
+                        showAlert('Failed to load service categories. Please refresh the page.', 'warning');
+                    });
+            }
+
+            // Load skills with pagination
+            function loadSkills(page) {
+                currentPage = page;
+                const offset = (page - 1) * skillsPerPage;
+
+                $.ajax({
+                    url: '/get-skills',
+                    method: 'GET',
+                    data: {
+                        limit: skillsPerPage,
+                        offset: offset
+                    },
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        console.log(response);
+                        if (response.success) {
+                            allSkills = response.data;
+                            totalSkills = response.data.total;
+                            displaySkills();
+                            updatePagination();
+                            updatePaginationInfo();
+                        } else {
+                            showAlert('Failed to load skills: ' + response.message, 'danger');
+                        }
+                    })
+                    .fail(function (xhr) {
+                        showAlert('Failed to load skills. Please refresh the page.', 'danger');
+                        console.error('Error loading skills:', xhr);
+                    });
+            }
+
+            // Display skills in table
+            function displaySkills() {
+                const tbody = $('#skillsTableBody');
+                tbody.empty();
+
+                if (allSkills.length === 0) {
+                    tbody.html(`
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <br>No skills found
+                            </td>
+                        </tr>
+                    `);
+                    return;
+                }
+
+                allSkills.forEach(function (skill) {
+                    const categoriesText = skill.recommended_categories && skill.recommended_categories.length > 0
+                        ? skill.recommended_categories.map(cat => cat.name).join(', ')
+                        : 'No categories';
+
+                    const row = `
+                        <tr>
+                            <td>${skill.name}</td>
+                            <td>${skill.description.length > 50 ? skill.description.substring(0, 50) + '...' : skill.description}</td>
+                            <td>
+                                <span class="text-muted small">${categoriesText}</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-${skill.is_active ? 'success' : 'danger'}">
+                                    ${skill.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/edit-skill/${skill._id}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button class="btn btn-danger btn-sm ml-1" onclick="deleteSkill('${skill._id}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+
+            // Update pagination info
+            function updatePaginationInfo() {
+                const start = ((currentPage - 1) * skillsPerPage) + 1;
+                const end = Math.min(currentPage * skillsPerPage, totalSkills);
+                $('#showingStart').text(start);
+                $('#showingEnd').text(end);
+                $('#totalSkills').text(totalSkills);
+            }
+
+            // Generate pagination controls
+            function updatePagination() {
+                const totalPages = Math.ceil(totalSkills / skillsPerPage);
+                const pagination = $('#skillsPagination');
+                pagination.empty();
+
+                if (totalPages <= 1) {
+                    return;
+                }
+
+                // Previous button
+                const prevDisabled = currentPage === 1 ? 'disabled' : '';
+                pagination.append(`
+                    <li class="page-item ${prevDisabled}">
+                        <a class="page-link" href="#" onclick="changePage(${currentPage - 1})" ${prevDisabled}>
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                `);
+
+                // Page numbers
+                const startPage = Math.max(1, currentPage - 2);
+                const endPage = Math.min(totalPages, currentPage + 2);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === currentPage ? 'active' : '';
+                    pagination.append(`
+                        <li class="page-item ${active}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>
+                    `);
+                }
+
+                // Next button
+                const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+                pagination.append(`
+                    <li class="page-item ${nextDisabled}">
+                        <a class="page-link" href="#" onclick="changePage(${currentPage + 1})" ${nextDisabled}>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                `);
+            }
+
+            // Add category functionality
+            $('#addCategoryBtn').on('click', function () {
+                const categorySelect = $('#categorySelect');
+                const selectedOption = categorySelect.find('option:selected');
+
+                if (selectedOption.val() && selectedOption.val() !== '') {
+                    const categoryId = selectedOption.val();
+                    const categoryName = selectedOption.data('name');
+
+                    // Check if category is already selected
+                    if (selectedCategories.find(cat => cat.id === categoryId)) {
+                        showAlert('This category is already selected.', 'warning');
+                        return;
+                    }
+
+                    // Add to selected categories
+                    selectedCategories.push({
+                        id: categoryId,
+                        name: categoryName
+                    });
+
+                    // Update display
+                    updateSelectedCategoriesDisplay();
+
+                    // Reset select
+                    categorySelect.val('');
+                } else {
+                    showAlert('Please select a category first.', 'warning');
+                }
+            });
+
+            // Update selected categories display
+            function updateSelectedCategoriesDisplay() {
+                const container = $('#selectedCategories');
+                container.empty();
+
+                if (selectedCategories.length === 0) {
+                    container.html('<p class="text-muted small">No categories selected</p>');
+                    return;
+                }
+
+                selectedCategories.forEach(function (category, index) {
+                    const categoryTag = `
+                        <span class="badge badge-primary mr-2 mb-2 p-2" style="font-size: 0.9rem;">
+                            ${category.name}
+                            <button type="button" class="btn btn-sm btn-outline-light ml-2" 
+                                    onclick="removeCategory(${index})" style="padding: 0.1rem 0.3rem;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </span>
+                    `;
+                    container.append(categoryTag);
+                });
+
+                // Update hidden input
+                $('#recommendedCategoriesInput').val(JSON.stringify(selectedCategories.map(cat => cat.id)));
+            }
+
+            // Remove category function (global scope)
+            window.removeCategory = function (index) {
+                selectedCategories.splice(index, 1);
+                updateSelectedCategoriesDisplay();
+            };
+
+            // Global functions for skills table
+            window.changePage = function (page) {
+                loadSkills(page);
+            };
+
+            window.toggleSkillStatus = function (skillId, currentStatus) {
+                const newStatus = !currentStatus;
+
+                $.ajax({
+                    url: `/api/skills/${skillId}/toggle-status`,
+                    method: 'PATCH',
+                    data: { is_active: newStatus },
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            showAlert(`Skill ${newStatus ? 'activated' : 'deactivated'} successfully!`, 'success');
+                            loadSkills(currentPage); // Reload current page
+                        } else {
+                            showAlert('Failed to update skill status: ' + response.message, 'danger');
+                        }
+                    })
+                    .fail(function (xhr) {
+                        let errorMessage = 'An error occurred while updating the skill status.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        showAlert(errorMessage, 'danger');
+                    });
+            };
+
+            window.deleteSkill = function (skillId) {
+                if (confirm('Are you sure you want to delete this skill? This action cannot be undone.')) {
+                    $.ajax({
+                        url: `/api/skills/${skillId}`,
+                        method: 'DELETE',
+                        dataType: 'json'
+                    })
+                        .done(function (response) {
+                            if (response.success) {
+                                showAlert('Skill deleted successfully!', 'success');
+                                loadSkills(currentPage); // Reload current page
+                            } else {
+                                showAlert('Failed to delete skill: ' + response.message, 'danger');
+                            }
+                        })
+                        .fail(function (xhr) {
+                            let errorMessage = 'An error occurred while deleting the skill.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            showAlert(errorMessage, 'danger');
+                        });
+                }
+            };
+
+            // Form submission with AJAX
+            $('#createSkillForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get form data
+                const formData = {
+                    name: $('#skillName').val().trim(),
+                    description: $('#description').val().trim(),
+                    recommended_categories: selectedCategories.map(cat => cat.id),
+                    is_active: $('select[name="is_active"]').val() === 'true'
+                };
+
+                // Basic validation
+                if (!formData.name || !formData.description) {
+                    showAlert('Please fill in all required fields.', 'danger');
+                    return;
+                }
+
+                // Categories validation (optional but recommended)
+                if (formData.recommended_categories.length === 0) {
+                    if (!confirm('No categories selected. Are you sure you want to create this skill without recommended categories?')) {
+                        return;
+                    }
+                }
+
+                // Name validation
+                if (formData.name.length < 3) {
+                    showAlert('Skill name must be at least 3 characters long.', 'danger');
+                    return;
+                }
+
+                // Description validation
+                if (formData.description.length < 10) {
+                    showAlert('Description must be at least 10 characters long.', 'danger');
+                    return;
+                }
+
+                // Disable submit button and show loading
+                const $submitBtn = $('#createSkillForm button[type="submit"]');
+                const originalText = $submitBtn.text();
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating Skill...');
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '/create-skill',
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        // Success
+                        showAlert('Skill created successfully!', 'success');
+                        $('#createSkillForm')[0].reset(); // Reset form
+                        $('select[name="is_active"]').val('true'); // Reset to active
+
+                        // Reset selected categories
+                        selectedCategories = [];
+                        updateSelectedCategoriesDisplay();
+
+                        // Refresh the skills table to show the new skill
+                        loadSkills(1);
+                    })
+                    .fail(function (xhr) {
+                        // Error handling
+                        let errorMessage = 'An error occurred while creating the skill.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                errorMessage = errorData.message || errorMessage;
+                            } catch (e) {
+                                // If not JSON, use default message
+                            }
+                        }
+
+                        showAlert(errorMessage, 'danger');
+                    })
+                    .always(function () {
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).text(originalText);
+                    });
+            });
+
+            // Custom alert function using SB Admin 2 styling
+            function showAlert(message, type) {
+                // Remove existing alerts
+                $('.custom-alert').remove();
+
+                // Create alert HTML
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show custom-alert" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} mr-2"></i>
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `;
+
+                // Insert alert before the form
+                $('.card-body').prepend(alertHtml);
+
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(function () {
+                        $('.custom-alert').fadeOut(function () {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                }
+
+                // Scroll to top of form to show alert
+                $('html, body').animate({
+                    scrollTop: $('.card').offset().top - 100
+                }, 500);
+            }
+
+            // Field validation on blur
+            $('#skillName').on('blur', function () {
+                const name = $(this).val().trim();
+                if (name && name.length < 3) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#description').on('blur', function () {
+                const desc = $(this).val().trim();
+                if (desc && desc.length < 10) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Remove validation styling on focus
+            $('.form-control').on('focus', function () {
+                $(this).removeClass('is-invalid');
+            });
+
+            // Skills table search functionality
+            $('#searchSkillsTable').on('keyup', function () {
+                const searchTerm = $(this).val().toLowerCase();
+                const tableRows = $('#skillsTableBody tr');
+
+                tableRows.each(function () {
+                    const rowText = $(this).text().toLowerCase();
+                    if (rowText.includes(searchTerm)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Create Technician</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include("common/sidebar") %>
+            <!-- End of Sidebar -->
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <!-- End of Topbar -->
+
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
+
+                        <!-- Flash Messages -->
+                        <%- include('./common/flash-message') %>
+
+                            <!-- Page Heading -->
+                            <h1 class="h3 mb-4 text-gray-800">Create Technician</h1>
+
+                            <!-- Create Technician Form -->
+                            <div class="row">
+
+                                <div class="col-lg-8">
+
+                                    <!-- Basic Card Example -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Create New Technician Account
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form method="post" action="/create-technician" id="createTechnicianForm">
+
+                                                <!-- Name Fields -->
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="firstName" name="firstName" placeholder="First Name"
+                                                            required>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="lastName" name="lastName" placeholder="Last Name"
+                                                            required>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Email Address -->
+                                                <div class="form-group">
+                                                    <input type="email" class="form-control form-control-user"
+                                                        id="email" name="email" placeholder="Email Address" required>
+                                                </div>
+
+                                                <!-- Phone Number -->
+                                                <div class="form-group">
+                                                    <input type="tel" class="form-control form-control-user" id="phone"
+                                                        name="phone" placeholder="Phone Number" required>
+                                                </div>
+
+                                                <!-- Date of Birth -->
+                                                <div class="form-group">
+                                                    <input type="date" class="form-control form-control-user"
+                                                        id="dateOfBirth" name="dateOfBirth">
+                                                </div>
+
+                                                <!-- Specialization -->
+                                                <div class="form-group">
+                                                    <select class="form-control form-control-user" name="specialization"
+                                                        required>
+                                                        <option value="">Select Specialization</option>
+                                                        <option value="electrical">Electrical</option>
+                                                        <option value="plumbing">Plumbing</option>
+                                                        <option value="hvac">HVAC</option>
+                                                        <option value="carpentry">Carpentry</option>
+                                                        <option value="painting">Painting</option>
+                                                        <option value="landscaping">Landscaping</option>
+                                                        <option value="general">General Maintenance</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Experience Level -->
+                                                <div class="form-group">
+                                                    <select class="form-control form-control-user"
+                                                        name="experienceLevel" required>
+                                                        <option value="">Select Experience Level</option>
+                                                        <option value="entry">Entry Level (0-2 years)</option>
+                                                        <option value="intermediate">Intermediate (3-5 years)</option>
+                                                        <option value="advanced">Advanced (6-10 years)</option>
+                                                        <option value="expert">Expert (10+ years)</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- License Number -->
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="licenseNumber" name="licenseNumber"
+                                                        placeholder="License Number (if applicable)">
+                                                </div>
+
+                                                <!-- Role (Fixed) -->
+                                                <div class="form-group">
+                                                    <select class="form-control form-control-user" name="role" readonly>
+                                                        <option value="technician" selected>Technician</option>
+                                                    </select>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                                    Create Technician Account
+                                                </button>
+
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-4">
+
+                                    <!-- Role Information -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Role Information</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-tools fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-3">This form creates a new user account with the "Technician"
+                                                role.
+                                            </p>
+                                            <p class="mb-0">Technicians will have access to maintenance and repair
+                                                features and can manage
+                                                their own profile and work orders.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Specialization Info -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Specialization</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-certificate fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-3">Select the primary area of expertise for the technician.</p>
+                                            <p class="mb-0">This helps in assigning appropriate work orders and matching
+                                                technicians to specific job requirements.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Profile Image Notice -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Profile Image</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-camera fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-0 text-muted">Profile image upload feature will be available in
+                                                future updates.</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                    </div>
+                    <!-- /.container-fluid -->
+
+                </div>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2021</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Form submission with jQuery AJAX -->
+    <script>
+        $(document).ready(function () {
+            // Phone number formatting
+            $('#phone').on('input', function () {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.substring(0, 10);
+                }
+                if (value.length >= 6) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+                } else if (value.length >= 3) {
+                    value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+                }
+                this.value = value;
+            });
+
+            // Form submission with AJAX
+            $('#createTechnicianForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get form data
+                const formData = {
+                    firstName: $('#firstName').val().trim(),
+                    lastName: $('#lastName').val().trim(),
+                    email: $('#email').val().trim(),
+                    phone: $('#phone').val().replace(/\D/g, ''), // Remove formatting for submission
+                    dateOfBirth: $('#dateOfBirth').val(),
+                    specialization: $('select[name="specialization"]').val(),
+                    experienceLevel: $('select[name="experienceLevel"]').val(),
+                    licenseNumber: $('#licenseNumber').val().trim(),
+                    role: 'technician'
+                };
+
+                // Basic validation
+                if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.specialization || !formData.experienceLevel) {
+                    showAlert('Please fill in all required fields.', 'danger');
+                    return;
+                }
+
+                // Email validation
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(formData.email)) {
+                    showAlert('Please enter a valid email address.', 'danger');
+                    return;
+                }
+
+                // Phone validation (10 digits)
+                if (formData.phone.length !== 10) {
+                    showAlert('Please enter a valid 10-digit phone number.', 'danger');
+                    return;
+                }
+
+                // Disable submit button and show loading
+                const $submitBtn = $('#createTechnicianForm button[type="submit"]');
+                const originalText = $submitBtn.text();
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating Account...');
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '/create-technician',
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        // Success
+                        showAlert('Technician account created successfully!', 'success');
+                        $('#createTechnicianForm')[0].reset(); // Reset form
+                    })
+                    .fail(function (xhr) {
+                        // Error handling
+                        let errorMessage = 'An error occurred while creating the account.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                errorMessage = errorData.message || errorMessage;
+                            } catch (e) {
+                                // If not JSON, use default message
+                            }
+                        }
+
+                        showAlert(errorMessage, 'danger');
+                    })
+                    .always(function () {
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).text(originalText);
+                    });
+            });
+
+            // Custom alert function using SB Admin 2 styling
+            function showAlert(message, type) {
+                // Remove existing alerts
+                $('.custom-alert').remove();
+
+                // Create alert HTML
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show custom-alert" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} mr-2"></i>
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `;
+
+                // Insert alert before the form
+                $('.card-body').prepend(alertHtml);
+
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(function () {
+                        $('.custom-alert').fadeOut(function () {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                }
+
+                // Scroll to top of form to show alert
+                $('html, body').animate({
+                    scrollTop: $('.card').offset().top - 100
+                }, 500);
+            }
+
+            // Email field validation on blur
+            $('#email').on('blur', function () {
+                const email = $(this).val().trim();
+                if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Phone field validation on blur
+            $('#phone').on('blur', function () {
+                const phone = $(this).val().replace(/\D/g, '');
+                if (phone && phone.length !== 10) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Remove validation styling on focus
+            $('.form-control').on('focus', function () {
+                $(this).removeClass('is-invalid');
+            });
+        });
+    </script>
+
+</body>
+
+</html>

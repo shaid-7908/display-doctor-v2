@@ -127,7 +127,7 @@ class AuthController {
       req.flash("error_msg", "Invalid Email or password");
       return res.redirect("/register");
     }
-    if (!user.isVerified) {
+    if (user.status === "inactive") {
       req.flash(
         "error_msg",
         "Your account has been deactivated. Please contact support."

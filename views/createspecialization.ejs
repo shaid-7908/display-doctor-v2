@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>SB Admin 2 - Create Specialization</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include("common/sidebar") %>
+            <!-- End of Sidebar -->
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <!-- End of Topbar -->
+
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
+
+                        <!-- Flash Messages -->
+                        <%- include('./common/flash-message') %>
+
+                            <!-- Page Heading -->
+                            <h1 class="h3 mb-4 text-gray-800">Create Specialization</h1>
+
+                            <!-- Create Specialization Form -->
+                            <div class="row">
+
+                                <div class="col-lg-8">
+
+                                    <!-- Basic Card Example -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Create New Specialization</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form method="post" action="/create-specialization" id="createSpecializationForm">
+
+                                                <!-- Specialization Name -->
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="specializationName" name="specializationName" 
+                                                        placeholder="Specialization Name (e.g., Electrical, Plumbing, HVAC)"
+                                                        required>
+                                                </div>
+
+                                                <!-- Specialization Description -->
+                                                <div class="form-group">
+                                                    <textarea class="form-control form-control-user" 
+                                                        id="description" name="description" 
+                                                        placeholder="Brief description of the specialization"
+                                                        rows="3" required></textarea>
+                                                </div>
+
+                                                <!-- Category -->
+                                                <div class="form-group">
+                                                    <select class="form-control form-control-user" name="category" required>
+                                                        <option value="">Select Category</option>
+                                                        <option value="technical">Technical</option>
+                                                        <option value="maintenance">Maintenance</option>
+                                                        <option value="repair">Repair</option>
+                                                        <option value="installation">Installation</option>
+                                                        <option value="inspection">Inspection</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Skills Section -->
+                                                <div class="form-group">
+                                                    <label class="form-label font-weight-bold text-gray-700">Required Skills</label>
+                                                    <div id="skillsContainer">
+                                                        <div class="skill-item mb-2">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control form-control-user skill-input"
+                                                                    name="skills[]" placeholder="Enter a skill (e.g., Circuit Analysis, Troubleshooting)"
+                                                                    required>
+                                                                <div class="input-group-append">
+                                                                    <button type="button" class="btn btn-outline-danger remove-skill" style="display: none;">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addSkillBtn">
+                                                        <i class="fas fa-plus"></i> Add Another Skill
+                                                    </button>
+                                                </div>
+
+                                                <!-- Experience Level Required -->
+                                                <div class="form-group">
+                                                    <select class="form-control form-control-user" name="experienceLevel" required>
+                                                        <option value="">Select Minimum Experience Level</option>
+                                                        <option value="entry">Entry Level (0-2 years)</option>
+                                                        <option value="intermediate">Intermediate (3-5 years)</option>
+                                                        <option value="advanced">Advanced (6-10 years)</option>
+                                                        <option value="expert">Expert (10+ years)</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Certification Required -->
+                                                <div class="form-group">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="certificationRequired" name="certificationRequired">
+                                                        <label class="custom-control-label" for="certificationRequired">
+                                                            Certification Required
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Status -->
+                                                <div class="form-group">
+                                                    <select class="form-control form-control-user" name="status" required>
+                                                        <option value="">Select Status</option>
+                                                        <option value="active" selected>Active</option>
+                                                        <option value="inactive">Inactive</option>
+                                                    </select>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                                    Create Specialization
+                                                </button>
+
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-4">
+
+                                    <!-- Specialization Information -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Specialization Info</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-certificate fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-3">Create new specializations to categorize technicians and their skills.</p>
+                                            <p class="mb-0">This helps in better job matching and technician assignment based on expertise.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Skills Information -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Skills Management</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-tools fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-3">Add multiple skills that technicians in this specialization should possess.</p>
+                                            <p class="mb-0">Skills help in evaluating technician qualifications and matching them to appropriate jobs.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Category Information -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Category</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-tags fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-0">Categorize specializations to organize them better and improve search functionality.</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                    </div>
+                    <!-- /.container-fluid -->
+
+                </div>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2021</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Form submission with jQuery AJAX -->
+    <script>
+        $(document).ready(function () {
+            // Add skill functionality
+            $('#addSkillBtn').on('click', function() {
+                const skillHtml = `
+                    <div class="skill-item mb-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-user skill-input"
+                                name="skills[]" placeholder="Enter a skill (e.g., Circuit Analysis, Troubleshooting)"
+                                required>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-danger remove-skill">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#skillsContainer').append(skillHtml);
+                updateRemoveButtons();
+            });
+
+            // Remove skill functionality
+            $(document).on('click', '.remove-skill', function() {
+                $(this).closest('.skill-item').remove();
+                updateRemoveButtons();
+            });
+
+            // Update remove buttons visibility
+            function updateRemoveButtons() {
+                const skillItems = $('.skill-item');
+                if (skillItems.length === 1) {
+                    $('.remove-skill').hide();
+                } else {
+                    $('.remove-skill').show();
+                }
+            }
+
+            // Form submission with AJAX
+            $('#createSpecializationForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Get form data
+                const formData = {
+                    specializationName: $('#specializationName').val().trim(),
+                    description: $('#description').val().trim(),
+                    category: $('select[name="category"]').val(),
+                    skills: $('.skill-input').map(function() {
+                        return $(this).val().trim();
+                    }).get().filter(skill => skill !== ''),
+                    experienceLevel: $('select[name="experienceLevel"]').val(),
+                    certificationRequired: $('#certificationRequired').is(':checked'),
+                    status: $('select[name="status"]').val()
+                };
+
+                // Basic validation
+                if (!formData.specializationName || !formData.description || !formData.category || 
+                    !formData.experienceLevel || !formData.status || formData.skills.length === 0) {
+                    showAlert('Please fill in all required fields and add at least one skill.', 'danger');
+                    return;
+                }
+
+                // Skills validation
+                if (formData.skills.some(skill => skill.length < 3)) {
+                    showAlert('All skills must be at least 3 characters long.', 'danger');
+                    return;
+                }
+
+                // Disable submit button and show loading
+                const $submitBtn = $('#createSpecializationForm button[type="submit"]');
+                const originalText = $submitBtn.text();
+                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating Specialization...');
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '/create-specialization',
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json'
+                })
+                    .done(function (response) {
+                        // Success
+                        showAlert('Specialization created successfully!', 'success');
+                        $('#createSpecializationForm')[0].reset(); // Reset form
+                        // Reset skills container to single skill input
+                        $('#skillsContainer').html(`
+                            <div class="skill-item mb-2">
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-user skill-input"
+                                        name="skills[]" placeholder="Enter a skill (e.g., Circuit Analysis, Troubleshooting)"
+                                        required>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-danger remove-skill" style="display: none;">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                        updateRemoveButtons();
+                    })
+                    .fail(function (xhr) {
+                        // Error handling
+                        let errorMessage = 'An error occurred while creating the specialization.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                errorMessage = errorData.message || errorMessage;
+                            } catch (e) {
+                                // If not JSON, use default message
+                            }
+                        }
+
+                        showAlert(errorMessage, 'danger');
+                    })
+                    .always(function () {
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).text(originalText);
+                    });
+            });
+
+            // Custom alert function using SB Admin 2 styling
+            function showAlert(message, type) {
+                // Remove existing alerts
+                $('.custom-alert').remove();
+
+                // Create alert HTML
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show custom-alert" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} mr-2"></i>
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `;
+
+                // Insert alert before the form
+                $('.card-body').prepend(alertHtml);
+
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(function () {
+                        $('.custom-alert').fadeOut(function () {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                }
+
+                // Scroll to top of form to show alert
+                $('html, body').animate({
+                    scrollTop: $('.card').offset().top - 100
+                }, 500);
+            }
+
+            // Field validation on blur
+            $('#specializationName').on('blur', function () {
+                const name = $(this).val().trim();
+                if (name && name.length < 3) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            $('#description').on('blur', function () {
+                const desc = $(this).val().trim();
+                if (desc && desc.length < 10) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Remove validation styling on focus
+            $('.form-control').on('focus', function () {
+                $(this).removeClass('is-invalid');
+            });
+
+            // Initialize remove buttons visibility
+            updateRemoveButtons();
+        });
+    </script>
+
+</body>
+
+</html>

@@ -37,10 +37,13 @@ const userSchema = new Schema<UserDocument>(
       default: "customer",
     },
     isVerified: { type: Boolean, default: false },
+    status: { type: String, enum: ["active", "inactive"], default: "active" },
   },
   {
     timestamps: true,
   }
 );
+
+userSchema.index({status:1,role:1})
 
 export const UserModel = model<UserDocument>("users", userSchema);

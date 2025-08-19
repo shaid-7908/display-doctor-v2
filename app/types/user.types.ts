@@ -13,6 +13,7 @@ export interface UserDocument extends Document {
   googleId?: string;
   role: "user" | "admin" | string;
   isVerified: boolean;
+  status: "active" | "inactive";
 }
 
 // JWT Payload (used for signing JWT tokens)
