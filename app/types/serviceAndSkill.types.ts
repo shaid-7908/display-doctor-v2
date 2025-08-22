@@ -20,4 +20,5 @@ export interface SkillDocument extends Document{
     description:String;
     is_active:Boolean;
     recommended_categories:Types.ObjectId[];
+    skill_slug:String;
 }

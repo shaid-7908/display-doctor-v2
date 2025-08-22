@@ -86,7 +86,7 @@
                                             </h6>
                                         </div>
                                         <div class="card-body">
-                                            <form method="post" action="/create-technician" id="createTechnicianForm">
+                                            <form  id="createTechnicianForm">
 
                                                 <!-- Name Fields -->
                                                 <div class="form-group row">
@@ -122,17 +122,12 @@
 
                                                 <!-- Specialization -->
                                                 <div class="form-group">
-                                                    <select class="form-control form-control-user" name="specialization"
+                                                    <select class="form-control form-control-user" name="service_category" id="service_category"
                                                         required>
-                                                        <option value="">Select Specialization</option>
-                                                        <option value="electrical">Electrical</option>
-                                                        <option value="plumbing">Plumbing</option>
-                                                        <option value="hvac">HVAC</option>
-                                                        <option value="carpentry">Carpentry</option>
-                                                        <option value="painting">Painting</option>
-                                                        <option value="landscaping">Landscaping</option>
-                                                        <option value="general">General Maintenance</option>
-                                                        <option value="other">Other</option>
+                                                        <option value="">Select Parent Service Category</option>
+                                                        <% serviceCategories.forEach(serviceCategory => { %>
+                                                            <option value="<%= serviceCategory._id %>"><%= serviceCategory.name %></option>
+                                                        <% }); %>
                                                     </select>
                                                 </div>
 
@@ -265,6 +260,14 @@
     <!-- Form submission with jQuery AJAX -->
     <script>
         $(document).ready(function () {
+
+            $('#service_category').on('change', function () {
+                const serviceCategoryId = $(this).val();
+                const serviceCategory = $('#service_category').find('option:selected').text();
+                console.log(serviceCategoryId);
+                console.log(serviceCategory);
+            });
+
             // Phone number formatting
             $('#phone').on('input', function () {
                 let value = this.value.replace(/\D/g, '');

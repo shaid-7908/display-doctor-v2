@@ -23,6 +23,61 @@
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
+    <style>
+        .position-relative {
+            position: relative;
+        }
+
+        .position-absolute {
+            position: absolute;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Custom Select2 styling for better integration */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #bac8f3;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        /* Disabled state styling */
+        .select2-container--default.select2-container-disabled .select2-selection--multiple {
+            background-color: #e9ecef;
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .form-control:disabled {
+            background-color: #e9ecef;
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -89,7 +144,7 @@
                                                 Sub-Category</h6>
                                         </div>
                                         <div class="card-body">
-                                            <form method="post" action="/create-service-subcategory"
+                                            <form 
                                                 id="createServiceSubCategoryForm">
 
                                                 <!-- Service Category Selection -->
@@ -99,10 +154,12 @@
                                                     <select class="form-control form-control-user"
                                                         name="service_category" id="serviceCategory" required>
                                                         <option value="">Select Parent Service Category</option>
-                                                        <% serviceCategories.forEach(serviceCategory => { %>
-                                                            <option value="<%= serviceCategory._id %>"><%= serviceCategory.name %></option>
-                                                        <% }) %>
-                                                        <!-- Categories will be loaded via AJAX -->
+                                                        <% serviceCategories.forEach(serviceCategory=> { %>
+                                                            <option value="<%= serviceCategory._id %>">
+                                                                <%= serviceCategory.name %>
+                                                            </option>
+                                                            <% }) %>
+                                                                <!-- Categories will be loaded via AJAX -->
                                                     </select>
                                                 </div>
 
@@ -126,17 +183,27 @@
                                                 <div class="form-group">
                                                     <label class="form-label font-weight-bold text-gray-700">Required
                                                         Skills</label>
-                                                    <select class="form-control" name="required_skills"
-                                                        id="requiredSkills" multiple required>
-                                                        <!-- Skills will be loaded via AJAX -->
-                                                    </select>
+                                                    <div class="position-relative">
+                                                        <select class="form-control" name="required_skills"
+                                                            id="requiredSkills" multiple required disabled>
+                                                            <option value="">Select a service category first</option>
+                                                        </select>
+                                                        <div id="skillsLoadingSpinner" class="position-absolute"
+                                                            style="right: 10px; top: 50%; transform: translateY(-50%); display: none;">
+                                                            <div class="spinner-border spinner-border-sm text-primary"
+                                                                role="status">
+                                                                <span class="sr-only">Loading...</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple
-                                                        skills</small>
+                                                        skills. Skills will be automatically loaded based on the
+                                                        selected service category.</small>
                                                 </div>
 
                                                 <!-- Status -->
                                                 <div class="form-group">
-                                                    <select class="form-control form-control-user" name="is_active"
+                                                    <select class="form-control form-control-user" id="is_active_subcategory" name="is_active"
                                                         required>
                                                         <option value="">Select Status</option>
                                                         <option value="true" selected>Active</option>
@@ -271,137 +338,143 @@
     <!-- Form submission with jQuery AJAX -->
     <script>
         $(document).ready(function () {
-            // Initialize Select2 for skills dropdown
-            $('#requiredSkills').select2({
-                placeholder: 'Select required skills',
-                allowClear: true,
-                width: '100%'
+            // Initialize Select2 for both dropdowns
+            $('#serviceCategory').select2();
+            $('#requiredSkills').prop('disabled', true).select2({
+                placeholder: "Select required skills",
+                allowClear: true
             });
 
-            // Load service categories on page load
-            loadServiceCategories();
-            loadSkills();
 
-            function loadServiceCategories() {
+
+            // Handle service category change
+            $('#serviceCategory').on('change', function () {
+                const selectedServiceId = $(this).val();
+                const skillsDropdown = $('#requiredSkills');
+                const loadingSpinner = $('#skillsLoadingSpinner');
+
+                // Clear previous skills
+                skillsDropdown.empty();
+                skillsDropdown.append('<option value="">Loading skills...</option>');
+
+                if (!selectedServiceId) {
+                    skillsDropdown.empty();
+                    skillsDropdown.append('<option value="">Select a service category first</option>');
+                    skillsDropdown.prop('disabled', true);
+                    loadingSpinner.hide();
+                    return;
+                }
+
+                // Enable skills dropdown
+                skillsDropdown.prop('disabled', false);
+                skillsDropdown.trigger('change');
+
+
+                // Show loading spinner
+                loadingSpinner.show();
+
+                // Fetch skills for the selected service category
                 $.ajax({
-                    url: '/api/service-categories',
+                    url: '/get-skills-by-service',
                     method: 'GET',
-                    dataType: 'json'
-                })
-                    .done(function (categories) {
-                        const categorySelect = $('#serviceCategory');
-                        categorySelect.empty().append('<option value="">Select Parent Service Category</option>');
+                    data: { service_id: selectedServiceId },
+                    success: function (response) {
+                        skillsDropdown.empty();
+                        loadingSpinner.hide();
+                        console.log(response);
+                        if (response.data && response.data.length > 0) {
+                            skillsDropdown.append(`<option value="">Select required skills (${response.data.length} available)</option>`);
 
-                        categories.forEach(function (category) {
-                            if (category.is_active) {
-                                categorySelect.append(`<option value="${category._id}">${category.name}</option>`);
+                            response.data.forEach(function (skill) {
+                                skillsDropdown.append(
+                                    `<option value="${skill._id}">${skill.name}</option>`
+                                );
+                            });
+
+                            // Show success message
+                            if (response.data.length === 1) {
+                                $('<div class="alert alert-info alert-dismissible fade show" role="alert">')
+                                    .html(`Found 1 recommended skill for this service category`)
+                                    .append('<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>')
+                                    .insertAfter('#requiredSkills')
+                                    .delay(3000)
+                                    .fadeOut();
+                            } else {
+                                $('<div class="alert alert-info alert-dismissible fade show" role="alert">')
+                                    .html(`Found ${response.data.length} recommended skills for this service category`)
+                                    .append('<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>')
+                                    .insertAfter('#requiredSkills')
+                                    .delay(3000)
+                                    .fadeOut();
                             }
-                        });
-                    })
-                    .fail(function () {
-                        showAlert('Failed to load service categories. Please refresh the page.', 'warning');
-                    });
-            }
+                        } else {
+                            skillsDropdown.append('<option value="">No skills found for this service category</option>');
 
-            function loadSkills() {
-                $.ajax({
-                    url: '/get-skills',
-                    method: 'GET',
-                    dataType: 'json'
-                })
-                    .done(function (skills) {
-                        const skillsSelect = $('#requiredSkills');
-                        skillsSelect.empty();
+                            $('<div class="alert alert-warning alert-dismissible fade show" role="alert">')
+                                .html('No skills found for this service category. You may need to create skills first.')
+                                .append('<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>')
+                                .insertAfter('#requiredSkills')
+                                .delay(5000)
+                                .fadeOut();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        skillsDropdown.empty();
+                        skillsDropdown.append('<option value="">Error loading skills</option>');
+                        loadingSpinner.hide();
 
-                        skills.forEach(function (skill) {
-                            if (skill.is_active) {
-                                skillsSelect.append(`<option value="${skill._id}">${skill.name}</option>`);
-                            }
-                        });
+                        $('<div class="alert alert-danger alert-dismissible fade show" role="alert">')
+                            .html('Error loading skills. Please try again.')
+                            .append('<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>')
+                            .insertAfter('#requiredSkills')
+                            .delay(5000)
+                            .fadeOut();
 
-                        // Refresh Select2 after adding options
-                        skillsSelect.trigger('change');
-                    })
-                    .fail(function () {
-                        showAlert('Failed to load skills. Please refresh the page.', 'warning');
-                    });
-            }
+                        console.error('Error fetching skills:', error);
+                    }
+                });
+            });
 
-            // Form submission with AJAX
+            // Form submission handling
             $('#createServiceSubCategoryForm').on('submit', function (e) {
+                const selectedSkills = $('#requiredSkills').val();
+                const selectedServiceCategory = $('#serviceCategory').val();
+                const subCategoryName = $('#subCategoryName').val();
+                const description = $('#description').val();
+                const is_active = $('#is_active_subcategory').val();
                 e.preventDefault();
-
-                // Get form data
-                const formData = {
-                    service_category: $('#serviceCategory').val(),
-                    name: $('#subCategoryName').val().trim(),
-                    description: $('#description').val().trim(),
-                    required_skills: $('#requiredSkills').val(),
-                    is_active: $('select[name="is_active"]').val() === 'true'
-                };
-
-                // Basic validation
-                if (!formData.service_category || !formData.name || !formData.description || !formData.required_skills || formData.required_skills.length === 0) {
-                    showAlert('Please fill in all required fields and select at least one skill.', 'danger');
-                    return;
+                if (!selectedServiceCategory) {
+                    e.preventDefault();
+                    alert('Please select a service category first.');
+                    return false;
                 }
 
-                // Name validation
-                if (formData.name.length < 3) {
-                    showAlert('Sub-category name must be at least 3 characters long.', 'danger');
-                    return;
+                if (!selectedSkills || selectedSkills.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one required skill.');
+                    return false;
                 }
-
-                // Description validation
-                if (formData.description.length < 15) {
-                    showAlert('Description must be at least 15 characters long.', 'danger');
-                    return;
-                }
-
-                // Disable submit button and show loading
-                const $submitBtn = $('#createServiceSubCategoryForm button[type="submit"]');
-                const originalText = $submitBtn.text();
-                $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating Sub-Category...');
-
-                // Submit via AJAX
                 $.ajax({
                     url: '/create-service-subcategory',
                     method: 'POST',
-                    data: formData,
-                    dataType: 'json'
-                })
-                    .done(function (response) {
-                        // Success
-                        showAlert('Service sub-category created successfully!', 'success');
-                        $('#createServiceSubCategoryForm')[0].reset(); // Reset form
-                        $('select[name="is_active"]').val('true'); // Reset to active
-                        $('#serviceCategory').val('').trigger('change');
-                        $('#requiredSkills').val(null).trigger('change');
-                    })
-                    .fail(function (xhr) {
-                        // Error handling
-                        let errorMessage = 'An error occurred while creating the service sub-category.';
-
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.responseText) {
-                            try {
-                                const errorData = JSON.parse(xhr.responseText);
-                                errorMessage = errorData.message || errorMessage;
-                            } catch (e) {
-                                // If not JSON, use default message
-                            }
-                        }
-
-                        showAlert(errorMessage, 'danger');
-                    })
-                    .always(function () {
-                        // Re-enable submit button
-                        $submitBtn.prop('disabled', false).text(originalText);
-                    });
+                    data: {
+                        service_category: selectedServiceCategory,
+                        required_skills:selectedSkills,
+                        name: subCategoryName,
+                        description: description,   
+                        is_active: is_active
+                                  }
+                }).done(function (response) {
+                    showAlert('Service sub category created successfully!', 'success');
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500);
+                }).fail(function (error) {
+                    console.log(error);
+                    showAlert('An error occurred while creating the service sub category.', 'danger');
+                });
             });
 
-            // Custom alert function using SB Admin 2 styling
             function showAlert(message, type) {
                 // Remove existing alerts
                 $('.custom-alert').remove();
@@ -435,28 +508,15 @@
                 }, 500);
             }
 
-            // Field validation on blur
-            $('#subCategoryName').on('blur', function () {
-                const name = $(this).val().trim();
-                if (name && name.length < 3) {
-                    $(this).addClass('is-invalid');
-                } else {
-                    $(this).removeClass('is-invalid');
-                }
-            });
 
-            $('#description').on('blur', function () {
-                const desc = $(this).val().trim();
-                if (desc && desc.length < 15) {
-                    $(this).addClass('is-invalid');
-                } else {
-                    $(this).removeClass('is-invalid');
-                }
-            });
+            // Clear skills when service category is cleared
+            $('#serviceCategory').on('select2:clear', function () {
+                $('#requiredSkills').empty()
+                    .append('<option value="">Select a service category first</option>')
+                    .prop('disabled', true)
+                    .trigger('change');
+                $('#skillsLoadingSpinner').hide();
 
-            // Remove validation styling on focus
-            $('.form-control').on('focus', function () {
-                $(this).removeClass('is-invalid');
             });
         });
     </script>
