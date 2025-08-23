@@ -20,6 +20,71 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
+    <!-- Custom styles for subcategory checkboxes -->
+    <style>
+        .subcategory-checkbox {
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background-color: #f8f9fc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 200px;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .subcategory-checkbox:hover {
+            border-color: #4e73df;
+            background-color: #eaecf4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .subcategory-checkbox .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .subcategory-checkbox .form-check-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #5a5c69;
+            cursor: pointer;
+            margin-left: 5px;
+            line-height: 1.4;
+        }
+
+        .subcategory-checkbox .form-check-input:checked {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .subcategory-checkbox .form-check-input:checked+.form-check-label {
+            color: #2e59d9;
+            font-weight: 600;
+        }
+
+        .subcategory-checkbox:has(.form-check-input:checked) {
+            border-color: #4e73df;
+            background-color: #e8f4fd;
+            box-shadow: 0 2px 4px rgba(78, 115, 223, 0.2);
+        }
+
+        #sub-category-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -86,7 +151,7 @@
                                             </h6>
                                         </div>
                                         <div class="card-body">
-                                            <form  id="createTechnicianForm">
+                                            <form id="createTechnicianForm">
 
                                                 <!-- Name Fields -->
                                                 <div class="form-group row">
@@ -101,11 +166,15 @@
                                                             required>
                                                     </div>
                                                 </div>
-
-                                                <!-- Email Address -->
-                                                <div class="form-group">
-                                                    <input type="email" class="form-control form-control-user"
-                                                        id="email" name="email" placeholder="Email Address" required>
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="fatherName" name="fatherName"
+                                                            placeholder="Father's Name" required>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <input type="email" class="form-control form-control-user" id="email" name="email" placeholder="Email Address" required>
+                                                    </div>
                                                 </div>
 
                                                 <!-- Phone Number -->
@@ -120,15 +189,76 @@
                                                         id="dateOfBirth" name="dateOfBirth">
                                                 </div>
 
+                                                <!-- Aadhaar Number -->
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="aadhaarNumber" name="aadhaarNumber"
+                                                        placeholder="Aadhaar Number (12 digits)" maxlength="12"
+                                                        pattern="[0-9]{12}" required>
+                                                </div>
+
+                                                <!-- Address Fields -->
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="city" name="city" placeholder="City" required>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="state" name="state" placeholder="State" required>
+                                                    </div>
+                                                </div>
+
+                                                <!-- PIN Code -->
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="pinCode" name="pinCode" placeholder="PIN Code (6 digits)"
+                                                        maxlength="6" pattern="[0-9]{6}" required>
+                                                </div>
+                                                <!-- Address Line 1 -->
+                                                <div class="form-group">
+                                                    <input type="text-area" class="form-control form-control-user"
+                                                        id="addressLine1" name="addressLine1" placeholder="Address Line 1" required>
+                                                </div>
+
+                                                <!-- Photo Upload Fields -->
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <label for="aadhaarPhoto" class="form-label">Aadhaar
+                                                            Photo</label>
+                                                        <input type="file" class="form-control form-control-user"
+                                                            id="aadhaarPhoto" name="aadhaarPhoto" accept="image/*"
+                                                            required>
+                                                        <small class="form-text text-muted">Upload Aadhaar card photo
+                                                            (JPG, PNG, PDF)</small>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <label for="profilePhoto" class="form-label">Profile
+                                                            Photo</label>
+                                                        <input type="file" class="form-control form-control-user"
+                                                            id="profilePhoto" name="profilePhoto" accept="image/*"
+                                                            required>
+                                                        <small class="form-text text-muted">Upload profile photo (JPG,
+                                                            PNG)</small>
+                                                    </div>
+                                                </div>
+
                                                 <!-- Specialization -->
                                                 <div class="form-group">
-                                                    <select class="form-control form-control-user" name="service_category" id="service_category"
-                                                        required>
+                                                    <select class="form-control form-control-user"
+                                                        name="service_category" id="service_category" required>
                                                         <option value="">Select Parent Service Category</option>
-                                                        <% serviceCategories.forEach(serviceCategory => { %>
-                                                            <option value="<%= serviceCategory._id %>"><%= serviceCategory.name %></option>
-                                                        <% }); %>
+                                                        <% serviceCategories.forEach(serviceCategory=> { %>
+                                                            <option value="<%= serviceCategory._id %>">
+                                                                <%= serviceCategory.name %>
+                                                            </option>
+                                                            <% }); %>
                                                     </select>
+                                                </div>
+
+                                                <div id="sub-category-container" class="d-flex flex-wrap gap-2">
+
+
                                                 </div>
 
                                                 <!-- Experience Level -->
@@ -263,9 +393,35 @@
 
             $('#service_category').on('change', function () {
                 const serviceCategoryId = $(this).val();
-                const serviceCategory = $('#service_category').find('option:selected').text();
-                console.log(serviceCategoryId);
-                console.log(serviceCategory);
+                const subCategoryContainer = $('#sub-category-container');
+                $.ajax({
+                    url: `/get-sub-categories-by-service/${serviceCategoryId}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        subCategoryContainer.empty();
+                        if (response.data.length > 0) {
+                            response.data.forEach(subCategory => {
+                                const subCategoryHtml = `
+                                <div class="form-check subcategory-checkbox">
+                                    <input class="form-check-input" type="checkbox" value="${subCategory._id}" id="subcategory_${subCategory._id}">
+                                    <label class="form-check-label" for="subcategory_${subCategory._id}">
+                                        ${subCategory.name}
+                                    </label>
+                                </div>
+                            `;
+                                subCategoryContainer.append(subCategoryHtml);
+                            });
+                        } else {
+                            subCategoryContainer.append(`
+                                <p>No sub-categories found for this service category.</p>
+                            `);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                })
             });
 
             // Phone number formatting
@@ -282,41 +438,94 @@
                 this.value = value;
             });
 
+            // Aadhaar number formatting (only allow numbers, max 12 digits)
+            $('#aadhaarNumber').on('input', function () {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 12) {
+                    value = value.substring(0, 12);
+                }
+
+                this.value = value;
+            });
+
+            // PIN code formatting (only allow numbers, max 6 digits)
+            $('#pinCode').on('input', function () {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 6) {
+                    value = value.substring(0, 6);
+                }
+                this.value = value;
+            });
+
             // Form submission with AJAX
             $('#createTechnicianForm').on('submit', function (e) {
                 e.preventDefault();
 
                 // Get form data
-                const formData = {
-                    firstName: $('#firstName').val().trim(),
-                    lastName: $('#lastName').val().trim(),
-                    email: $('#email').val().trim(),
-                    phone: $('#phone').val().replace(/\D/g, ''), // Remove formatting for submission
-                    dateOfBirth: $('#dateOfBirth').val(),
-                    specialization: $('select[name="specialization"]').val(),
-                    experienceLevel: $('select[name="experienceLevel"]').val(),
-                    licenseNumber: $('#licenseNumber').val().trim(),
-                    role: 'technician'
-                };
+                const formData = new FormData();
+                formData.append('firstName', $('#firstName').val().trim());
+                formData.append('lastName', $('#lastName').val().trim());
+                formData.append('email', $('#email').val().trim());
+                formData.append('phone', $('#phone').val().replace(/\D/g, '')); // Remove formatting for submission
+                formData.append('dateOfBirth', $('#dateOfBirth').val());
+                formData.append('aadhaarNumber', $('#aadhaarNumber').val().trim());
+                formData.append('city', $('#city').val().trim());
+                formData.append('state', $('#state').val().trim());
+                formData.append('pinCode', $('#pinCode').val().trim());
+                formData.append('service_category', $('#service_category').val().trim());
+                formData.append('sub_categories', $('#sub-category-container input[type="checkbox"]:checked').map(function () {
+                    return $(this).val();
+                }).get());
+                formData.append('specialization', $('select[name="specialization"]').val());
+                formData.append('experienceLevel', $('select[name="experienceLevel"]').val());
+                formData.append('licenseNumber', $('#licenseNumber').val().trim());
+                formData.append('fatherName', $('#fatherName').val().trim());
+                formData.append('role', 'technician');
+                formData.append('addressLine1', $('#addressLine1').val().trim());
+
+                // Add file uploads
+                const aadhaarPhoto = $('#aadhaarPhoto')[0].files[0];
+                const profilePhoto = $('#profilePhoto')[0].files[0];
+
+                if (aadhaarPhoto) {
+                    formData.append('aadhaarPhoto', aadhaarPhoto);
+                }
+                if (profilePhoto) {
+                    formData.append('profilePhoto', profilePhoto);
+                }
 
                 // Basic validation
-                if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.specialization || !formData.experienceLevel) {
+                if (!formData.get('firstName') || !formData.get('lastName') || !formData.get('email') || !formData.get('phone') || !formData.get('aadhaarNumber') || !formData.get('city') || !formData.get('state') || !formData.get('pinCode') || !formData.get('specialization') || !formData.get('experienceLevel')) {
                     showAlert('Please fill in all required fields.', 'danger');
                     return;
                 }
 
-                // Email validation
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(formData.email)) {
-                    showAlert('Please enter a valid email address.', 'danger');
+                // Aadhaar validation (12 digits)
+                const aadhaarNumber = formData.get('aadhaarNumber');
+                if (!/^[0-9]{12}$/.test(aadhaarNumber)) {
+                    showAlert('Please enter a valid 12-digit Aadhaar number.', 'danger');
                     return;
                 }
 
-                // Phone validation (10 digits)
-                if (formData.phone.length !== 10) {
-                    showAlert('Please enter a valid 10-digit phone number.', 'danger');
+                // PIN code validation (6 digits)
+                const pinCode = formData.get('pinCode');
+                if (!/^[0-9]{6}$/.test(pinCode)) {
+                    showAlert('Please enter a valid 6-digit PIN code.', 'danger');
                     return;
                 }
+
+                // Email validation
+                // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                // if (!emailPattern.test(formData.email)) {
+                //     showAlert('Please enter a valid email address.', 'danger');
+                //     return;
+                // }
+
+                // Phone validation (10 digits)
+                // if (formData.phone.length !== 10) {
+                //     showAlert('Please enter a valid 10-digit phone number.', 'danger');
+                //     return;
+                // }
 
                 // Disable submit button and show loading
                 const $submitBtn = $('#createTechnicianForm button[type="submit"]');
@@ -328,6 +537,8 @@
                     url: '/create-technician',
                     method: 'POST',
                     data: formData,
+                    processData: false,
+                    contentType: false,
                     dataType: 'json'
                 })
                     .done(function (response) {
@@ -406,6 +617,26 @@
             $('#phone').on('blur', function () {
                 const phone = $(this).val().replace(/\D/g, '');
                 if (phone && phone.length !== 10) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // Aadhaar number validation on blur
+            $('#aadhaarNumber').on('blur', function () {
+                const aadhaar = $(this).val().trim();
+                if (aadhaar && !/^[0-9]{12}$/.test(aadhaar)) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+
+            // PIN code validation on blur
+            $('#pinCode').on('blur', function () {
+                const pin = $(this).val().trim();
+                if (pin && !/^[0-9]{6}$/.test(pin)) {
                     $(this).addClass('is-invalid');
                 } else {
                     $(this).removeClass('is-invalid');

@@ -44,6 +44,6 @@ const userSchema = new Schema<UserDocument>(
   }
 );
 
-userSchema.index({status:1,role:1})
+userSchema.index({ status: 1, role: 1 })
 
 export const UserModel = model<UserDocument>("users", userSchema);

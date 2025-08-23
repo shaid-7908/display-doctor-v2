@@ -1,6 +1,7 @@
 import express from "express";
 import adminController from "../controller/admin.controller";
 import { authChecker, roleChecker } from "../middelware/auth.middleware";
+import { upload } from "../middelware/multer.middleware";
 
 const adminRouter = express.Router();
 
@@ -10,7 +11,8 @@ adminRouter.post("/create-caller", authChecker, roleChecker(["admin"]), adminCon
 
 //technician routes
 adminRouter.get("/create-technician", authChecker, roleChecker(["admin"]), adminController.renderCreateTechnician);
-adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]), adminController.renderCreateSpecialization);
+adminRouter.post("/create-technician", authChecker, roleChecker(["admin"]),upload.fields([{ name: 'aadhaarPhoto', maxCount: 1 }, { name: 'profilePhoto', maxCount: 1 }]), adminController.createTechnician);
+adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]),upload.single('image'), adminController.renderCreateSpecialization);
 
 //skill routes
 adminRouter.get("/create-skill", authChecker, roleChecker(["admin"]), adminController.renderCreateSkill);
@@ -26,8 +28,10 @@ adminRouter.get("/create-service-category", authChecker, roleChecker(["admin"]),
 adminRouter.post("/create-service-category", authChecker, roleChecker(["admin"]), adminController.createServiceCategory);
 adminRouter.delete("/delete-service-category/:id", authChecker, roleChecker(["admin"]), adminController.deleteServiceCategory);
 
+
 //service sub category routes
 adminRouter.get("/create-service-subcategory", authChecker, roleChecker(["admin"]), adminController.renderCreateServiceSubCategory);
 adminRouter.post("/create-service-subcategory", authChecker, roleChecker(["admin"]), adminController.createServiceSubCategory);
+adminRouter.get("/get-sub-categories-by-service/:service_id", authChecker, roleChecker(["admin"]), adminController.getSubCategoriesByServiceCategory);
 
 export default adminRouter; 
