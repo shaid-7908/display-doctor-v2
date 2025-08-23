@@ -130,6 +130,11 @@ class AdminController {
        
     })
 
+    renderTechnicianList = asyncHandler(async (req: Request, res: Response) => {
+        const technicians = await UserModel.find({ role: "technician" });
+        res.render("technicianlistpage", { default_user: req.user, technicians });
+    })
+
     renderCreateSpecialization = asyncHandler(async (req: Request, res: Response) => {
         res.render("createspecialization", { default_user: req.user });
     })

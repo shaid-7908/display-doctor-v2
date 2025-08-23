@@ -13,6 +13,8 @@ adminRouter.post("/create-caller", authChecker, roleChecker(["admin"]), adminCon
 adminRouter.get("/create-technician", authChecker, roleChecker(["admin"]), adminController.renderCreateTechnician);
 adminRouter.post("/create-technician", authChecker, roleChecker(["admin"]),upload.fields([{ name: 'aadhaarPhoto', maxCount: 1 }, { name: 'profilePhoto', maxCount: 1 }]), adminController.createTechnician);
 adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]),upload.single('image'), adminController.renderCreateSpecialization);
+adminRouter.get("/technician-list", authChecker, roleChecker(["admin"]), adminController.renderTechnicianList);
+
 
 //skill routes
 adminRouter.get("/create-skill", authChecker, roleChecker(["admin"]), adminController.renderCreateSkill);
