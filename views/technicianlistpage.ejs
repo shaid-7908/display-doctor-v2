@@ -82,6 +82,61 @@
             margin: 0.1rem;
             display: inline-block;
         }
+
+        /* Modal Styles */
+        .technician-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #4e73df;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-lg {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .info-group {
+            background: #f8f9fc;
+            border-radius: 0.35rem;
+            padding: 1rem;
+        }
+
+        .info-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-item label {
+            color: #5a5c69;
+            margin-right: 0.5rem;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .info-item span {
+            color: #2e2e2e;
+        }
+
+        .profile-section {
+            background: #f8f9fc;
+            border-radius: 0.35rem;
+            padding: 1.5rem;
+        }
+
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .modal-header.bg-primary {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%) !important;
+        }
+
+        .details-section {
+            max-height: 500px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -101,17 +156,18 @@
 
                     <!-- Topbar -->
                     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    
+
                         <!-- Sidebar Toggle (Topbar) -->
                         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                             <i class="fa fa-bars"></i>
                         </button>
-                    
+
                         <!-- Topbar Search -->
-                        <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                    aria-label="Search" aria-describedby="basic-addon2">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button">
                                         <i class="fas fa-search fa-sm"></i>
@@ -119,240 +175,213 @@
                                 </div>
                             </div>
                         </form>
-                    
+
                         <!-- Topbar Navbar -->
                         <%- include("common/topnavbar") %>
-                    
+
                     </nav>
                     <!-- End of Topbar -->
 
-                        <!-- Begin Page Content -->
-                        <div class="container-fluid">
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
 
-                            <!-- Page Heading -->
-                            <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 class="h3 mb-0 text-gray-800">Technician Management</h1>
-                                <a href="/admin/createtechnician"
-                                    class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                    <i class="fas fa-plus fa-sm text-white-50"></i> Add New Technician
-                                </a>
-                            </div>
-
-                            <!-- Filter Section -->
-                            <div class="filter-section">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <label for="searchInput" class="form-label">Search Technicians</label>
-                                        <input type="text" class="form-control search-box" id="searchInput"
-                                            placeholder="Search by name, email, or ID...">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="statusFilter" class="form-label">Status</label>
-                                        <select class="form-control" id="statusFilter">
-                                            <option value="">All Status</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="verificationFilter" class="form-label">Verification</label>
-                                        <select class="form-control" id="verificationFilter">
-                                            <option value="">All</option>
-                                            <option value="verified">Verified</option>
-                                            <option value="unverified">Unverified</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="serviceFilter" class="form-label">Service Category</label>
-                                        <select class="form-control" id="serviceFilter">
-                                            <option value="">All Services</option>
-                                            <!-- Service categories will be populated dynamically -->
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">&nbsp;</label>
-                                        <div class="d-flex">
-                                            <button type="button" class="btn btn-secondary mr-2" id="clearFilters">
-                                                <i class="fas fa-times"></i> Clear
-                                            </button>
-                                            <button type="button" class="btn btn-primary" id="exportData">
-                                                <i class="fas fa-download"></i> Export
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Technicians Table -->
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Technicians List</h6>
-                                    <div class="float-right">
-                                        <span class="badge badge-info" id="totalCount">Total: 0</span>
-                                        <span class="badge badge-success" id="activeCount">Active: 0</span>
-                                        <span class="badge badge-warning" id="inactiveCount">Inactive: 0</span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="techniciansTable" width="100%"
-                                            cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Photo</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Technician ID</th>
-                                                    <th>Services</th>
-                                                    <th>Status</th>
-                                                    <th>Verification</th>
-                                                    <th>Joined Date</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <!-- Sample data - will be populated dynamically -->
-                                                <tr>
-                                                    <td>
-                                                        <img src="/img/undraw_profile.svg" alt="Profile"
-                                                            class="technician-avatar">
-                                                    </td>
-                                                    <td>John Doe</td>
-                                                    <td>john.doe@example.com</td>
-                                                    <td>+1 234-567-8900</td>
-                                                    <td><span class="badge badge-primary">TECHNI25000001</span></td>
-                                                    <td>
-                                                        <span class="service-category">Electronics</span>
-                                                        <span class="service-category">Appliances</span>
-                                                    </td>
-                                                    <td><span class="badge badge-success status-badge">Active</span>
-                                                    </td>
-                                                    <td><span class="badge badge-success status-badge">Verified</span>
-                                                    </td>
-                                                    <td>Jan 15, 2025</td>
-                                                    <td>
-                                                        <div class="btn-group" role="group">
-                                                            <button type="button" class="btn btn-sm btn-info"
-                                                                title="View Details">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-primary"
-                                                                title="Edit">
-                                                                <i class="fas fa-edit"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-warning"
-                                                                title="Toggle Status">
-                                                                <i class="fas fa-toggle-on"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-danger"
-                                                                title="Delete">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <img src="/img/undraw_profile_1.svg" alt="Profile"
-                                                            class="technician-avatar">
-                                                    </td>
-                                                    <td>Jane Smith</td>
-                                                    <td>jane.smith@example.com</td>
-                                                    <td>+1 234-567-8901</td>
-                                                    <td><span class="badge badge-primary">TECHNI25000002</span></td>
-                                                    <td>
-                                                        <span class="service-category">Plumbing</span>
-                                                        <span class="service-category">Electrical</span>
-                                                    </td>
-                                                    <td><span class="badge badge-success status-badge">Active</span>
-                                                    </td>
-                                                    <td><span class="badge badge-warning status-badge">Unverified</span>
-                                                    </td>
-                                                    <td>Jan 20, 2025</td>
-                                                    <td>
-                                                        <div class="btn-group" role="group">
-                                                            <button type="button" class="btn btn-sm btn-info"
-                                                                title="View Details">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-primary"
-                                                                title="Edit">
-                                                                <i class="fas fa-edit"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-warning"
-                                                                title="Toggle Status">
-                                                                <i class="fas fa-toggle-on"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-danger"
-                                                                title="Delete">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <img src="/img/undraw_profile_2.svg" alt="Profile"
-                                                            class="technician-avatar">
-                                                    </td>
-                                                    <td>Mike Johnson</td>
-                                                    <td>mike.johnson@example.com</td>
-                                                    <td>+1 234-567-8902</td>
-                                                    <td><span class="badge badge-primary">TECHNI25000003</span></td>
-                                                    <td>
-                                                        <span class="service-category">HVAC</span>
-                                                        <span class="service-category">Carpentry</span>
-                                                    </td>
-                                                    <td><span class="badge badge-secondary status-badge">Inactive</span>
-                                                    </td>
-                                                    <td><span class="badge badge-success status-badge">Verified</span>
-                                                    </td>
-                                                    <td>Jan 25, 2025</td>
-                                                    <td>
-                                                        <div class="btn-group" role="group">
-                                                            <button type="button" class="btn btn-sm btn-info"
-                                                                title="View Details">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-primary"
-                                                                title="Edit">
-                                                                <i class="fas fa-edit"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-warning"
-                                                                title="Toggle Status">
-                                                                <i class="fas fa-toggle-off"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-danger"
-                                                                title="Delete">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pagination -->
-                            <nav aria-label="Technicians pagination">
-                                <ul class="pagination justify-content-center">
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                                    </li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
-
+                        <!-- Page Heading -->
+                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                            <h1 class="h3 mb-0 text-gray-800">Technician Management</h1>
+                            <a href="/admin/createtechnician"
+                                class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i class="fas fa-plus fa-sm text-white-50"></i> Add New Technician
+                            </a>
                         </div>
-                        <!-- /.container-fluid -->
+
+                        <!-- Filter Section -->
+                        <div class="filter-section">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="searchInput" class="form-label">Search Technicians</label>
+                                    <input type="text" class="form-control search-box" id="searchInput"
+                                        placeholder="Search by name, email, or ID...">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="statusFilter" class="form-label">Status</label>
+                                    <select class="form-control" id="statusFilter">
+                                        <option value="">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="verificationFilter" class="form-label">Verification</label>
+                                    <select class="form-control" id="verificationFilter">
+                                        <option value="">All</option>
+                                        <option value="verified">Verified</option>
+                                        <option value="unverified">Unverified</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="serviceFilter" class="form-label">Service Category</label>
+                                    <select class="form-control" id="serviceFilter">
+                                        <option value="">All Services</option>
+                                        <!-- Service categories will be populated dynamically -->
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="d-flex">
+                                        <button type="button" class="btn btn-secondary mr-2" id="clearFilters">
+                                            <i class="fas fa-times"></i> Clear
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="exportData">
+                                            <i class="fas fa-download"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technicians Table -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Technicians List</h6>
+                                <div class="float-right">
+                                    <span class="badge badge-info" id="totalCount">Total: 0</span>
+                                    <span class="badge badge-success" id="activeCount">Active: 0</span>
+                                    <span class="badge badge-warning" id="inactiveCount">Inactive: 0</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="techniciansTable" width="100%"
+                                        cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Photo</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Technician ID</th>
+                                                <th>Services</th>
+                                                <th>Status</th>
+                                                <th>Verification</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Sample data - will be populated dynamically -->
+                                            <tr>
+                                                <td>
+                                                    <img src="/img/undraw_profile.svg" alt="Profile"
+                                                        class="technician-avatar">
+                                                </td>
+                                                <td>John Doe</td>
+                                                <td>john.doe@example.com</td>
+                                                <td>+1 234-567-8900</td>
+                                                <td><span class="badge badge-primary">TECHNI25000001</span></td>
+                                                <td>
+                                                    <span class="service-category">Electronics</span>
+                                                    <span class="service-category">Appliances</span>
+                                                </td>
+                                                <td><span class="badge badge-success status-badge">Active</span>
+                                                </td>
+                                                <td><span class="badge badge-success status-badge">Verified</span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" class="btn btn-sm btn-info"
+                                                            title="View Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-primary"
+                                                            title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-warning"
+                                                            title="Toggle Status">
+                                                            <i class="fas fa-toggle-on"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% technicians.forEach(technician=> { %>
+                                                <tr>
+                                                    <td><img src="<%= technician.profileImage %>" alt="Technician Photo"
+                                                            class="technician-avatar"></td>
+                                                    <td>
+                                                        <%= technician.firstName %>
+                                                            <%= technician.lastName %>
+                                                    </td>
+                                                    <td>
+                                                        <%= technician.email %>
+                                                    </td>
+                                                    <td>
+                                                        <%= technician.phone %>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-primary">
+                                                            <%= technician.technicianToServiceRelation.human_redable_id
+                                                                %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="service-category">
+
+                                                            <%= technician.serviceCategory.name %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-success status-badge">
+                                                            <%= technician.status %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-success status-badge">
+                                                            <%= technician.isVerified %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button" class="btn btn-sm btn-info"
+                                                                title="View Details">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-primary"
+                                                                title="Edit">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-danger"
+                                                                title="Delete">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Technicians pagination">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+
+                    </div>
+                    <!-- /.container-fluid -->
 
                 </div>
                 <!-- End of Main Content -->
@@ -393,6 +422,156 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     <a class="btn btn-primary" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technician Details Modal -->
+    <div class="modal fade" id="technicianDetailsModal" tabindex="-1" role="dialog"
+        aria-labelledby="technicianModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="technicianModalLabel">
+                        <i class="fas fa-user-cog mr-2"></i>Technician Details
+                    </h5>
+                    <button class="close text-white" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Profile Section -->
+                        <div class="col-md-4 text-center">
+                            <div class="profile-section mb-4">
+                                <img id="modalProfileImage" src="/img/undraw_profile.svg" alt="Profile"
+                                    class="technician-avatar-large mb-3">
+                                <h5 id="modalTechnicianName" class="text-primary">John Doe</h5>
+                                <span id="modalTechnicianId" class="badge badge-primary badge-lg">TECHNI25000001</span>
+                                <div class="mt-3">
+                                    <span id="modalStatus" class="badge badge-success status-badge">Active</span>
+                                    <span id="modalVerification"
+                                        class="badge badge-success status-badge ml-2">Verified</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Details Section -->
+                        <div class="col-md-8">
+                            <div class="details-section">
+                                <!-- Personal Information -->
+                                <div class="info-group mb-4">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-user mr-2"></i>Personal Information
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Full Name:</label>
+                                                <span id="modalFullName">John Doe</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Email:</label>
+                                                <span id="modalEmail">john.doe@example.com</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Phone:</label>
+                                                <span id="modalPhone">+1 234-567-8900</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Date of Birth:</label>
+                                                <span id="modalDob">January 15, 1990</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Service Information -->
+                                <div class="info-group mb-4">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-tools mr-2"></i>Service Information
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Service Category:</label>
+                                                <span id="modalServiceCategory">Electronics</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Specialization:</label>
+                                                <span id="modalSpecialization">Computer Repair</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Skills:</label>
+                                                <div id="modalSkills" class="mt-1">
+                                                    <span class="skill-tag">Hardware Repair</span>
+                                                    <span class="skill-tag">Software Installation</span>
+                                                    <span class="skill-tag">Virus Removal</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Address Information -->
+                                <div class="info-group mb-4">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-map-marker-alt mr-2"></i>Address Information
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Address:</label>
+                                                <span id="modalAddress">123 Main Street, City, State 12345</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Information -->
+                                <div class="info-group">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-info-circle mr-2"></i>Additional Information
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Join Date:</label>
+                                                <span id="modalJoinDate">January 2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-item">
+                                                <label class="font-weight-bold">Experience:</label>
+                                                <span id="modalExperience">5+ years</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="editTechnicianBtn">
+                        <i class="fas fa-edit mr-2"></i>Edit Technician
+                    </button>
                 </div>
             </div>
         </div>
@@ -512,8 +691,84 @@
             // Action button handlers
             $(document).on('click', '.btn-info', function () {
                 var row = $(this).closest('tr');
-                var name = row.find('td:eq(1)').text();
-                alert('View details for: ' + name);
+                var technicianData = {
+                    profileImage: row.find('td:eq(0) img').attr('src') || '/img/undraw_profile.svg',
+                    name: row.find('td:eq(1)').text().trim(),
+                    email: row.find('td:eq(2)').text().trim(),
+                    phone: row.find('td:eq(3)').text().trim(),
+                    technicianId: row.find('td:eq(4) .badge').text().trim(),
+                    serviceCategory: row.find('td:eq(5) .service-category').text().trim(),
+                    status: row.find('td:eq(6) .badge').text().trim(),
+                    verification: row.find('td:eq(7) .badge').text().trim()
+                };
+
+                // Populate modal with technician data
+                populateTechnicianModal(technicianData);
+
+                // Show the modal
+                $('#technicianDetailsModal').modal('show');
+            });
+
+            // Function to populate the modal with technician data
+            function populateTechnicianModal(data) {
+                $('#modalProfileImage').attr('src', data.profileImage);
+                $('#modalTechnicianName').text(data.name);
+                $('#modalTechnicianId').text(data.technicianId);
+                $('#modalStatus').text(data.status);
+                $('#modalVerification').text(data.verification);
+                $('#modalFullName').text(data.name);
+                $('#modalEmail').text(data.email);
+                $('#modalPhone').text(data.phone);
+                $('#modalServiceCategory').text(data.serviceCategory);
+
+                // Update status badge colors
+                var statusBadge = $('#modalStatus');
+                statusBadge.removeClass().addClass('badge status-badge');
+                if (data.status.toLowerCase() === 'active') {
+                    statusBadge.addClass('badge-success');
+                } else {
+                    statusBadge.addClass('badge-secondary');
+                }
+
+                // Update verification badge colors
+                var verificationBadge = $('#modalVerification');
+                verificationBadge.removeClass().addClass('badge status-badge');
+                if (data.verification.toLowerCase() === 'verified') {
+                    verificationBadge.addClass('badge-success');
+                } else {
+                    verificationBadge.addClass('badge-warning');
+                }
+
+                // Set default values for fields that might not be available in the table
+                $('#modalDob').text('Not specified');
+                $('#modalSpecialization').text(data.serviceCategory);
+                $('#modalAddress').text('Not specified');
+                $('#modalJoinDate').text('Not specified');
+                $('#modalExperience').text('Not specified');
+
+                // Set default skills based on service category
+                var defaultSkills = {
+                    'Electronics': ['Hardware Repair', 'Software Installation', 'Virus Removal'],
+                    'Appliances': ['Refrigerator Repair', 'Washing Machine Repair', 'AC Maintenance'],
+                    'Plumbing': ['Pipe Repair', 'Drain Cleaning', 'Fixture Installation'],
+                    'Electrical': ['Wiring', 'Circuit Repair', 'Installation']
+                };
+
+                var skills = defaultSkills[data.serviceCategory] || ['General Repair', 'Maintenance', 'Installation'];
+                var skillsHtml = skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('');
+                $('#modalSkills').html(skillsHtml);
+            }
+
+            // Edit technician button handler
+            $(document).on('click', '#editTechnicianBtn', function () {
+                var technicianName = $('#modalTechnicianName').text();
+                var technicianId = $('#modalTechnicianId').text();
+
+                // Close the modal first
+                $('#technicianDetailsModal').modal('hide');
+
+                // Show edit confirmation (you can replace this with actual edit functionality)
+                alert('Edit functionality for technician: ' + technicianName + ' (' + technicianId + ') will be implemented here.');
             });
 
             $(document).on('click', '.btn-primary', function () {

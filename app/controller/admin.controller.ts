@@ -131,7 +131,69 @@ class AdminController {
     })
 
     renderTechnicianList = asyncHandler(async (req: Request, res: Response) => {
-        const technicians = await UserModel.find({ role: "technician" });
+        const technicians = await UserModel.aggregate([
+            {
+                $match: {
+                    role: "technician"
+                }
+            },
+            {
+                $lookup: {
+                    from: "address_proofs",
+                    localField: "_id",
+                    foreignField: "userId",
+                    as: "addressProof"
+                }
+            },
+            {
+                $lookup: {
+                    from: "technician_to_service_relations",
+                    localField: "_id",
+                    foreignField: "technicianId",
+                    as: "technicianToServiceRelation"
+                }
+            },
+            {$unwind: "$addressProof"},
+            {$unwind: "$technicianToServiceRelation"},
+
+            {
+                $lookup: {
+                    from: "servicecategories",
+                    localField: "technicianToServiceRelation.parent_serviceId",
+                    foreignField: "_id",
+                    as: "serviceCategory"
+                }
+            },
+            {
+                $unwind: "$serviceCategory"
+            },
+            {
+                $project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    email: 1,
+                    phone: 1,
+                    profileImage: 1,
+                    status: 1,
+                    isVerified: 1,
+                    "addressProof.aadhaar_number": 1,
+                    "addressProof.city": 1,
+                    "addressProof.state": 1,
+                    "addressProof.pin_code": 1,
+                    "addressProof.adhar_front_image": 1,
+                    "addressProof.son_or_daughter_of": 1,
+                    "addressProof.address_line_1": 1,
+                    "technicianToServiceRelation.parent_serviceId": 1,
+                    "technicianToServiceRelation.sub_serviceId": 1,
+                    "technicianToServiceRelation.human_redable_id": 1,
+                    "serviceCategory.name": 1,
+                    "serviceCategory.description": 1,
+                    "serviceCategory.is_active": 1,
+                    "serviceCategory.createdAt": 1,
+                }
+            }
+        ])
         res.render("technicianlistpage", { default_user: req.user, technicians });
     })
 
