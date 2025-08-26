@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Issue List - Admin Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <style>
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .status-new {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .status-screening {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .status-scheduled {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .status-assigned {
+            background-color: #20c997;
+            color: white;
+        }
+
+        .status-en_route {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .status-in_progress {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-on_hold_parts {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-on_hold_customer {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-awaiting_payment {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .status-resolved {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-closed {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .priority-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.4rem;
+        }
+
+        .priority-urgent {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .priority-high {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .priority-normal {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .priority-low {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .action-buttons .btn {
+            margin: 0.1rem;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                    
+                        <!-- Topbar Search -->
+                        <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                    aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+                    
+                    </nav>
+                    <!-- End of Topbar -->
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+
+                            <!-- Page Heading -->
+                            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 class="h3 mb-0 text-gray-800">Issue Management</h1>
+                                <a href="/create-issue" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
+                                    <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Create New Issue
+                                </a>
+                            </div>
+
+                            <!-- Flash Message -->
+                            <%- include('common/flash-message') %>
+
+                                <!-- Statistics Cards -->
+                                <div class="row mb-4">
+                                    <div class="col-xl-3 col-md-6 mb-4">
+                                        <div class="card border-left-primary shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div
+                                                            class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                            Total Issues</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                            id="totalIssues">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-3 col-md-6 mb-4">
+                                        <div class="card border-left-success shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div
+                                                            class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                            Active Issues</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                            id="activeIssues">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-3 col-md-6 mb-4">
+                                        <div class="card border-left-warning shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div
+                                                            class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                            On Hold</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                            id="onHoldIssues">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-pause fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-3 col-md-6 mb-4">
+                                        <div class="card border-left-info shadow h-100 py-2">
+                                            <div class="card-body">
+                                                <div class="row no-gutters align-items-center">
+                                                    <div class="col mr-2">
+                                                        <div
+                                                            class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                            Resolved Today</div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                            id="resolvedToday">0</div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Issue List Table -->
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">All Issues</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="issueTable" width="100%"
+                                                cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Issue ID</th>
+                                                        <th>Contact</th>
+                                                        <th>Device</th>
+                                                        <th>Problem</th>
+                                                        <th>Status</th>
+                                                        <th>Priority</th>
+                                                        <th>Assigned To</th>
+                                                        <th>Created</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Sample data - will be populated dynamically -->
+                                                    <tr>
+                                                        <td>
+                                                            <strong>ISS2500001</strong>
+                                                        </td>
+                                                        <td>
+                                                            <div><strong>John Doe</strong></div>
+                                                            <small class="text-muted">+91 9876543210</small>
+                                                        </td>
+                                                        <td>
+                                                            <div>TV - Samsung</div>
+                                                            <small class="text-muted">Model: 55" QLED</small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="text-truncate" style="max-width: 200px;">
+                                                                Screen not turning on, no power indicator
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge status-badge status-new">New</span>
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                class="badge priority-badge priority-normal">Normal</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-muted">Unassigned</span>
+                                                        </td>
+                                                        <td>
+                                                            <div>2024-01-15</div>
+                                                            <small class="text-muted">2 hours ago</small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="action-buttons">
+                                                                <button class="btn btn-sm btn-primary"
+                                                                    title="View Details">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-success" title="Edit">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-info"
+                                                                    title="Change Status">
+                                                                    <i class="fas fa-exchange-alt"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>ISS2500002</strong>
+                                                        </td>
+                                                        <td>
+                                                            <div><strong>Jane Smith</strong></div>
+                                                            <small class="text-muted">+91 8765432109</small>
+                                                        </td>
+                                                        <td>
+                                                            <div>TV - LG</div>
+                                                            <small class="text-muted">Model: 65" OLED</small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="text-truncate" style="max-width: 200px;">
+                                                                Audio not working, picture is fine
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                class="badge status-badge status-assigned">Assigned</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge priority-badge priority-high">High</span>
+                                                        </td>
+                                                        <td>
+                                                            <div>Tech. Rajesh</div>
+                                                        </td>
+                                                        <td>
+                                                            <div>2024-01-14</div>
+                                                            <small class="text-muted">1 day ago</small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="action-buttons">
+                                                                <button class="btn btn-sm btn-primary"
+                                                                    title="View Details">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-success" title="Edit">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-info"
+                                                                    title="Change Status">
+                                                                    <i class="fas fa-exchange-alt"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>ISS2500003</strong>
+                                                        </td>
+                                                        <td>
+                                                            <div><strong>Mike Johnson</div>
+                                                            <small class="text-muted">+91 7654321098</small>
+                                                        </td>
+                                                        <td>
+                                                            <div>TV - Sony</div>
+                                                            <small class="text-muted">Model: 75" Bravia</small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="text-truncate" style="max-width: 200px;">
+                                                                Remote control not responding
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span
+                                                                class="badge status-badge status-resolved">Resolved</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge priority-badge priority-low">Low</span>
+                                                        </td>
+                                                        <td>
+                                                            <div>Tech. Amit</div>
+                                                        </td>
+                                                        <td>
+                                                            <div>2024-01-13</div>
+                                                            <small class="text-muted">2 days ago</small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="action-buttons">
+                                                                <button class="btn btn-sm btn-primary"
+                                                                    title="View Details">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-success" title="Edit">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-info"
+                                                                    title="Change Status">
+                                                                    <i class="fas fa-exchange-alt"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                        </div>
+                        <!-- /.container-fluid -->
+
+                </div>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2024</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Custom JavaScript for this page -->
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#issueTable').DataTable({
+                "order": [[7, "desc"]], // Sort by created date descending
+                "pageLength": 25,
+                "language": {
+                    "search": "Search issues:",
+                    "lengthMenu": "Show _MENU_ issues per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ issues",
+                    "paginate": {
+                        "first": "First",
+                        "last": "Last",
+                        "next": "Next",
+                        "previous": "Previous"
+                    }
+                }
+            });
+
+            // Update statistics (this would typically come from API)
+            updateStatistics();
+
+            // Add event listeners for action buttons
+            $('.action-buttons .btn').on('click', function () {
+                const action = $(this).attr('title');
+                const issueId = $(this).closest('tr').find('td:first strong').text();
+
+                if (action === 'View Details') {
+                    viewIssueDetails(issueId);
+                } else if (action === 'Edit') {
+                    editIssue(issueId);
+                } else if (action === 'Change Status') {
+                    changeIssueStatus(issueId);
+                }
+            });
+        });
+
+        function updateStatistics() {
+            // This would typically fetch data from an API
+            // For now, using sample data
+            $('#totalIssues').text('3');
+            $('#activeIssues').text('2');
+            $('#onHoldIssues').text('0');
+            $('#resolvedToday').text('1');
+        }
+
+        function viewIssueDetails(issueId) {
+            // Navigate to issue details page
+            window.location.href = `/issue-details/${issueId}`;
+        }
+
+        function editIssue(issueId) {
+            // Navigate to edit issue page
+            window.location.href = `/edit-issue/${issueId}`;
+        }
+
+        function changeIssueStatus(issueId) {
+            // Show status change modal
+            alert(`Change status for issue ${issueId}`);
+            // In a real implementation, this would open a modal with status options
+        }
+
+        // Refresh data every 30 seconds
+        setInterval(function () {
+            // This would typically refresh the table data from an API
+            console.log('Refreshing issue data...');
+        }, 30000);
+    </script>
+
+</body>
+
+</html>

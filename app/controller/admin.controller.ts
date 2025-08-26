@@ -4,7 +4,7 @@ import { sendError, sendSuccess } from "../utils/unified.response";
 import STATUS_CODES from "../utils/status.codes";
 import { UserModel } from "../model/user.model";
 import { hashPassword } from "../utils/hash.password";
-import { sendCallerRegistrationEmail ,sendTechnicianRegistrationEmail } from "../utils/email.service";
+import { sendCallerRegistrationEmail, sendTechnicianRegistrationEmail } from "../utils/email.service";
 import { ServiceCategoryModel, ServiceSubCategoryModel } from "../model/service.model";
 import { z } from "zod";
 import { SkillModel } from "../model/skill.model";
@@ -57,7 +57,7 @@ class AdminController {
     })
 
     createTechnician = asyncHandler(async (req: Request, res: Response) => {
-        const { firstName, lastName, email, phone, dateOfBirth, aadhaarNumber, city, state, pinCode, specialization, experienceLevel,service_category,sub_categories, licenseNumber, role,fatherName ,addressLine1} = req.body;
+        const { firstName, lastName, email, phone, dateOfBirth, aadhaarNumber, city, state, pinCode, specialization, experienceLevel, service_category, sub_categories, licenseNumber, role, fatherName, addressLine1 } = req.body;
 
         // Handle file uploads with proper typing
         let aadhaarPhoto: Express.Multer.File | undefined;
@@ -110,7 +110,7 @@ class AdminController {
             adhar_front_image: aadhaarPhoto.filename,
             son_or_daughter_of: fatherName,
             address_line_1: addressLine1
-        }); 
+        });
         await addressProof.save();
         const newTechnicianCode = await TechnicianToServiceModel.generateTechnicianUniqueCode();
         const arrayOfSubCategories = sub_categories.split(",");
@@ -127,7 +127,7 @@ class AdminController {
         } else {
             return sendError(res, "Failed to send email", null, STATUS_CODES.BAD_REQUEST)
         }
-       
+
     })
 
     renderTechnicianList = asyncHandler(async (req: Request, res: Response) => {
@@ -153,8 +153,8 @@ class AdminController {
                     as: "technicianToServiceRelation"
                 }
             },
-            {$unwind: "$addressProof"},
-            {$unwind: "$technicianToServiceRelation"},
+            { $unwind: "$addressProof" },
+            { $unwind: "$technicianToServiceRelation" },
 
             {
                 $lookup: {

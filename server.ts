@@ -10,6 +10,7 @@ import flash from "connect-flash";
 import bodyParser from "body-parser";
 import authRouter from "./app/routes/auth.route";
 import adminRouter from "./app/routes/admin.routes";
+import commonRouter from "./app/routes/common.routes";
 const app = express();
 
 //a basic setup that should be done almost always
@@ -54,6 +55,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(authRouter);
 app.use("/any-prefix", basicRouter);
 app.use(adminRouter);
+app.use(commonRouter);
 
 //this is the global erro handler middleware , it should always be at the buttom of all rotes
 app.use(errorHandler);

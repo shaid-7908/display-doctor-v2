@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Create Issue - Admin Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <style>
+        .form-section {
+            background: #f8f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4e73df;
+        }
+
+        .form-section h5 {
+            color: #4e73df;
+            margin-bottom: 15px;
+        }
+
+        .priority-high {
+            color: #e74a3b;
+        }
+
+        .priority-urgent {
+            color: #e74a3b;
+            font-weight: bold;
+        }
+
+        .priority-normal {
+            color: #858796;
+        }
+
+        .priority-low {
+            color: #1cc88a;
+        }
+    </style>
+    <!-- Custom styles for subcategory checkboxes -->
+    <style>
+        .subcategory-checkbox {
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            background-color: #f8f9fc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-width: 200px;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .subcategory-checkbox:hover {
+            border-color: #4e73df;
+            background-color: #eaecf4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .subcategory-checkbox .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .subcategory-checkbox .form-check-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #5a5c69;
+            cursor: pointer;
+            margin-left: 5px;
+            line-height: 1.4;
+        }
+
+        .subcategory-checkbox .form-check-input:checked {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .subcategory-checkbox .form-check-input:checked+.form-check-label {
+            color: #2e59d9;
+            font-weight: 600;
+        }
+
+        .subcategory-checkbox:has(.form-check-input:checked) {
+            border-color: #4e73df;
+            background-color: #e8f4fd;
+            box-shadow: 0 2px 4px rgba(78, 115, 223, 0.2);
+        }
+
+        #sub-category-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <!-- End of Topbar -->
+
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
+
+                        <!-- Page Heading -->
+                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                            <h1 class="h3 mb-0 text-gray-800">Create New Issue</h1>
+                        </div>
+
+                        <!-- Flash Message -->
+                        <%- include('common/flash-message') %>
+
+                            <!-- Create Issue Form -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Issue Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form id="createIssueForm" enctype="multipart/form-data">
+
+                                        <!-- Contact Information Section -->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-user mr-2"></i>Contact Information</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="contactName">Contact Name *</label>
+                                                        <input type="text" class="form-control" id="contactName"
+                                                            name="contact.name" required >
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="contactPhone">Phone Number *</label>
+                                                        <input type="tel" class="form-control" id="contactPhone"
+                                                            name="contact.phone" required pattern="[0-9]{10}"
+                                                            placeholder="10 digit number">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="contactEmail">Email (Optional)</label>
+                                                        <input type="email" class="form-control" id="contactEmail"
+                                                            name="contact.email">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Address Section -->
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="addressLine1">Address Line 1 *</label>
+                                                        <input type="text" class="form-control" id="addressLine1"
+                                                            name="contact.address.line1" required minlength="3">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="landmark">Landmark (Optional)</label>
+                                                        <input type="text" class="form-control" id="landmark"
+                                                            name="contact.address.landmark">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="city">City *</label>
+                                                        <input type="text" class="form-control" id="city"
+                                                            name="contact.address.city" required minlength="2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="state">State *</label>
+                                                        <input type="text" class="form-control" id="state"
+                                                            name="contact.address.state" required minlength="2">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="pinCode">PIN Code *</label>
+                                                        <input type="text" class="form-control" id="pinCode"
+                                                            name="contact.address.pinCode" required pattern="[0-9]{6}"
+                                                            placeholder="6 digit PIN">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Service Information Section -->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-concierge-bell mr-2"></i>Service Information</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="serviceCategory">Service Category
+                                                        </label>
+                                                        <select class="form-control" id="serviceCategory"
+                                                            name="serviceCategoryId">
+                                                            <option value="">Select Category</option>
+                                                            <% serviceCategories.forEach(category=> { %>
+                                                                <option value="<%= category._id %>">
+                                                                    <%= category.name %>
+                                                                </option>
+                                                                <% }) %>
+
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="">
+                                                <div class="form-group">
+                                                    <label for="serviceSubCategory">Service Sub-Category</label>
+                                                    <div id="sub-category-container" class="d-flex flex-wrap gap-2">
+
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Device Information Section -->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-tv mr-2"></i>Device Information</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="deviceType">Device Type</label>
+                                                        <select class="form-control" id="deviceType" name="device.type">
+                                                            <option value="tv" selected>TV</option>
+                                                            <!-- Future device types can be added here -->
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="deviceBrand">Brand (Optional)</label>
+                                                        <input type="text" class="form-control" id="deviceBrand"
+                                                            name="device.brand">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="deviceModel">Model (Optional)</label>
+                                                        <input type="text" class="form-control" id="deviceModel"
+                                                            name="device.model">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="serialNumber">Serial Number (Optional)</label>
+                                                        <input type="text" class="form-control" id="serialNumber"
+                                                            name="device.serialNumber">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="warrantyStatus">Warranty Status</label>
+                                                        <select class="form-control" id="warrantyStatus"
+                                                            name="device.warrantyStatus">
+                                                            <option value="">Select Status</option>
+                                                            <option value="in_warranty">In Warranty</option>
+                                                            <option value="out_of_warranty">Out of Warranty</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Problem Description Section -->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-exclamation-triangle mr-2"></i>Problem Description
+                                            </h5>
+                                            <div class="form-group">
+                                                <label for="problemDescription">Problem Description *</label>
+                                                <textarea class="form-control" id="problemDescription"
+                                                    name="problemDescription" rows="4" required minlength="5"
+                                                    placeholder="Please describe the problem in detail..."></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="photos">Photos (Optional)</label>
+                                                <input type="file" class="form-control-file" id="photos" name="photos"
+                                                    multiple accept="image/*">
+                                                <small class="form-text text-muted">You can select multiple
+                                                    images</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Source & Priority Section -->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-info-circle mr-2"></i>Source & Priority</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="source">Source Channel</label>
+                                                        <select class="form-control" id="source" name="source">
+                                                            <option value="call_center" selected>Call Center
+                                                            </option>
+                                                            <option value="customer_portal">Customer Portal</option>
+                                                            <option value="social_ad">Social Ad</option>
+                                                            <option value="website">Website</option>
+                                                            <option value="whatsapp">WhatsApp</option>
+                                                            <option value="referral">Referral</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="campaignId">Campaign ID (Optional)</label>
+                                                        <input type="text" class="form-control" id="campaignId"
+                                                            name="campaignId">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="priority">Priority Level</label>
+                                                        <select class="form-control" id="priority" name="priority">
+                                                            <option value="normal" selected>Normal</option>
+                                                            <option value="low">Low</option>
+                                                            <option value="high">High</option>
+                                                            <option value="urgent">Urgent</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Scheduling Section -->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-calendar-alt mr-2"></i>Scheduling Preferences</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="preferredDate">Preferred Date (Optional)</label>
+                                                        <input type="date" class="form-control" id="preferredDate"
+                                                            name="schedule.preferredDate">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="timeWindow">Preferred Time Window</label>
+                                                        <select class="form-control" id="timeWindow"
+                                                            name="schedule.window">
+                                                            <option value="any" selected>Any Time</option>
+                                                            <option value="morning">Morning (9 AM - 12 PM)</option>
+                                                            <option value="afternoon">Afternoon (12 PM - 3 PM)
+                                                            </option>
+                                                            <option value="evening">Evening (3 PM - 6 PM)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Buttons -->
+                                        <div class="row mt-4">
+                                            <div class="col-md-12 text-center">
+                                                <button type="submit" class="btn btn-primary btn-lg mr-3">
+                                                    <i class="fas fa-save mr-2"></i>Create Issue
+                                                </button>
+                                                <a href="/" class="btn btn-secondary btn-lg">
+                                                    <i class="fas fa-times mr-2"></i>Cancel
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                    </div>
+                    <!-- /.container-fluid -->
+
+                </div>
+                <!-- End of Main Content -->
+
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2024</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+            <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- Custom JavaScript for this page -->
+    <script>
+        // Priority color coding
+        document.getElementById('priority').addEventListener('change', function () {
+            const priority = this.value;
+            this.className = 'form-control';
+
+            if (priority === 'urgent') {
+                this.classList.add('priority-urgent');
+            } else if (priority === 'high') {
+                this.classList.add('priority-high');
+            } else if (priority === 'normal') {
+                this.classList.add('priority-normal');
+            } else if (priority === 'low') {
+                this.classList.add('priority-low');
+            }
+        });
+
+        // Service category and subcategory dependency
+        document.getElementById('serviceCategory').addEventListener('change', function () {
+            const categoryId = this.value;
+            const subCategorySelect = document.getElementById('serviceSubCategory');
+
+            // Reset subcategory
+            subCategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+
+            if (categoryId) {
+                // Here you would typically make an AJAX call to get subcategories
+                // For now, we'll just enable the field
+                subCategorySelect.disabled = false;
+            } else {
+                subCategorySelect.disabled = true;
+            }
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
+
+        // Phone number validation
+        document.getElementById('contactPhone').addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 10) {
+                this.value = this.value.slice(0, 10);
+            }
+        });
+
+        // PIN code validation
+        document.getElementById('pinCode').addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 6) {
+                this.value = this.value.slice(0, 6);
+            }
+        });
+        $(document).ready(function () {
+
+            $('#serviceCategory').on('change', function () {
+                const serviceCategoryId = $(this).val();
+                const subCategoryContainer = $('#sub-category-container');
+                $.ajax({
+                    url: `/get-sub-categories-by-service/${serviceCategoryId}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        subCategoryContainer.empty();
+                        if (response.data.length > 0) {
+                            response.data.forEach(subCategory => {
+                                const subCategoryHtml = `
+                                <div class="form-check subcategory-checkbox">
+                                    <input class="form-check-input" type="checkbox" value="${subCategory._id}" id="subcategory_${subCategory._id}">
+                                    <label class="form-check-label" for="subcategory_${subCategory._id}">
+                                        ${subCategory.name}
+                                    </label>
+                                </div>
+                            `;
+                                subCategoryContainer.append(subCategoryHtml);
+                            });
+                        } else {
+                            subCategoryContainer.append(`
+                                <p>No sub-categories found for this service category.</p>
+                            `);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                    }
+                })
+            });
+
+            function showAlert(message, type) {
+                // Remove existing alerts
+                $('.custom-alert').remove();
+
+                // Create alert HTML
+                const alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible fade show custom-alert" role="alert">
+                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} mr-2"></i>
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `;
+
+                // Insert alert before the form
+                $('.card-body').prepend(alertHtml);
+
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(function () {
+                        $('.custom-alert').fadeOut(function () {
+                            $(this).remove();
+                        });
+                    }, 5000);
+                }
+
+                // Scroll to top of form to show alert
+                $('html, body').animate({
+                    scrollTop: $('.card').offset().top - 100
+                }, 500);
+            }
+
+
+            $("#createIssueForm").submit(function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                // Collect selected subcategories
+                const selectedSubCategories = [];
+                $('.subcategory-checkbox input:checked').each(function () {
+                    selectedSubCategories.push($(this).val());
+                });
+
+                // Add subcategories to form data
+                if (selectedSubCategories.length > 0) {
+                    selectedSubCategories.forEach((subCategoryId, index) => {
+                        formData.append(`serviceSubCategoryId[${index}]`, subCategoryId);
+                    });
+                }
+
+                $.ajax({
+                    url: "/create-issue",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log(response);
+                            showAlert(response.message, 'success');
+                            // Optionally redirect or clear form
+                        
+                    },
+                    error: function (xhr, status, error) {
+                        let errorMessage = 'An error occurred while creating the account.';
+                        console.log(xhr.responseJSON);
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            try {
+                                const errorData = JSON.parse(xhr.responseText);
+                                errorMessage = errorData.message || errorMessage;
+                            } catch (e) {
+                                // If not JSON, use default message
+                            }
+                        }
+
+                        showAlert(errorMessage, 'danger');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
