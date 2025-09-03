@@ -429,6 +429,20 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--- Additional notes-->
+                                        <div class="form-section">
+                                            <h5><i class="fas fa-exclamation-triangle mr-2"></i>Aditional Note</h5>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                     <div class="form-group">
+                                                    <label>Note (Optional)</label>
+                                                    <textarea type="text" class="form-control" id="additionalnotes" rows="4" name="additionalnotes" placeholder="Additional note for the issue" ></textarea>
+
+                                                </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
 
                                         <!-- Submit Buttons -->
                                         <div class="row mt-4">
@@ -648,13 +662,22 @@
                         console.log(response);
                             showAlert(response.message, 'success');
                             // Optionally redirect or clear form
-                        
+                          $("#createIssueForm")[0].reset()
                     },
                     error: function (xhr, status, error) {
                         let errorMessage = 'An error occurred while creating the account.';
                         console.log(xhr.responseJSON);
                         if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
+                            if(xhr.responseJSON.message === "Zod Error"){
+                                let combiedMessage = ''
+                                xhr.responseJSON.error.forEach((e)=>{
+                                    combiedMessage += JSON.stringify(e)
+                                })
+                                errorMessage = combiedMessage
+                            }else{
+
+                                errorMessage = xhr.responseJSON.message;
+                            }
                         } else if (xhr.responseText) {
                             try {
                                 const errorData = JSON.parse(xhr.responseText);

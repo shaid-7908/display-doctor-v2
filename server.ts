@@ -12,7 +12,7 @@ import authRouter from "./app/routes/auth.route";
 import adminRouter from "./app/routes/admin.routes";
 import commonRouter from "./app/routes/common.routes";
 const app = express();
-
+import moment from "moment";
 //a basic setup that should be done almost always
 
 app.use(express.json());
@@ -26,6 +26,10 @@ app.use(
   })
 );
 app.use(flash());
+app.use((req, res, next) => {
+  res.locals.moment = moment;
+  next();
+});
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");

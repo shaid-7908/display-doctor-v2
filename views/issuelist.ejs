@@ -16,108 +16,13 @@
     <!-- Custom styles for this template-->
     <link href="/css/sb-admin-2.css" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
-    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
 
     <!-- DataTables CSS -->
     <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
-    <style>
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .status-new {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .status-screening {
-            background-color: #6f42c1;
-            color: white;
-        }
-
-        .status-scheduled {
-            background-color: #fd7e14;
-            color: white;
-        }
-
-        .status-assigned {
-            background-color: #20c997;
-            color: white;
-        }
-
-        .status-en_route {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .status-in_progress {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .status-on_hold_parts {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .status-on_hold_customer {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .status-awaiting_payment {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .status-resolved {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .status-closed {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .status-cancelled {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .priority-badge {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.4rem;
-        }
-
-        .priority-urgent {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .priority-high {
-            background-color: #fd7e14;
-            color: white;
-        }
-
-        .priority-normal {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .priority-low {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .action-buttons .btn {
-            margin: 0.1rem;
-        }
-    </style>
+    <link href="/css/issuelist.css" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -136,17 +41,18 @@
 
                     <!-- Topbar -->
                     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    
+
                         <!-- Sidebar Toggle (Topbar) -->
                         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                             <i class="fa fa-bars"></i>
                         </button>
-                    
+
                         <!-- Topbar Search -->
-                        <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                    aria-label="Search" aria-describedby="basic-addon2">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button">
                                         <i class="fas fa-search fa-sm"></i>
@@ -154,279 +60,222 @@
                                 </div>
                             </div>
                         </form>
-                    
+
                         <!-- Topbar Navbar -->
                         <%- include("common/topnavbar") %>
-                    
+
                     </nav>
                     <!-- End of Topbar -->
 
-                        <!-- Begin Page Content -->
-                        <div class="container-fluid">
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
 
-                            <!-- Page Heading -->
-                            <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                                <h1 class="h3 mb-0 text-gray-800">Issue Management</h1>
-                                <a href="/create-issue" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
-                                    <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Create New Issue
-                                </a>
+                        <!-- Page Heading -->
+                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                            <h1 class="h3 mb-0 text-gray-800">Issue Management</h1>
+                            <a href="/create-issue" class="d-none d-sm-inline-block btn btn-primary shadow-sm">
+                                <i class="fas fa-plus fa-sm text-white-50 mr-2"></i>Create New Issue
+                            </a>
+                        </div>
+
+                        <!-- Flash Message -->
+                        <%- include('common/flash-message') %>
+
+                            <!-- Statistics Cards -->
+                            <div class="row mb-4">
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-primary shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                        Total Issues</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                        id="totalIssues">0</div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-success shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                        Active Issues</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                        id="activeIssues">0</div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-warning shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div
+                                                        class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                        On Hold</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                        id="onHoldIssues">0</div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-pause fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-info shadow h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col mr-2">
+                                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                        Resolved Today</div>
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"
+                                                        id="resolvedToday">0</div>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Flash Message -->
-                            <%- include('common/flash-message') %>
+                            <!-- Issue List Table -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">All Issues</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="issueTable" width="100%"
+                                            cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Issue ID</th>
+                                                    <th>Contact</th>
+                                                    <th>Device</th>
+                                                    <th>Problem</th>
+                                                    <th>Status</th>
+                                                    <th>Priority</th>
+                                                    <th>Assigned To</th>
+                                                    <th>Created</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Sample data - will be populated dynamically -->
+                                                <% issues.forEach(issue=> { %>
+                                                    <tr data-issue='<%= JSON.stringify(issue) %>'>
+                                                        <td><strong>
+                                                                <%= issue.human_readable_id %>
+                                                            </strong></td>
+                                                        <td>
+                                                            <div>
 
-                                <!-- Statistics Cards -->
-                                <div class="row mb-4">
-                                    <div class="col-xl-3 col-md-6 mb-4">
-                                        <div class="card border-left-primary shadow h-100 py-2">
-                                            <div class="card-body">
-                                                <div class="row no-gutters align-items-center">
-                                                    <div class="col mr-2">
-                                                        <div
-                                                            class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                            Total Issues</div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
-                                                            id="totalIssues">0</div>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                                <strong>
+                                                                    <%= issue.contact.name %>
+                                                                </strong>
+                                                            </div>
+                                                            <small>
+                                                                <%= issue.contact.phone %>
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <div>
+                                                                <%= issue.device.type %>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <%= issue.problemDescription %>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge status-badge status-new">
+                                                                <%= issue.status %>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <%= issue.priority %>
+                                                        </td>
+                                                        <td>
+                                                            <% if (issue.assignment && issue.assignment.technicianId) {
+                                                                %>
+                                                                <span class="text-success">
+                                                                    <i class="fas fa-user-check"></i>
+                                                                    <% if (typeof
+                                                                        issue.assignment.technicianId==='object' &&
+                                                                        issue.assignment.technicianId.firstName) { %>
+                                                                        <%= issue.assignment.technicianId.firstName %>
+                                                                            <%= issue.assignment.technicianId.lastName
+                                                                                %>
+                                                                                <% } else { %>
+                                                                                    Assigned
+                                                                                    <% } %>
+                                                                </span>
+                                                                <% } else { %>
+                                                                    <span class="text-muted">
+                                                                        <i class="fas fa-user-times"></i> Unassigned
+                                                                    </span>
+                                                                    <% } %>
+                                                        </td>
+                                                        <td>
+                                                            <!-- This is mongodb date , make it like it would show created time difference from current time    -->
+                                                            <%= moment(issue.createdAt).fromNow() %>
+                                                        </td>
+                                                        <td>
+                                                            <div class="action-buttons">
+                                                                <button class="btn btn-sm btn-primary view-issue-btn"
+                                                                    title="View Details"
+                                                                    data-issue-id="<%= issue.human_readable_id %>">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
 
-                                    <div class="col-xl-3 col-md-6 mb-4">
-                                        <div class="card border-left-success shadow h-100 py-2">
-                                            <div class="card-body">
-                                                <div class="row no-gutters align-items-center">
-                                                    <div class="col mr-2">
-                                                        <div
-                                                            class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                            Active Issues</div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
-                                                            id="activeIssues">0</div>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                                <button class="btn btn-sm btn-warning history-issue-btn"
+                                                                    title="History">
+                                                                    <i class="fas fa-history"></i>
+                                                                </button>
 
-                                    <div class="col-xl-3 col-md-6 mb-4">
-                                        <div class="card border-left-warning shadow h-100 py-2">
-                                            <div class="card-body">
-                                                <div class="row no-gutters align-items-center">
-                                                    <div class="col mr-2">
-                                                        <div
-                                                            class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                            On Hold</div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
-                                                            id="onHoldIssues">0</div>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <i class="fas fa-pause fa-2x text-gray-300"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="col-xl-3 col-md-6 mb-4">
-                                        <div class="card border-left-info shadow h-100 py-2">
-                                            <div class="card-body">
-                                                <div class="row no-gutters align-items-center">
-                                                    <div class="col mr-2">
-                                                        <div
-                                                            class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                            Resolved Today</div>
-                                                        <div class="h5 mb-0 font-weight-bold text-gray-800"
-                                                            id="resolvedToday">0</div>
-                                                    </div>
-                                                    <div class="col-auto">
-                                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                                <a href="/edit-issue/<%= issue._id %>" class="btn btn-sm btn-success" title="Edit">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </a>
+                                                                <!-- Change this button below to assign to technician  -->
+                                                                <button
+                                                                    class="btn btn-sm btn-info assign-to-technician-btn"
+                                                                    title="Assign to Technician"
+                                                                    data-issue-id="<%= issue.human_readable_id %>">
+                                                                    <i class="fas fa-user-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- Issue List Table -->
-                                <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">All Issues</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered" id="issueTable" width="100%"
-                                                cellspacing="0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Issue ID</th>
-                                                        <th>Contact</th>
-                                                        <th>Device</th>
-                                                        <th>Problem</th>
-                                                        <th>Status</th>
-                                                        <th>Priority</th>
-                                                        <th>Assigned To</th>
-                                                        <th>Created</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <!-- Sample data - will be populated dynamically -->
-                                                    <tr>
-                                                        <td>
-                                                            <strong>ISS2500001</strong>
-                                                        </td>
-                                                        <td>
-                                                            <div><strong>John Doe</strong></div>
-                                                            <small class="text-muted">+91 9876543210</small>
-                                                        </td>
-                                                        <td>
-                                                            <div>TV - Samsung</div>
-                                                            <small class="text-muted">Model: 55" QLED</small>
-                                                        </td>
-                                                        <td>
-                                                            <div class="text-truncate" style="max-width: 200px;">
-                                                                Screen not turning on, no power indicator
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge status-badge status-new">New</span>
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                class="badge priority-badge priority-normal">Normal</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="text-muted">Unassigned</span>
-                                                        </td>
-                                                        <td>
-                                                            <div>2024-01-15</div>
-                                                            <small class="text-muted">2 hours ago</small>
-                                                        </td>
-                                                        <td>
-                                                            <div class="action-buttons">
-                                                                <button class="btn btn-sm btn-primary"
-                                                                    title="View Details">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-success" title="Edit">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-info"
-                                                                    title="Change Status">
-                                                                    <i class="fas fa-exchange-alt"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <strong>ISS2500002</strong>
-                                                        </td>
-                                                        <td>
-                                                            <div><strong>Jane Smith</strong></div>
-                                                            <small class="text-muted">+91 8765432109</small>
-                                                        </td>
-                                                        <td>
-                                                            <div>TV - LG</div>
-                                                            <small class="text-muted">Model: 65" OLED</small>
-                                                        </td>
-                                                        <td>
-                                                            <div class="text-truncate" style="max-width: 200px;">
-                                                                Audio not working, picture is fine
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                class="badge status-badge status-assigned">Assigned</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge priority-badge priority-high">High</span>
-                                                        </td>
-                                                        <td>
-                                                            <div>Tech. Rajesh</div>
-                                                        </td>
-                                                        <td>
-                                                            <div>2024-01-14</div>
-                                                            <small class="text-muted">1 day ago</small>
-                                                        </td>
-                                                        <td>
-                                                            <div class="action-buttons">
-                                                                <button class="btn btn-sm btn-primary"
-                                                                    title="View Details">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-success" title="Edit">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-info"
-                                                                    title="Change Status">
-                                                                    <i class="fas fa-exchange-alt"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <strong>ISS2500003</strong>
-                                                        </td>
-                                                        <td>
-                                                            <div><strong>Mike Johnson</div>
-                                                            <small class="text-muted">+91 7654321098</small>
-                                                        </td>
-                                                        <td>
-                                                            <div>TV - Sony</div>
-                                                            <small class="text-muted">Model: 75" Bravia</small>
-                                                        </td>
-                                                        <td>
-                                                            <div class="text-truncate" style="max-width: 200px;">
-                                                                Remote control not responding
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <span
-                                                                class="badge status-badge status-resolved">Resolved</span>
-                                                        </td>
-                                                        <td>
-                                                            <span class="badge priority-badge priority-low">Low</span>
-                                                        </td>
-                                                        <td>
-                                                            <div>Tech. Amit</div>
-                                                        </td>
-                                                        <td>
-                                                            <div>2024-01-13</div>
-                                                            <small class="text-muted">2 days ago</small>
-                                                        </td>
-                                                        <td>
-                                                            <div class="action-buttons">
-                                                                <button class="btn btn-sm btn-primary"
-                                                                    title="View Details">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-success" title="Edit">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <button class="btn btn-sm btn-info"
-                                                                    title="Change Status">
-                                                                    <i class="fas fa-exchange-alt"></i>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-
-                        </div>
-                        <!-- /.container-fluid -->
+                    </div>
+                    <!-- /.container-fluid -->
 
                 </div>
                 <!-- End of Main Content -->
@@ -447,6 +296,235 @@
     </div>
     <!-- End of Page Wrapper -->
 
+    <!-- Issue Details Modal -->
+    <div class="modal fade" id="issueDetailsModal" tabindex="-1" role="dialog" aria-labelledby="issueDetailsModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="issueDetailsModalLabel">Issue Details</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Basic Information Section -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h6>Basic Information</h6>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="info-table">
+                                    <tr>
+                                        <td>Issue ID:</td>
+                                        <td id="modal-issue-id"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Status:</td>
+                                        <td id="modal-status"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Priority:</td>
+                                        <td id="modal-priority"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="info-table">
+                                    <tr>
+                                        <td>Created:</td>
+                                        <td id="modal-created"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Assigned To:</td>
+                                        <td id="modal-assigned"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Section -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h6>Contact Information</h6>
+                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td>Name:</td>
+                                <td id="modal-contact-name"></td>
+                            </tr>
+                            <tr>
+                                <td>Phone:</td>
+                                <td id="modal-contact-phone"></td>
+                            </tr>
+                            <tr>
+                                <td>Email:</td>
+                                <td id="modal-contact-email"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Device Information Section -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="icon">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <h6>Device Information</h6>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="info-table">
+                                    <tr>
+                                        <td>Device Type:</td>
+                                        <td id="modal-device-type"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Brand:</td>
+                                        <td id="modal-device-brand"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="info-table">
+                                    <tr>
+                                        <td>Model:</td>
+                                        <td id="modal-device-model"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Serial Number:</td>
+                                        <td id="modal-device-serial"></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problem Description Section -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h6>Problem Description</h6>
+                        </div>
+                        <div class="content-box">
+                            <p id="modal-problem-description"></p>
+                        </div>
+                    </div>
+
+                    <!-- Additional Notes Section -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="icon">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <h6>Additional Notes</h6>
+                        </div>
+                        <div class="content-box">
+                            <p id="modal-notes">No additional notes available.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="modal-edit-btn">Edit Issue</button>
+                    <button type="button" class="btn btn-info" id="modal-status-btn">Change Status</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Technician Modal -->
+    <div class="modal fade" id="assignTechnicianModal" tabindex="-1" role="dialog"
+        aria-labelledby="assignTechnicianModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignTechnicianModalLabel">Assign Technician</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignTechnicianForm">
+                        <input type="hidden" id="assign-issue-id" name="issueId">
+
+                        <!-- Issue Information -->
+                        <div class="section-card mb-3">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                <h6>Issue Information</h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Issue ID:</strong>
+                                    <span id="assign-modal-issue-id"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Priority:</strong>
+                                    <span id="assign-modal-priority"></span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <strong>Problem:</strong>
+                                    <span id="assign-modal-problem"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technician Selection -->
+                        <div class="form-group">
+                            <label for="technicianSelect"><strong>Select Technician</strong></label>
+                            <select class="form-control" id="technicianSelect" name="technicianId" required>
+                                <option value="">Loading technicians...</option>
+                            </select>
+                            <small class="form-text text-muted">Choose a qualified technician for this service
+                                type.</small>
+                        </div>
+
+                        <!-- Assignment Notes -->
+                        <div class="form-group">
+                            <label for="assignmentNotes"><strong>Assignment Notes</strong></label>
+                            <textarea class="form-control" id="assignmentNotes" name="notes" rows="3"
+                                placeholder="Enter any specific instructions or notes for the technician..."></textarea>
+                        </div>
+
+                        <!-- Priority Override -->
+                        <div class="form-group">
+                            <label for="priorityOverride"><strong>Priority (Optional Override)</strong></label>
+                            <select class="form-control" id="priorityOverride" name="priority">
+                                <option value="">Keep current priority</option>
+                                <option value="low">Low</option>
+                                <option value="normal">Normal</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssignBtn">
+                        <i class="fas fa-user-plus"></i> Assign Technician
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
@@ -497,11 +575,67 @@
                 if (action === 'View Details') {
                     viewIssueDetails(issueId);
                 } else if (action === 'Edit') {
-                    editIssue(issueId);
+                    // editIssue(issueId);
                 } else if (action === 'Change Status') {
                     changeIssueStatus(issueId);
                 }
             });
+
+            // Add specific event listener for view button
+            $(document).on('click', '.view-issue-btn', function (e) {
+                e.preventDefault();
+                const issueId = $(this).data('issue-id');
+                const issueRow = $(this).closest('tr');
+                const issueData = JSON.parse(issueRow.attr('data-issue'));
+                openIssueModal(issueData);
+            });
+
+            // Modal button event listeners
+            $('#modal-edit-btn').on('click', function () {
+                const issueId = $('#modal-issue-id').text();
+                editIssue(issueId);
+            });
+
+            $('#modal-status-btn').on('click', function () {
+                const issueId = $('#modal-issue-id').text();
+                changeIssueStatus(issueId);
+            });
+
+            // Ensure modal closes properly
+            $('#issueDetailsModal').on('hidden.bs.modal', function () {
+                // Reset modal content when closed
+                $(this).find('input, textarea').val('');
+            });
+
+            // Add click outside modal to close functionality
+            $(document).on('click', function (e) {
+                if ($(e.target).hasClass('modal') && !$(e.target).hasClass('modal-content')) {
+                    $('#issueDetailsModal').modal('hide');
+                }
+            });
+
+            // Force close modal with escape key
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $('#issueDetailsModal').hasClass('show')) {
+                    closeIssueModal();
+                }
+            });
+
+            // Add click handlers for close buttons
+            $('.close, [data-dismiss="modal"], [data-bs-dismiss="modal"]').on('click', function () {
+                const modalId = $(this).closest('.modal').attr('id');
+                closeIssueModal(modalId);
+            });
+
+
+            $(document).on('click', '.assign-to-technician-btn', function () {
+                const issueId = $(this).data('issue-id');
+                const issueRow = $(this).closest('tr');
+                const issueData = JSON.parse(issueRow.attr('data-issue'));
+
+                openAssignTechnicianModal(issueData);
+            });
+
         });
 
         function updateStatistics() {
@@ -513,9 +647,70 @@
             $('#resolvedToday').text('1');
         }
 
+        function openIssueModal(issueData) {
+            // Populate modal with issue data
+            $('#modal-issue-id').text(issueData.human_readable_id || 'N/A');
+            $('#modal-status').html(`<span class="badge status-badge status-${issueData.status.toLowerCase().replace(/[^a-z0-9]/g, '_')}">${issueData.status}</span>`);
+            $('#modal-priority').text(issueData.priority || 'N/A');
+            $('#modal-created').text(new Date(issueData.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }));
+            $('#modal-assigned').text('Unassigned'); // You can update this based on your data structure
+
+            // Contact information
+            $('#modal-contact-name').text(issueData.contact?.name || 'N/A');
+            $('#modal-contact-phone').text(issueData.contact?.phone || 'N/A');
+            $('#modal-contact-email').text(issueData.contact?.email || 'N/A');
+
+            // Device information
+            $('#modal-device-type').text(issueData.device?.type || 'N/A');
+            $('#modal-device-brand').text(issueData.device?.brand || 'N/A');
+            $('#modal-device-model').text(issueData.device?.model || 'N/A');
+            $('#modal-device-serial').text(issueData.device?.serialNumber || 'N/A');
+
+            // Problem description
+            $('#modal-problem-description').text(issueData.problemDescription || 'No description available');
+
+            // Additional notes (if available)
+            if (issueData.notes) {
+                $('#modal-notes').text(issueData.notes);
+            } else {
+                $('#modal-notes').text('No additional notes available.');
+            }
+
+            // Show the modal
+            $('#issueDetailsModal').modal('show');
+        }
+
+        function closeIssueModal(modalId) {
+            // Blur active element (avoid aria-hidden focus issue)
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                // Bootstrap 5
+                const modalEl = document.getElementById(modalId);
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            } else {
+                // Bootstrap 4
+                $('#' + modalId).modal('hide');
+            }
+        }
+
         function viewIssueDetails(issueId) {
-            // Navigate to issue details page
-            window.location.href = `/issue-details/${issueId}`;
+            // This function is now handled by the modal
+            // Find the issue data and open modal
+            const issueRow = $(`tr[data-issue*="${issueId}"]`);
+            if (issueRow.length > 0) {
+                const issueData = JSON.parse(issueRow.attr('data-issue'));
+                openIssueModal(issueData);
+            }
         }
 
         function editIssue(issueId) {
@@ -527,6 +722,151 @@
             // Show status change modal
             alert(`Change status for issue ${issueId}`);
             // In a real implementation, this would open a modal with status options
+        }
+
+        function openAssignTechnicianModal(issueData) {
+            // Populate modal with issue data
+            $('#assign-issue-id').val(issueData.human_readable_id);
+            $('#assign-modal-issue-id').text(issueData.human_readable_id);
+            $('#assign-modal-priority').html(`<span class="badge status-badge status-${issueData.priority}">${issueData.priority}</span>`);
+            $('#assign-modal-problem').text(issueData.problemDescription || 'No description available');
+
+            // Reset form
+            $('#assignTechnicianForm')[0].reset();
+            $('#assign-issue-id').val(issueData.human_readable_id);
+            console.log('issueData', issueData);
+            // Load technicians for this service category
+            loadTechniciansForIssue(issueData.serviceCategoryId);
+
+            // Show the modal
+            $('#assignTechnicianModal').modal('show');
+        }
+
+        function loadTechniciansForIssue(serviceCategoryId) {
+            $('#technicianSelect').html('<option value="">Loading technicians...</option>');
+
+            console.log('Loading technicians for service category:', serviceCategoryId._id);
+
+            // Check if serviceCategoryId is valid
+            if (!serviceCategoryId._id) {
+                $('#technicianSelect').html('<option value="">No service category specified</option>');
+                return;
+            }
+
+            $.ajax({
+                url: `/get-technicians-to-assign/${serviceCategoryId._id}`,
+                method: 'GET',
+                success: function (response) {
+                    console.log('Technicians response:', response);
+
+                    if (response.success && response.data && response.data.length > 0) {
+                        let options = '<option value="">Select a technician...</option>';
+
+                        response.data.forEach(function (item) {
+                            if (item.technician) {
+                                const tech = item.technician;
+                                options += `<option value="${tech._id}">${tech.firstName} ${tech.lastName} - ${tech.phone}</option>`;
+                            }
+                        });
+
+                        $('#technicianSelect').html(options);
+                        console.log('Loaded', response.data.length, 'technicians');
+                    } else {
+                        console.log('No technicians found or invalid response');
+                        $('#technicianSelect').html('<option value="">No technicians available for this service</option>');
+                    }
+                },
+                error: function () {
+                    $('#technicianSelect').html('<option value="">Error loading technicians</option>');
+                    showNotification('Error loading technicians', 'error');
+                }
+            });
+        }
+
+        // Handle assignment confirmation
+        $(document).on('click', '#confirmAssignBtn', function () {
+            const form = $('#assignTechnicianForm');
+            const issueId = $('#assign-issue-id').val();
+            const technicianId = $('#technicianSelect').val();
+            const notes = $('#assignmentNotes').val();
+            const priority = $('#priorityOverride').val();
+
+            if (!technicianId) {
+                showNotification('Please select a technician', 'error');
+                return;
+            }
+
+            // Disable button and show loading
+            $('#confirmAssignBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Assigning...');
+
+            $.ajax({
+                url: `/assign-issue-to-technician/${issueId}`,
+                method: 'POST',
+                data: {
+                    technicianId: technicianId,
+                    notes: notes,
+                    priority: priority || undefined
+                },
+                success: function (response) {
+                    if (response.success) {
+                        showNotification('Technician assigned successfully!', 'success');
+                        $('#assignTechnicianModal').modal('hide');
+
+                        // Update the UI to show assignment
+                        updateAssignmentInTable(issueId, response.data);
+
+                        // Optionally reload the page to reflect changes
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showNotification(response.message || 'Assignment failed', 'error');
+                    }
+                },
+                error: function (xhr) {
+                    const response = xhr.responseJSON;
+                    showNotification(response?.message || 'Assignment failed', 'error');
+                },
+                complete: function () {
+                    $('#confirmAssignBtn').prop('disabled', false).html('<i class="fas fa-user-plus"></i> Assign Technician');
+                }
+            });
+        });
+
+        function updateAssignmentInTable(issueId, assignmentData) {
+            // Find the row and update the "Assigned To" column
+            $('table tbody tr').each(function () {
+                const row = $(this);
+                const rowIssueId = row.find('td:first strong').text().trim();
+
+                if (rowIssueId === issueId) {
+                    const assignedToCell = row.find('td').eq(6); // Assuming "Assigned To" is the 7th column (index 6)
+                    if (assignmentData && assignmentData.technicianName) {
+                        assignedToCell.html(`<span class="text-success">${assignmentData.technicianName}</span>`);
+                    }
+                }
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create a simple notification
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+            const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+
+            $('body').append(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(function () {
+                notification.alert('close');
+            }, 5000);
         }
 
         // Refresh data every 30 seconds
