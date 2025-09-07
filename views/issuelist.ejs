@@ -782,7 +782,7 @@
         });
 
         function openIssueHistoryModal(issueData) {
-    $.ajax({
+        $.ajax({
         url: `/get-issue-history/${issueData._id}`,
         type: 'GET',
         success: function (response) {

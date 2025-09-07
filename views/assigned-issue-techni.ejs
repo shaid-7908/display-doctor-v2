@@ -64,6 +64,80 @@
                         <%- include("common/topnavbar") %>
 
                     </nav>
+
+                    <div class="container-fluid">
+
+                      <div class="row  mb-4">
+                        <div class="col-md-3">
+                          <input type="text" id="frontendSearch" class="form-control" placeholder="Filter visible rows..." />
+                        </div>
+                        <form id="filterForm" class="row  col-md-9">
+                          <div class="col-md-3">
+                            <input type="text" name="search" class="form-control" hidden
+                              placeholder="Search by code/name/customer..." />
+                          </div>
+                          <div class="col-md-2 form-group">
+                            <select name="status" class="form-control">
+                              <option value="">All Status</option>
+                              <option value="open">Open</option>
+                              <option value="in_progress">In Progress</option>
+                              <option value="resolved">Resolved</option>
+                              <option value="rejected_after_visit">Rejected After Visit</option>
+                              <option value="visit_scheduled">Visit Scheduled</option>
+                              <option value="closed">Closed</option>
+                              <option value="rejected">Rejected</option>
+                            </select>
+
+                          </div>
+                          <div class="col-md-2">
+                            <input type="date" name="fromDate" class="form-control" />
+                          </div>
+                          <div class="col-md-2">
+                            <input type="date" name="toDate" class="form-control" />
+                          </div>
+                          <div class="col-md-3">
+                            <button class="btn btn-primary w-100" type="submit">
+                              <i class="fas fa-filter me-1"></i>Apply Filters
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+
+                      <div class="row">
+                          <div class="card shadow mb-4 col-md-12">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">All Issues</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="issueTable" width="100%"
+                                            cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Issue ID</th>
+                                                    <th>Contact</th>
+                                                    <th>Device</th>
+                                                    <th>Problem</th>
+                                                    <th>Status</th>
+                                                    <th>Priority</th>
+                                                    <th>Scheduled At</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="issue-table-body">
+                                                <!-- Sample data - will be populated dynamically -->
+                                               
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                      </div>
+
+
+                      </div>
+
                 </div>
 
 
@@ -78,7 +152,226 @@
                 <!-- End of Footer -->
 
         </div>
+        <!-- Issue Details Modal -->
+        <div class="modal fade" id="issueDetailsModal" tabindex="-1" role="dialog" aria-labelledby="issueDetailsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="issueDetailsModalLabel">Issue Details</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Basic Information Section -->
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <h6>Basic Information</h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="info-table">
+                                        <tr>
+                                            <td>Issue ID:</td>
+                                            <td id="modal-issue-id"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Status:</td>
+                                            <td id="modal-status"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Priority:</td>
+                                            <td id="modal-priority"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="info-table">
+                                        <tr>
+                                            <td>Created:</td>
+                                            <td id="modal-created"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Assigned To:</td>
+                                            <td id="modal-assigned"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- Contact Information Section -->
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <h6>Contact Information</h6>
+                            </div>
+                            <table class="info-table">
+                                <tr>
+                                    <td>Name:</td>
+                                    <td id="modal-contact-name"></td>
+                                </tr>
+                                <tr>
+                                    <td>Phone:</td>
+                                    <td id="modal-contact-phone"></td>
+                                </tr>
+                                <tr>
+                                    <td>Email:</td>
+                                    <td id="modal-contact-email"></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Device Information Section -->
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-laptop"></i>
+                                </div>
+                                <h6>Device Information</h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="info-table">
+                                        <tr>
+                                            <td>Device Type:</td>
+                                            <td id="modal-device-type"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Brand:</td>
+                                            <td id="modal-device-brand"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="info-table">
+                                        <tr>
+                                            <td>Model:</td>
+                                            <td id="modal-device-model"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Serial Number:</td>
+                                            <td id="modal-device-serial"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Problem Description Section -->
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h6>Problem Description</h6>
+                            </div>
+                            <div class="content-box">
+                                <p id="modal-problem-description"></p>
+                            </div>
+                        </div>
+
+                        <!-- Additional Notes Section -->
+                        <div class="section-card">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-sticky-note"></i>
+                                </div>
+                                <h6>Additional Notes</h6>
+                            </div>
+                            <div class="content-box">
+                                <p id="modal-notes">No additional notes available.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="modal-edit-btn">Edit Issue</button>
+                        <button type="button" class="btn btn-info" id="modal-status-btn">Change Status</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue Report modal -->
+
+        <div class="modal fade" id="issueReportModal" tabindex="-1" aria-labelledby="issueReportModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content">
+                      
+                      <!-- Header -->
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="issueReportModalLabel">Issue Report</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+
+                      <!-- Body -->
+                      <div class="modal-body">
+                        <form id="issueReportForm">
+                          
+                          <!-- Issue ID -->
+                          <div class="mb-3">
+                            <label class="form-label">Issue ID :<strong id="report-issue-human-redable-id"></strong></label>
+                            <input type="hidden" class="form-control" name="issue_id" id="report-issue-id"  placeholder="Enter Issue ID" required>
+                            <input type="hidden" id="repost-service-issue-id" name="serviceCategoryId">
+                          </div>
+
+
+                          <!-- Device Type -->
+                          <div class="mb-3">
+                            <label class="form-label">Device Type</label>
+                            <input type="text" class="form-control" name="deviceType" value="tv">
+                          </div>
+
+                          <!-- Device Model Number -->
+                          <div class="mb-3">
+                            <label class="form-label">Device Model Number</label>
+                            <input type="text" class="form-control" name="deviceModelNumber" placeholder="Enter Model Number">
+                          </div>
+
+                          <!-- Device Name -->
+                          <div class="mb-3">
+                            <label class="form-label">Device Name</label>
+                            <input type="text" class="form-control" name="deviceName" placeholder="Enter Device Name">
+                          </div>
+
+                          <!-- Technician Notes -->
+                          <div class="mb-3">
+                            <label class="form-label">Technician Note</label>
+                            <textarea class="form-control" name="techNote" rows="3" placeholder="Enter technician notes"></textarea>
+                          </div>
+
+                          <!-- Required Parts -->
+                          <div class="mb-3">
+                            <label class="form-label">Required Parts</label>
+                            <textarea type="text" class="form-control" name="requiredParts" rows="3" placeholder="Enter required parts"></textarea>
+                          </div>
+
+                          <!-- Budget Estimation -->
+                          <div class="mb-3">
+                            <label class="form-label">Budget Estimation</label>
+                            <input type="number" class="form-control" name="budgetEstimation" placeholder="Enter budget estimation">
+                          </div>
+                          
+                        </form>
+                      </div>
+
+                      <!-- Footer -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" form="issueReportForm" class="btn btn-primary">Save Report</button>
+                      </div>
+
+                    </div>
+                  </div>
+        </div>
 
     </div>
     <a class="scroll-to-top rounded" href="#page-top">
@@ -98,5 +391,186 @@
     <!-- DataTables JavaScript -->
     <script src="/vendor/datatables/jquery.dataTables.js"></script>
     <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <script>
+      function loadIssues(page = 1) {
+      const filters = $('#filterForm').serialize();
+      $.get(`/technician/get-assigned-issue/?page=${page}&${filters}`, function (html) {
+        $('#issueTableContainer').html(html);
+      });
+
+      $.ajax({
+        url:`/technician/get-assigned-issue/?page=${page}&${filters}`,
+        type:'GET',
+        success:function (response){
+           loadIssueInTable(response.data)
+           console.log(response)
+        },
+        error:function(xhr){
+
+        }
+      })
+    }
+
+    function loadIssueInTable(issueData) {
+                    const $tbody = $("#issue-table-body");
+
+                    
+                    $tbody.empty(); // clear old rows
+
+                    $.each(issueData, function(_, issue) {
+                      let scheduleDate = issue.schedule?.preferredDate ? new Date(issue.schedule.preferredDate) : null;
+                          let dateText = "-";
+                          let daysText = "";
+
+                          if (scheduleDate) {
+                            const today = new Date();
+                            today.setHours(0,0,0,0); // normalize
+                            scheduleDate.setHours(0,0,0,0);
+
+                            const diffTime = scheduleDate.getTime() - today.getTime();
+                            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                            if (diffDays === 0) {
+                              daysText = "(Today)";
+                            } else if (diffDays > 0) {
+                              daysText = `(${diffDays} day${diffDays > 1 ? "s" : ""})`;
+                            } else {
+                              daysText = `(${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
+                            }
+
+                            dateText = scheduleDate.toLocaleDateString();
+                          }
+                      const row = `
+                        <tr data-issue="${JSON.stringify(issue)}">
+                          <td>${issue.human_readable_id || "-"}</td>
+                          <td>
+                            <div><strong>${issue.contact?.name || "-"}</strong></div>
+                            <small>${issue.contact?.phone}</small>
+                          </td>
+                          <td>${issue.device?.type || "-"}</td>
+                          <td>${issue.problemDescription || "-"}</td>
+                          <td>${issue.status || "-"}</td>
+                          <td>${issue.priority || "-"}</td>
+                          <td>
+                            <div><strong>${dateText}</strong> <span class="text-muted">${daysText}</span></div>
+                              <small>${issue.schedule?.window || ""}</small>
+                            
+                            </td>
+
+                            <td>
+                              <div class="action-buttons">
+                                    <button class="btn btn-sm btn-primary view-issue-btn"
+                                        title="View Details"
+                                        data-issue-id="${issue.human_readable_id}">
+                                      <i class="fas fa-eye"></i>
+                                    </button>
+
+                                    <button class="btn btn-sm btn-warning report-issue-btn"
+                                        data-issue-id="${issue._id}" 
+                                         data-service-id="${issue.serviceCategoryId}"
+                                         data-human-redable-id="${issue.human_readable_id}"
+                                        title="Report creation" id="report-issue-btn">
+                                        <i class="fas fa-file-alt"></i>
+
+                                    </button>
+
+
+                                    <button class="btn btn-sm btn-success Pick-issue-btn" title="Pick Issue" id="pick-issue-btn" 
+                                         data-issue-id="${issue._id}" 
+                                         data-service-id="${issue.serviceCategoryId}"
+                                         data-human-redable-id="${issue.human_readable_id}"
+                                    
+                                        >
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <!-- Change this button below to assign to technician  -->
+                                    <button
+                                        class="btn btn-sm btn-info assign-to-technician-btn"
+                                        title="Assign to Technician"
+                                        data-issue-id="${issue._id}">
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
+                                </div>
+                            </td>
+                          
+                        </tr>
+                      `;
+                      $tbody.append(row);
+                    });
+  }
+
+  function openIssueModal(issueData) {
+            // Populate modal with issue data
+            $('#modal-issue-id').text(issueData.human_readable_id || 'N/A');
+            $('#modal-status').html(`<span class="badge status-badge status-${issueData.status.toLowerCase().replace(/[^a-z0-9]/g, '_')}">${issueData.status}</span>`);
+            $('#modal-priority').text(issueData.priority || 'N/A');
+            $('#modal-created').text(new Date(issueData.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }));
+            $('#modal-assigned').text('Unassigned'); // You can update this based on your data structure
+
+            // Contact information
+            $('#modal-contact-name').text(issueData.contact?.name || 'N/A');
+            $('#modal-contact-phone').text(issueData.contact?.phone || 'N/A');
+            $('#modal-contact-email').text(issueData.contact?.email || 'N/A');
+
+            // Device information
+            $('#modal-device-type').text(issueData.device?.type || 'N/A');
+            $('#modal-device-brand').text(issueData.device?.brand || 'N/A');
+            $('#modal-device-model').text(issueData.device?.model || 'N/A');
+            $('#modal-device-serial').text(issueData.device?.serialNumber || 'N/A');
+
+            // Problem description
+            $('#modal-problem-description').text(issueData.problemDescription || 'No description available');
+
+            // Additional notes (if available)
+            if (issueData.notes) {
+                $('#modal-notes').text(issueData.notes);
+            } else {
+                $('#modal-notes').text('No additional notes available.');
+            }
+
+            // Show the modal
+            $('#issueDetailsModal').modal('show');
+        }
+    $(document).ready(function (){
+     loadIssues()
+
+
+     $(document).on('click', '.view-issue-btn', function (e) {
+                e.preventDefault();
+                const issueId = $(this).data('issue-id');
+                $.ajax({
+                  url:`/get-issue-details/${issueId}`,
+                  type:'GET',
+                  success:function (response){
+                   openIssueModal(response.data)
+                  },
+                  error:function (xhr){
+
+                  }
+                })
+                
+      });
+     
+     $(document).on('click','.report-issue-btn',function (e){
+       e.preventDefault()
+       const issueId = $(this).data('issue-id')
+       const serviceId = $(this).data('service-id')
+       const human_readable_id = $(this).data('human-redable-id')
+       console.log(human_readable_id,'hk')
+       console.log(issueId,'kl')
+       $('#issueReportModal').modal('show')
+       $('#report-issue-id').val(issueId)
+       $('#report-issue-human-redable-id').text(human_readable_id)
+       $('#repost-service-issue-id').val(serviceId)
+     })
+    })
+    </script>
 </body>
 </html>
