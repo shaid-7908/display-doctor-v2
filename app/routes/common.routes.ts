@@ -15,4 +15,9 @@ commonRouter.get("/get-technicians-to-assign/:id", authChecker, roleChecker(["ca
 commonRouter.get("/get-issue-details/:id", authChecker, roleChecker(["caller", "admin"]), commonController.getIssueDetails);
 commonRouter.post("/assign-issue-to-technician/:id", authChecker, roleChecker(["caller", "admin"]), commonController.assignIssueToTechnician);
 
+//Issue Schedule Routes
+commonRouter.get("/get-current-schedule/:id", authChecker, roleChecker(["caller", "admin"]), commonController.getCurrentSchedule);
+commonRouter.post('/change-schedule',authChecker,roleChecker(["caller","admin"]),commonController.changeSchedule)
+
+commonRouter.get('/get-issue-history/:id',authChecker,roleChecker(['caller','admin']),commonController.getIssueHistory)
 export default commonRouter;

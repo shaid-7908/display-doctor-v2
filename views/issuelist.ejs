@@ -208,9 +208,21 @@
                                                             <%= issue.problemDescription %>
                                                         </td>
                                                         <td>
+                                                            <% if( issue.status === 'new'){ %>
                                                             <span class="badge status-badge status-new">
                                                                 <%= issue.status %>
                                                             </span>
+                                                            <% } %>
+                                                            <% if (issue.status === 'scheduled') {%>
+                                                            <span class="badge status-badge status-scheduled">
+                                                                <%= issue.status %>
+                                                            </span>
+                                                            <% } %>
+                                                            <% if(issue.status === 'assigned') { %>
+                                                               <span class="badge status-badge status-assigned">
+                                                                <%= issue.status %>
+                                                            </span> 
+                                                            <% } %>
                                                         </td>
                                                         <td>
                                                             <%= issue.priority %>
@@ -249,14 +261,14 @@
                                                                 </button>
 
                                                                 <button class="btn btn-sm btn-warning history-issue-btn"
-                                                                    title="History">
+                                                                    title="History" id="history-issue-btn">
                                                                     <i class="fas fa-history"></i>
                                                                 </button>
 
 
-                                                                <a href="/edit-issue/<%= issue._id %>" class="btn btn-sm btn-success" title="Edit">
+                                                                <button class="btn btn-sm btn-success schedule-issue-btn" title="Schedule" id="schedule-issue-btn" data-issue-id="<%= issue._id %>">
                                                                     <i class="fas fa-edit"></i>
-                                                                </a>
+                                                                </button>
                                                                 <!-- Change this button below to assign to technician  -->
                                                                 <button
                                                                     class="btn btn-sm btn-info assign-to-technician-btn"
@@ -444,10 +456,56 @@
         </div>
     </div>
 
+    <!--- issue history modal --->    
+    <div class="modal fade" id="issueHistoryModal" tabindex="-1" role="dialog" aria-labelledby="issueHistoryModalLabel"
+      aria-hidden="true">
+     <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="issueHistoryModalLabel">Issue History</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="history-issue-modal-body">
+
+                <!-- Status Changes Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="icon">
+                            <i class="fas fa-random"></i>
+                        </div>
+                        <h6>Status Changes</h6>
+                    </div>
+                    <div class="timeline-box" id="modal-history-status">
+                        <!-- Example entry -->
+                        <!--
+                        <div class="history-entry">
+                            <span class="time">2025-09-07 10:30</span>
+                            <p><strong>Shahid Ali</strong> changed status from <em>scheduled</em> to <em>in_progress</em></p>
+                            <small>Note: Engineer has started work</small>
+                        </div>
+                        -->
+                    </div>
+                </div>
+
+                
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+   </div>
+
+
     <!-- Assign Technician Modal -->
     <div class="modal fade" id="assignTechnicianModal" tabindex="-1" role="dialog"
         aria-labelledby="assignTechnicianModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="assignTechnicianModalLabel">Assign Technician</h5>
@@ -521,6 +579,77 @@
                     <button type="button" class="btn btn-primary" id="confirmAssignBtn">
                         <i class="fas fa-user-plus"></i> Assign Technician
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Schedule Modal -->
+    <div class="modal fade" id="issue_schedule_modal" tabindex="-1" role="dialog" aria-labelledby="issue_schedule_modal_label"
+        aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="issue_schedule_modal_label">Issue Schedule</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="issue_schedule_modal_body">
+                    <div class="section-card mb-3">
+                        <div class="section-header">
+                            <div class="icon">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <h6>Issue Information</h6>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Issue ID:</strong>
+                                <span id="issue-schedule-modal-issue-id"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Priority:</strong>
+                                <span id="issue-schedule-modal-priority"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <strong>Problem:</strong>
+                                <span id="issue-schedule-modal-problem"></span>
+                            </div>
+                        </div>
+                        <div class="row mt-2" id="issue-schedule-modal-schedule-information">
+                            <div class="col-12">
+                                <strong>Schedule Information:</strong>
+                                <span id="issue-schedule-modal-notes"></span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    
+
+                    <form id="issue-schedule-form">
+                        <input type="hidden" id="to-be-scheduled-issue-id" name="issue_id" />
+                        <div class="form-group">
+                            <label for="timeWindow">Preferred Time Window</label>
+                            <select class="form-control" id="timeWindow-issue-schedule-select" name="schedule.window">
+                                <option value="any" selected>Any Time</option>
+                                <option value="morning">Morning (9 AM - 12 PM)</option>
+                                <option value="afternoon">Afternoon (12 PM - 3 PM)
+                                </option>
+                                <option value="evening">Evening (3 PM - 6 PM)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferredDate">Preferred Date (Optional)</label>
+                            <input type="date" class="form-control" id="preferredDate-issue-schedule-input" name="schedule.preferredDate">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Change Schedule
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -636,7 +765,69 @@
                 openAssignTechnicianModal(issueData);
             });
 
+            $(document).on('click', '.schedule-issue-btn', function () {
+                const issueId = $(this).data('issue-id');
+                const issueRow = $(this).closest('tr');
+                const issueData = JSON.parse(issueRow.attr('data-issue'));
+                openIssueScheduleModal(issueData);
+            });
+
+            $(document).on('click','.history-issue-btn',function (){
+                const issueId = $(this).data('issue-id');
+                const issueRow = $(this).closest('tr');
+                const issueData = JSON.parse(issueRow.attr('data-issue'));
+                openIssueHistoryModal(issueData)
+            })
+
         });
+
+        function openIssueHistoryModal(issueData) {
+    $.ajax({
+        url: `/get-issue-history/${issueData._id}`,
+        type: 'GET',
+        success: function (response) {
+            if (response && response.data && response.data.length > 0) {
+                const container = $('#modal-history-status');
+                container.empty(); // clear old entries
+
+                response.data.forEach(entry => {
+                    const userName = entry.by?.name || "Unknown User";
+                    const action = entry.action || "updated";
+                    const fromStatus = entry.from || "-";
+                    const toStatus = entry.to || "-";
+                    const note = entry.note || ""; // if you add note field
+                    const time = new Date(entry.at).toLocaleString();
+
+                    const html = `
+                        <div class="history-entry">
+                            <span class="time">${time}</span>
+                            <p>
+                                <strong>${userName}</strong> 
+                                ${action} from 
+                                <em>${fromStatus}</em> 
+                                to 
+                                <em>${toStatus}</em>
+                            </p>
+                            ${note ? `<small>Note: ${note}</small>` : ""}
+                        </div>
+                    `;
+                    container.append(html);
+                });
+            } else {
+                $('#modal-history-status').html('<p>No history available.</p>');
+            }
+
+            // finally open the modal
+            $('#issueHistoryModal').modal('show');
+        },
+        error: function (xhr) {
+            console.error("Error fetching issue history:", xhr);
+            $('#modal-history-status').html('<p class="text-danger">Failed to load history.</p>');
+            $('#issueHistoryModal').modal('show');
+        }
+    });
+}
+
 
         function updateStatistics() {
             // This would typically fetch data from an API
@@ -723,6 +914,47 @@
             alert(`Change status for issue ${issueId}`);
             // In a real implementation, this would open a modal with status options
         }
+        
+        function openIssueScheduleModal(issueData) {
+            $('#issue-schedule-modal-issue-id').text(issueData.human_readable_id);
+            $('#issue-schedule-modal-priority').text(issueData.priority);
+            $('#issue-schedule-modal-problem').text(issueData.problemDescription);
+            $('#to-be-scheduled-issue-id').val(issueData._id)
+            loadIssueSchedule(issueData._id);
+            $('#issue_schedule_modal').modal('show');
+        }
+
+        function loadIssueSchedule(issueID){
+            $.ajax({
+                url: `/get-current-schedule/${issueID}`,
+                method: 'GET',
+                success: function (response) {
+                    console.log('Issue schedule response:', response);
+
+                    if (response && response.data && response.data.preferredDate && response.data.window) {
+                        const preferredDate = response.data.preferredDate;
+                        const timeWindow = response.data.window;
+                        const formattedDate = preferredDate.split('T')[0]
+                        $('#preferredDate-issue-schedule-input').val(formattedDate);
+                        $('#timeWindow-issue-schedule-select').val(timeWindow)
+
+                        $('#issue-schedule-modal-schedule-information').html(`<div class="col-12">
+                                <strong>Schedule Information:<span class="text-success">Scheduled (<span id="issue-schedule-modal-notes">${formattedDate} - ${timeWindow}</span>)</span></strong>
+                                
+                            </div>`);
+
+                    }else{
+                        $('#issue-schedule-modal-schedule-information').html(`<div class="col-12">
+                                <strong>Schedule Information:<span class="text-danger text-sm"> Not Scheduled</span></strong>
+                                <span id="issue-schedule-modal-notes"></span>
+                            </div>`);
+                    }
+                },
+                error: function (xhr) {
+                    console.log('Issue schedule error:', xhr);
+                }
+            });
+        }
 
         function openAssignTechnicianModal(issueData) {
             // Populate modal with issue data
@@ -782,7 +1014,28 @@
                 }
             });
         }
-
+         
+        $('#issue-schedule-form').on('submit',function(e){
+            e.preventDefault()
+            $.ajax({
+                url:'/change-schedule',
+                type:'POST',
+                data:$(this).serialize(),
+                success:function(response){
+                   if(response.success){
+                    showNotification('Issue scheduled successfully')
+                    $('#issue_schedule_modal').modal('hide')
+                    setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                   }
+                },
+                error:function(xhr,status,err){
+                 const response = xhr.responseJSON;
+                    showNotification(response?.message || 'Schedule failed', 'error');
+                }
+            })
+        })
         // Handle assignment confirmation
         $(document).on('click', '#confirmAssignBtn', function () {
             const form = $('#assignTechnicianForm');
@@ -875,6 +1128,17 @@
             console.log('Refreshing issue data...');
         }, 30000);
     </script>
+    <script>
+    // Get today's date
+    const today = new Date();
+    // Add 1 day to ensure only future dates are selectable
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Format as yyyy-mm-dd
+    const minDate = tomorrow.toISOString().split("T")[0];
+    document.getElementById("preferredDate-issue-schedule-input").setAttribute("min", minDate);
+</script>
 
 </body>
 

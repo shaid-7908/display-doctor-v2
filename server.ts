@@ -13,6 +13,7 @@ import adminRouter from "./app/routes/admin.routes";
 import commonRouter from "./app/routes/common.routes";
 const app = express();
 import moment from "moment";
+import technicianRouter from "./app/routes/technician.routes";
 //a basic setup that should be done almost always
 
 app.use(express.json());
@@ -60,6 +61,7 @@ app.use(authRouter);
 app.use("/any-prefix", basicRouter);
 app.use(adminRouter);
 app.use(commonRouter);
+app.use(technicianRouter)
 
 //this is the global erro handler middleware , it should always be at the buttom of all rotes
 app.use(errorHandler);

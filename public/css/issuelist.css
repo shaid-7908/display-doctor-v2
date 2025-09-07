@@ -7,6 +7,14 @@
     background-color: #17a2b8;
     color: white;
 }
+.status-scheduled{
+    background-color: #ffc107;
+    color: white;
+}
+.status-assigned{
+    background-color: #28a745;
+    color: white;
+}
 
 .status-screening {
     background-color: #6f42c1;
