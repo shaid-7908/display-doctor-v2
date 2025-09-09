@@ -10,6 +10,12 @@ export interface IIssueReport extends Document{
     techNote:String,
     requiredParts:String,
     budgetEstimation:Number,
+    initialQuotation:Number,
+    finalQuotation:Number,
+    is_approved:Boolean,
+    technicianId:Types.ObjectId,
+    quotation_type:String
+    issue_human_redable_id:String,
 }
 
 const IssueSchema = new Schema<IIssueReport>({
@@ -17,6 +23,7 @@ const IssueSchema = new Schema<IIssueReport>({
     type:Schema.Types.ObjectId,
     ref:'issues'
   },
+
   serviceCategoryId: {
     type: Schema.Types.ObjectId,
     ref: "serviceCategories",
@@ -39,7 +46,34 @@ const IssueSchema = new Schema<IIssueReport>({
   },
   budgetEstimation:{
     type:Number
+  },
+
+  initialQuotation:{
+    type:Number,
+    default:0
+  },
+
+  finalQuotation:{
+    type:Number,
+    default:0
+  },
+  is_approved:{
+   type:Boolean,
+   default:false
+  },
+  technicianId:{
+    type:Schema.Types.ObjectId,
+    ref:'users'
+  },
+  quotation_type:{
+    type:String,
+    enum:['none','initial','final'],
+    default:['none']
+  },
+  issue_human_redable_id:{
+    type:String
   }
+
 });
 
-const IssuModel = model<IIssueReport>('issue_reports',IssueSchema)
+export const IssueReportModel = model<IIssueReport>('issue_reports',IssueSchema)

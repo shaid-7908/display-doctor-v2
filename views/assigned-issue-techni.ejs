@@ -68,27 +68,7 @@
                     <div class="container-fluid">
 
                       <div class="row  mb-4">
-                        <div class="col-md-3">
-                          <input type="text" id="frontendSearch" class="form-control" placeholder="Filter visible rows..." />
-                        </div>
                         <form id="filterForm" class="row  col-md-9">
-                          <div class="col-md-3">
-                            <input type="text" name="search" class="form-control" hidden
-                              placeholder="Search by code/name/customer..." />
-                          </div>
-                          <div class="col-md-2 form-group">
-                            <select name="status" class="form-control">
-                              <option value="">All Status</option>
-                              <option value="open">Open</option>
-                              <option value="in_progress">In Progress</option>
-                              <option value="resolved">Resolved</option>
-                              <option value="rejected_after_visit">Rejected After Visit</option>
-                              <option value="visit_scheduled">Visit Scheduled</option>
-                              <option value="closed">Closed</option>
-                              <option value="rejected">Rejected</option>
-                            </select>
-
-                          </div>
                           <div class="col-md-2">
                             <input type="date" name="fromDate" class="form-control" />
                           </div>
@@ -119,6 +99,7 @@
                                                     <th>Device</th>
                                                     <th>Problem</th>
                                                     <th>Status</th>
+                                                    <th>Repost Generation</th>
                                                     <th>Priority</th>
                                                     <th>Scheduled At</th>
                                                     <th>Actions</th>
@@ -309,7 +290,9 @@
                       <!-- Header -->
                       <div class="modal-header">
                         <h5 class="modal-title" id="issueReportModalLabel">Issue Report</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" id="issueReportModal-close-btn" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                       </div>
 
                       <!-- Body -->
@@ -321,6 +304,7 @@
                             <label class="form-label">Issue ID :<strong id="report-issue-human-redable-id"></strong></label>
                             <input type="hidden" class="form-control" name="issue_id" id="report-issue-id"  placeholder="Enter Issue ID" required>
                             <input type="hidden" id="repost-service-issue-id" name="serviceCategoryId">
+                            <input type="hidden" name="issue_human_redable_id"  id="issue_human_redable_id">
                           </div>
 
 
@@ -365,7 +349,7 @@
 
                       <!-- Footer -->
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" id="close-issue-report-modal-btn" data-bs-dismiss="modal">Close</button>
                         <button type="submit" form="issueReportForm" class="btn btn-primary">Save Report</button>
                       </div>
 
@@ -393,11 +377,33 @@
     <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
 
     <script>
-      function loadIssues(page = 1) {
+
+    let table;
+
+    function showNotification(message, type = 'info') {
+            // Create a simple notification
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+            const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+
+            $('body').append(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(function () {
+                notification.alert('close');
+            }, 5000);
+        }
+      
+    function loadIssues(page = 1) {
       const filters = $('#filterForm').serialize();
-      $.get(`/technician/get-assigned-issue/?page=${page}&${filters}`, function (html) {
-        $('#issueTableContainer').html(html);
-      });
+      
 
       $.ajax({
         url:`/technician/get-assigned-issue/?page=${page}&${filters}`,
@@ -407,100 +413,40 @@
            console.log(response)
         },
         error:function(xhr){
-
+          console.log(xhr.responseJSON)
         }
       })
     }
 
     function loadIssueInTable(issueData) {
-                    const $tbody = $("#issue-table-body");
+    table.clear(); // clear old rows
 
-                    
-                    $tbody.empty(); // clear old rows
+    $.each(issueData, function (_, issue) {
+      let scheduleDate = issue.schedule?.preferredDate ? new Date(issue.schedule.preferredDate) : null;
+      let dateText = "-";
+      if (scheduleDate) dateText = scheduleDate.toLocaleDateString();
 
-                    $.each(issueData, function(_, issue) {
-                      let scheduleDate = issue.schedule?.preferredDate ? new Date(issue.schedule.preferredDate) : null;
-                          let dateText = "-";
-                          let daysText = "";
+      table.row.add([
+        issue.human_readable_id || "-",
+        `<div><strong>${issue.contact?.name || "-"}</strong><br><small>${issue.contact?.phone}</small></div>`,
+        issue.device?.type || "-",
+        issue.problemDescription || "-",
+        issue.status || "-",
+        `<span class="btn btn-sm ${issue.hasIssueReport ? "btn-success" : "btn-warning"}">${issue.hasIssueReport ? "Done" : "Pending"}</span>`,
+        issue.priority || "-",
+        `<div><strong>${dateText}</strong></div><small>${issue.schedule?.window || ""}</small>`,
+        `<div class="action-buttons">
+          <button class="btn btn-sm btn-primary view-issue-btn" data-issue-id="${issue.human_readable_id}"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-sm ${issue.hasIssueReport ? "btn-success" : "btn-warning"} report-issue-btn" data-issue-id="${issue._id}" data-service-id="${issue.serviceCategoryId}" data-human-redable-id="${issue.human_readable_id}"><i class="fas fa-file-alt"></i></button>
+        </div>`
+      ]);
+    });
 
-                          if (scheduleDate) {
-                            const today = new Date();
-                            today.setHours(0,0,0,0); // normalize
-                            scheduleDate.setHours(0,0,0,0);
-
-                            const diffTime = scheduleDate.getTime() - today.getTime();
-                            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-                            if (diffDays === 0) {
-                              daysText = "(Today)";
-                            } else if (diffDays > 0) {
-                              daysText = `(${diffDays} day${diffDays > 1 ? "s" : ""})`;
-                            } else {
-                              daysText = `(${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? "s" : ""} ago)`;
-                            }
-
-                            dateText = scheduleDate.toLocaleDateString();
-                          }
-                      const row = `
-                        <tr data-issue="${JSON.stringify(issue)}">
-                          <td>${issue.human_readable_id || "-"}</td>
-                          <td>
-                            <div><strong>${issue.contact?.name || "-"}</strong></div>
-                            <small>${issue.contact?.phone}</small>
-                          </td>
-                          <td>${issue.device?.type || "-"}</td>
-                          <td>${issue.problemDescription || "-"}</td>
-                          <td>${issue.status || "-"}</td>
-                          <td>${issue.priority || "-"}</td>
-                          <td>
-                            <div><strong>${dateText}</strong> <span class="text-muted">${daysText}</span></div>
-                              <small>${issue.schedule?.window || ""}</small>
-                            
-                            </td>
-
-                            <td>
-                              <div class="action-buttons">
-                                    <button class="btn btn-sm btn-primary view-issue-btn"
-                                        title="View Details"
-                                        data-issue-id="${issue.human_readable_id}">
-                                      <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="btn btn-sm btn-warning report-issue-btn"
-                                        data-issue-id="${issue._id}" 
-                                         data-service-id="${issue.serviceCategoryId}"
-                                         data-human-redable-id="${issue.human_readable_id}"
-                                        title="Report creation" id="report-issue-btn">
-                                        <i class="fas fa-file-alt"></i>
-
-                                    </button>
-
-
-                                    <button class="btn btn-sm btn-success Pick-issue-btn" title="Pick Issue" id="pick-issue-btn" 
-                                         data-issue-id="${issue._id}" 
-                                         data-service-id="${issue.serviceCategoryId}"
-                                         data-human-redable-id="${issue.human_readable_id}"
-                                    
-                                        >
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <!-- Change this button below to assign to technician  -->
-                                    <button
-                                        class="btn btn-sm btn-info assign-to-technician-btn"
-                                        title="Assign to Technician"
-                                        data-issue-id="${issue._id}">
-                                        <i class="fas fa-user-plus"></i>
-                                    </button>
-                                </div>
-                            </td>
-                          
-                        </tr>
-                      `;
-                      $tbody.append(row);
-                    });
+    table.draw();
   }
 
-  function openIssueModal(issueData) {
+
+    function openIssueModal(issueData) {
             // Populate modal with issue data
             $('#modal-issue-id').text(issueData.human_readable_id || 'N/A');
             $('#modal-status').html(`<span class="badge status-badge status-${issueData.status.toLowerCase().replace(/[^a-z0-9]/g, '_')}">${issueData.status}</span>`);
@@ -538,10 +484,27 @@
             // Show the modal
             $('#issueDetailsModal').modal('show');
         }
+     
     $(document).ready(function (){
-     loadIssues()
+        
+     table = $('#issueTable').DataTable({
+            paging: true,
+            searching: true,   // enables global search box
+            ordering: true,
+            lengthChange: true,
+            pageLength: 10
+        });
+        loadIssues()
+    
+    $('#frontendSearch').on('keyup', function () {
+    table.search(this.value).draw();
+    });
 
 
+     $('#filterForm').on('submit',function (e){
+        e.preventDefault()
+        loadIssues()
+     })
      $(document).on('click', '.view-issue-btn', function (e) {
                 e.preventDefault();
                 const issueId = $(this).data('issue-id');
@@ -552,7 +515,7 @@
                    openIssueModal(response.data)
                   },
                   error:function (xhr){
-
+                   console.log(xhr.responseJSON)
                   }
                 })
                 
@@ -563,13 +526,43 @@
        const issueId = $(this).data('issue-id')
        const serviceId = $(this).data('service-id')
        const human_readable_id = $(this).data('human-redable-id')
-       console.log(human_readable_id,'hk')
-       console.log(issueId,'kl')
        $('#issueReportModal').modal('show')
        $('#report-issue-id').val(issueId)
        $('#report-issue-human-redable-id').text(human_readable_id)
+       $('#issue_human_redable_id').val(human_readable_id)
        $('#repost-service-issue-id').val(serviceId)
      })
+     $('#issueReportModal-close-btn').on('click',function (e){
+        e.preventDefault()
+        $('#issueReportModal').modal('hide')
+     })
+     $('#close-issue-report-modal-btn').on('click',function (e){
+        e.preventDefault()
+        $('#issueReportModal').modal('hide')
+     })
+
+     $('#issueReportForm').on('submit',function (e){
+        e.preventDefault()
+        $.ajax({
+            url:'/technician/generate-issue-report',
+            type:'POST',
+            data:$(this).serialize(),
+            success:function (response){
+             if(response.success){
+                showNotification('Issue report submitted successfully','success')
+                $('#issueReportModal').modal('hide')
+                setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+             }
+            },
+            error:function(xhr){
+              console.log(xhr)
+            }
+        })
+     })
+
+     
     })
     </script>
 </body>
