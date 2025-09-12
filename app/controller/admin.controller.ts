@@ -11,6 +11,9 @@ import { SkillModel } from "../model/skill.model";
 import path from "path";
 import AddressProofModel from "../model/address_proof.model";
 import TechnicianToServiceModel from "../model/technicianToService.model";
+import { IssueReportModel } from "../model/issuereport.model";
+import mongoose from "mongoose";
+import { IssueModel } from "../model/issue.model";
 
 
 
@@ -328,6 +331,74 @@ class AdminController {
         const newServiceSubCategory = new ServiceSubCategoryModel({ name, description, required_skills, is_active, service_category });
         await newServiceSubCategory.save();
         return sendSuccess(res, "Service sub category created successfully", null, STATUS_CODES.CREATED);
+    })
+
+    renderIssueReportPage = asyncHandler(async (req:Request,res:Response)=>{
+     res.render('issue-report-page',{default_user:req.user})
+    })
+
+    getIssueReports = asyncHandler(async (req,res)=>{
+       const issueReports = await IssueReportModel.aggregate([
+        {
+            $lookup:{
+                from:'users',
+                localField:'technicianId',
+                foreignField:'_id',
+                as:'submitted_by'
+            }
+        },
+        {$unwind:'$submitted_by'},
+        {$project:{
+            "submitted_by.password":0,
+            "submitted_by.createdAt":0,
+            "submitted_by.__v":0,
+            "submitted_by.updatedAt":0,
+            "submitted_by.dateOfBirth":0
+        }}
+       ])
+       return sendSuccess(res,'Issue reports fetched Successfully',issueReports,STATUS_CODES.OK)
+    })
+
+    getIssueReportById = asyncHandler(async (req,res)=>{
+        const reportId = req.params.id
+        const fullReport = await IssueReportModel.aggregate([
+            {
+                $match:{"_id":new mongoose.Types.ObjectId(reportId)}
+            },
+            {
+                $lookup:{
+                    from:'issues',
+                    localField:'issue_id',
+                    foreignField:'_id',
+                    as:'issue_details'
+                }
+            },
+            {$unwind:"$issue_details"}
+        ])
+       return sendSuccess(res,"Full Issue details",fullReport,STATUS_CODES.OK)
+    })
+
+    submitQuotation = asyncHandler(async (req,res)=>{
+        const reportId = req.body.reportId
+        const initialQuotation = Number(req.body.initialQuotation)
+        const finalQuotation = Number(req.body.finalQuotation)
+        let quotationType = ""
+        if(finalQuotation === 0) quotationType = "initial"
+        else if (finalQuotation > 0) quotationType ="final"
+        else if (initialQuotation === 0 && finalQuotation === 0) quotationType = "none"
+        else if (finalQuotation > 0 && initialQuotation > 0) quotationType = "final"
+        const report = await IssueReportModel.findOne({_id:reportId})
+        if(!report){
+            return sendError(res,"Report not found",null,STATUS_CODES.NOT_FOUND)
+        }
+        const updatedReport = await IssueReportModel.findByIdAndUpdate(reportId,{$set:{initialQuotation:initialQuotation,finalQuotation:finalQuotation,quotation_type:quotationType,is_approved:true}},{new:true})
+        if(!updatedReport){
+            return sendError(res,"Failed to update quotation",null,STATUS_CODES.INTERNAL_SERVER_ERROR)
+        }
+        const issue_id = updatedReport.issue_id
+        await IssueModel.findByIdAndUpdate(issue_id,{$set:{status:'in_progress'}})
+        console.log('yup')
+        return sendSuccess(res,"Quotation submitted successfully",updatedReport,STATUS_CODES.ACCEPTED)
     })
 
 }

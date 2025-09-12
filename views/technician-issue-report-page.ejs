@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Technician Issue Report - Admin Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+
+
+    <!-- DataTables CSS -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/css/issuelist.css" rel="stylesheet">
+
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="card shadow mb-4 col-md-12">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Issue Reports</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="issueReportTable" width="100%"
+                                            cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Issue ID</th>
+                                                    <th>Approved</th>
+                                                    <th>Quotation(Rs)</th>
+                                                    <th>Quotation Type</th>
+                                                    <th>Budget Est (Rs)</th>
+                                                    <th>Parts</th>
+                                                    <th>Device Info</th>
+                                                    <th>Submitted At</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="issue-report-table-body">
+                                                <!-- Sample data - will be populated dynamically -->
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Footer -->
+                <footer class="sticky-footer bg-white">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto">
+                            <span>Copyright &copy; Your Website 2024</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+
+            </div>
+    </div>
+
+    <!-- Bill Generation Modal -->
+    <div class="modal fade" id="billGenerationModal" tabindex="-1" aria-labelledby="billGenerationLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-3">
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="billGenerationLabel">
+                        <i class="fas fa-receipt mr-2"></i>Generate Bill
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <!-- Bill Preview -->
+                    <div id="billPreview" class="p-4 border rounded bg-white">
+                        <!-- Company Header -->
+                        <div class="text-center mb-4">
+                            <h3 class="text-primary font-weight-bold">TechFix Solutions</h3>
+                            <p class="mb-1">123 Service Street, Tech City, TC 12345</p>
+                            <p class="mb-1">Phone: (555) 123-4567 | Email: info@techfix.com</p>
+                            <p class="mb-0">GST No: 12ABCDE3456F7G8</p>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Invoice Details -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-primary">Bill To:</h5>
+                                <p class="mb-1"><strong id="bill-customer-name">John Doe</strong></p>
+                                <p class="mb-1" id="bill-customer-phone">Phone: +91 9876543210</p>
+                                <p class="mb-0" id="bill-customer-address">123 Main Street, City, State - 123456</p>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <h5 class="text-primary">Invoice Details:</h5>
+                                <p class="mb-1"><strong>Invoice No:</strong> <span
+                                        id="bill-invoice-no">INV-2024-001</span></p>
+                                <p class="mb-1"><strong>Issue ID:</strong> <span id="bill-issue-id">TF-001</span></p>
+                                <p class="mb-1"><strong>Date:</strong> <span id="bill-date">2024-03-15</span></p>
+                                <p class="mb-0"><strong>Due Date:</strong> <span id="bill-due-date">2024-03-22</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Service Details -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">Service Details:</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Device Info</th>
+                                            <th>Parts Used</th>
+                                            <th class="text-right">Amount (₹)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td id="bill-service-description">Laptop Screen Replacement & Software
+                                                Installation</td>
+                                            <td id="bill-device-info">HP Pavilion 15 - Model: DV6-3000</td>
+                                            <td id="bill-parts-used">15.6" LED Display, Thermal Paste</td>
+                                            <td class="text-right" id="bill-service-amount">₹8,500</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Calculation Summary -->
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Subtotal:</strong></td>
+                                        <td class="text-right" id="bill-subtotal">₹8,500</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GST (18%):</strong></td>
+                                        <td class="text-right" id="bill-gst">₹1,530</td>
+                                    </tr>
+                                    <tr class="table-primary">
+                                        <td><strong>Total Amount:</strong></td>
+                                        <td class="text-right"><strong id="bill-total">₹10,030</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mt-4 pt-3 border-top">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary">Payment Information:</h6>
+                                    <p class="small mb-1">Account: TechFix Solutions</p>
+                                    <p class="small mb-1">Bank: Tech Bank Ltd.</p>
+                                    <p class="small mb-0">Account No: 1234567890</p>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <h6 class="text-primary">Technician:</h6>
+                                    <p class="mb-1" id="bill-technician-name">Rajesh Kumar</p>
+                                    <p class="small text-muted mb-0">Certified Technician</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <p class="small text-muted mb-0">Thank you for choosing TechFix Solutions!</p>
+                            <p class="small text-muted">For any queries, contact us at support@techfix.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-success" id="downloadPdfBtn">
+                        <i class="fas fa-download mr-1"></i>Download PDF
+                    </button>
+                    <button type="button" class="btn btn-primary" id="printBillBtn">
+                        <i class="fas fa-print mr-1"></i>Print Bill
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <script>
+        let table
+        function loadReport() {
+            $.ajax({
+                url: `/technician/get-issue-reports-list`,
+                type: "GET",
+                success: function (response) {
+                    loadIssueReportInTable(response.data)
+                    console.log(response)
+                },
+                error: function (xhr) {
+
+                }
+            })
+        }
+
+        function loadIssueReportInTable(issueReportData) {
+            table.clear()
+            $.each(issueReportData, function (_, issueReport) {
+                let quotationTypeIndicator = ""
+                if (issueReport.quotation_type === 'none') quotationTypeIndicator = `<span class='btn btn-danger btn-sm'>None</span>`
+                else if (issueReport.quotation_type === 'initial') quotationTypeIndicator = `<span class='btn btn-primary btn-sm'>Initial</span>`
+                else if (issueReport.quotation_type === 'final') quotationTypeIndicator = `<span class='btn btn-success btn-sm'>Final</span>`
+                let statusIdentifier = ""
+                if (issueReport.status === "open") statusIdentifier = "danger"
+                else if (issueReport.status === "bill-generated") statusIdentifier = "warning"
+                else statusIdentifier = "success"
+                let submittedOn = issueReport.createdAt ? new Date(issueReport.createdAt) : ""
+                let dataText = "-"
+                if (submittedOn) dataText = submittedOn.toLocaleDateString()
+                let billgenerationButton = ""
+                if (issueReport.status !== "bill-generated" && issueReport.quotation_type === "final" && issueReport.is_approved) billgenerationButton = `<button class="btn btn-sm btn-warning bill-generation-btn" data-issue-id="${issueReport._id}"><i class="fas fa-receipt"></i></button>`
+                else if (issueReport.status === "bill-generated") billgenerationButton = `<button class="btn btn-sm btn-success bill-generation-btn" data-issue-id="${issueReport._id}"><i class="fas fa-receipt"></i></button>`
+
+                table.row.add([
+                    issueReport.issue_human_redable_id || "-",
+                    `<div>${issueReport.is_approved ? "<span class='btn btn-outline-success'>Approved</span>" : "<span class='btn btn-outline-warning btn-sm'>Pending</span>"}</div>`,
+                    `${issueReport.finalQuotation === 0 ? issueReport.initialQuotation : issueReport.finalQuotation}`,
+                    `${quotationTypeIndicator}`,
+                    issueReport.budgetEstimation || "-",
+                    issueReport.requiredParts || "-",
+                    `<div class='d-flex flex-column'><div><strong>Type:</strong>${issueReport.deviceType || "-"}</div> <div><strong>Name:</strong>${issueReport.deviceName || "-"}</div></div>`,
+                    `<strong>${dataText}</strong>`,
+                    `<div class="btn btn-${statusIdentifier} btn-sm">${issueReport.status.toUpperCase()}</div>`,
+                    `<div class="action-buttons">
+                                <button class="btn btn-sm btn-primary view-issue-btn" data-issue-id="${issueReport.issue_human_redable_id}"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-sm ${issueReport.quotation_type === "final" ? "btn-success" : "btn-warning"} report-issue-btn" data-issue-id="${issueReport._id}" data-service-id="${issueReport.serviceCategoryId}" data-human-redable-id="${issueReport.issue_human_redable_id}"><i class="fas fa-file-alt"></i></button>
+                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                ${billgenerationButton}
+                                </div>
+                    `
+
+                ])
+            })
+            table.draw()
+        }
+
+
+        // Function to open bill generation modal with hardcoded data
+        function openBillModal(issueId) {
+            // Hardcoded data for demonstration
+            const billData = {
+                customerName: "John Doe",
+                customerPhone: "+91 9876543210",
+                customerAddress: "123 Main Street, Mumbai, Maharashtra - 400001",
+                invoiceNo: `INV-2024-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+                issueId: "TF-001",
+                date: new Date().toLocaleDateString('en-IN'),
+                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
+                serviceDescription: "Laptop Screen Replacement & Software Installation",
+                deviceInfo: "HP Pavilion 15 - Model: DV6-3000",
+                partsUsed: "15.6\" LED Display, Thermal Paste",
+                serviceAmount: 8500,
+                technicianName: "Rajesh Kumar"
+            };
+
+            // Calculate totals
+            const subtotal = billData.serviceAmount;
+            const gst = Math.round(subtotal * 0.18);
+            const total = subtotal + gst;
+
+            // Populate modal with data
+            $('#bill-customer-name').text(billData.customerName);
+            $('#bill-customer-phone').text(`Phone: ${billData.customerPhone}`);
+            $('#bill-customer-address').text(billData.customerAddress);
+            $('#bill-invoice-no').text(billData.invoiceNo);
+            $('#bill-issue-id').text(billData.issueId);
+            $('#bill-date').text(billData.date);
+            $('#bill-due-date').text(billData.dueDate);
+            $('#bill-service-description').text(billData.serviceDescription);
+            $('#bill-device-info').text(billData.deviceInfo);
+            $('#bill-parts-used').text(billData.partsUsed);
+            $('#bill-service-amount').text(`₹${billData.serviceAmount.toLocaleString('en-IN')}`);
+            $('#bill-subtotal').text(`₹${subtotal.toLocaleString('en-IN')}`);
+            $('#bill-gst').text(`₹${gst.toLocaleString('en-IN')}`);
+            $('#bill-total').text(`₹${total.toLocaleString('en-IN')}`);
+            $('#bill-technician-name').text(billData.technicianName);
+
+            // Show modal
+            $('#billGenerationModal').modal('show');
+        }
+
+        // Function to generate and download PDF
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Helper function to add text with proper wrapping
+            function addWrappedText(text, x, y, maxWidth, lineHeight = 5) {
+                const lines = doc.splitTextToSize(text, maxWidth);
+                doc.text(lines, x, y);
+                return y + (lines.length * lineHeight);
+            }
+
+            // Company header - centered
+            doc.setFontSize(20);
+            doc.setTextColor(40, 116, 166);
+            doc.text('TechFix Solutions', 105, 25, { align: 'center' });
+
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text('123 Service Street, Tech City, TC 12345', 105, 35, { align: 'center' });
+            doc.text('Phone: (555) 123-4567 | Email: info@techfix.com', 105, 42, { align: 'center' });
+            doc.text('GST No: 12ABCDE3456F7G8', 105, 49, { align: 'center' });
+
+            // Line separator
+            doc.setLineWidth(0.5);
+            doc.line(20, 55, 190, 55);
+
+            // Invoice details section
+            doc.setFontSize(12);
+            doc.setTextColor(40, 116, 166);
+            doc.text('BILL TO:', 20, 70);
+            doc.text('INVOICE DETAILS:', 120, 70);
+
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+
+            // Left side - Customer details
+            let yPos = 80;
+            doc.setFont(undefined, 'bold');
+            doc.text($('#bill-customer-name').text(), 20, yPos);
+            doc.setFont(undefined, 'normal');
+            yPos += 6;
+            doc.text($('#bill-customer-phone').text(), 20, yPos);
+            yPos += 6;
+            yPos = addWrappedText($('#bill-customer-address').text(), 20, yPos, 80, 5);
+
+            // Right side - Invoice details
+            yPos = 80;
+            doc.text(`Invoice No: ${$('#bill-invoice-no').text()}`, 120, yPos);
+            yPos += 6;
+            doc.text(`Issue ID: ${$('#bill-issue-id').text()}`, 120, yPos);
+            yPos += 6;
+            doc.text(`Date: ${$('#bill-date').text()}`, 120, yPos);
+            yPos += 6;
+            doc.text(`Due Date: ${$('#bill-due-date').text()}`, 120, yPos);
+
+            // Service details table
+            const tableTop = 120;
+            doc.setFontSize(12);
+            doc.setTextColor(40, 116, 166);
+            doc.text('SERVICE DETAILS:', 20, tableTop);
+
+            // Table headers
+            const headerY = tableTop + 15;
+            doc.setFontSize(10);
+            doc.setTextColor(255, 255, 255);
+            doc.setFillColor(40, 116, 166);
+
+            // Draw header background
+            doc.rect(20, headerY - 5, 170, 8, 'F');
+
+            // Header text
+            doc.text('Description', 22, headerY);
+            doc.text('Device Info', 70, headerY);
+            doc.text('Parts Used', 120, headerY);
+            doc.text('Amount', 185, headerY, { align: 'right' });
+
+            // Table borders for header
+            doc.setDrawColor(40, 116, 166);
+            doc.setLineWidth(0.5);
+            doc.rect(20, headerY - 5, 170, 8);
+            doc.line(68, headerY - 5, 68, headerY + 3); // Column 1 separator
+            doc.line(118, headerY - 5, 118, headerY + 3); // Column 2 separator
+            doc.line(158, headerY - 5, 158, headerY + 3); // Column 3 separator
+
+            // Table data
+            const dataY = headerY + 10;
+            doc.setTextColor(0, 0, 0);
+            doc.setFillColor(248, 249, 250);
+
+            // Data row background
+            doc.rect(20, dataY - 5, 170, 20, 'F');
+
+            // Data text with wrapping
+            addWrappedText($('#bill-service-description').text(), 22, dataY, 45, 4);
+            addWrappedText($('#bill-device-info').text(), 70, dataY, 47, 4);
+            addWrappedText($('#bill-parts-used').text(), 120, dataY, 37, 4);
+            doc.text($('#bill-service-amount').text().replace(/\s/g, ''), 185, dataY, { align: 'right' });
+
+            // Table borders for data row
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(20, dataY - 5, 170, 20);
+            doc.line(68, dataY - 5, 68, dataY + 15);
+            doc.line(118, dataY - 5, 118, dataY + 15);
+            doc.line(158, dataY - 5, 158, dataY + 15);
+
+            // Totals section
+            const totalsY = dataY + 35;
+            const totalsX = 120;
+
+            // Totals background
+            doc.setFillColor(248, 249, 250);
+            doc.rect(totalsX, totalsY - 5, 70, 25, 'F');
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(totalsX, totalsY - 5, 70, 25);
+
+            doc.setFontSize(10);
+            doc.text('Subtotal:', totalsX + 5, totalsY + 2);
+            doc.text($('#bill-subtotal').text().replace(/\s/g, ''), 185, totalsY + 2, { align: 'right' });
+
+            doc.text('GST (18%):', totalsX + 5, totalsY + 8);
+            doc.text($('#bill-gst').text().replace(/\s/g, ''), 185, totalsY + 8, { align: 'right' });
+
+            // Total amount with emphasis
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(11);
+            doc.text('Total Amount:', totalsX + 5, totalsY + 16);
+            doc.text($('#bill-total').text().replace(/\s/g, ''), 185, totalsY + 16, { align: 'right' });
+            doc.setFont(undefined, 'normal');
+
+            // Footer section
+            const footerY = totalsY + 40;
+            doc.setLineWidth(0.3);
+            doc.line(20, footerY, 190, footerY);
+
+            doc.setFontSize(10);
+            doc.setTextColor(40, 116, 166);
+            doc.text('PAYMENT INFORMATION:', 20, footerY + 10);
+            doc.text('TECHNICIAN:', 120, footerY + 10);
+
+            doc.setFontSize(9);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Account: TechFix Solutions', 20, footerY + 18);
+            doc.text('Bank: Tech Bank Ltd.', 20, footerY + 24);
+            doc.text('Account No: 1234567890', 20, footerY + 30);
+
+            doc.setFont(undefined, 'bold');
+            doc.text($('#bill-technician-name').text(), 120, footerY + 18);
+            doc.setFont(undefined, 'normal');
+            doc.text('Certified Technician', 120, footerY + 24);
+
+            // Thank you message
+            doc.setFontSize(10);
+            doc.setTextColor(40, 116, 166);
+            doc.text('Thank you for choosing TechFix Solutions!', 105, footerY + 45, { align: 'center' });
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('For any queries, contact us at support@techfix.com', 105, footerY + 52, { align: 'center' });
+
+            // Save PDF
+            const invoiceNo = $('#bill-invoice-no').text();
+            doc.save(`Bill_${invoiceNo}.pdf`);
+        }
+
+        // Function to print bill
+        function printBill() {
+            const printWindow = window.open('', '_blank');
+            const billContent = document.getElementById('billPreview').innerHTML;
+
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Print Bill</title>
+                        <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+                        <style>
+                            @media print {
+                                .btn { display: none !important; }
+                                body { font-size: 12px; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${billContent}
+                    </body>
+                </html>
+            `);
+
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
+
+        $(document).ready(function () {
+            loadReport()
+            table = $('#issueReportTable').DataTable({
+                paging: true,
+                searching: true,   // enables global search box
+                ordering: true,
+                lengthChange: true,
+                pageLength: 10
+            });
+
+            // Event handler for bill generation button
+            $(document).on('click', '.bill-generation-btn', function (e) {
+                e.preventDefault();
+                const issueId = $(this).data('issue-id');
+                openBillModal(issueId);
+            });
+
+            // Event handler for PDF download
+            $('#downloadPdfBtn').on('click', function () {
+                generatePDF();
+            });
+
+            // Event handler for print bill
+            $('#printBillBtn').on('click', function () {
+                printBill();
+            });
+        })
+
+    </script>
+</body>
+
+</html>

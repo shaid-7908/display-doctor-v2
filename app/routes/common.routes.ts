@@ -20,4 +20,7 @@ commonRouter.get("/get-current-schedule/:id", authChecker, roleChecker(["caller"
 commonRouter.post('/change-schedule',authChecker,roleChecker(["caller","admin"]),commonController.changeSchedule)
 
 commonRouter.get('/get-issue-history/:id',authChecker,roleChecker(['caller','admin']),commonController.getIssueHistory)
+
+//Issue report route
+
 export default commonRouter;

@@ -488,6 +488,7 @@ class CommonController {
       STATUS_CODES.OK
     );
   });
+  
 }
 
 const commonController = new CommonController();

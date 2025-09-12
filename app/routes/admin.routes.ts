@@ -36,4 +36,11 @@ adminRouter.get("/create-service-subcategory", authChecker, roleChecker(["admin"
 adminRouter.post("/create-service-subcategory", authChecker, roleChecker(["admin"]), adminController.createServiceSubCategory);
 adminRouter.get("/get-sub-categories-by-service/:service_id", authChecker, roleChecker(["admin"]), adminController.getSubCategoriesByServiceCategory);
 
+
+//Issue Report Routes
+adminRouter.get('/issue-reports',authChecker,roleChecker(["admin"]),adminController.renderIssueReportPage)
+adminRouter.get('/get-issue-reports',authChecker,roleChecker(["admin"]),adminController.getIssueReports)
+adminRouter.get('/get-issue-report-details/:id',authChecker,roleChecker(["admin"]),adminController.getIssueReportById)
+adminRouter.patch('/submit-quotation',authChecker,roleChecker(['admin']),adminController.submitQuotation)
+
 export default adminRouter; 

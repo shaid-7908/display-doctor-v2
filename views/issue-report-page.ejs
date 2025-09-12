@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Issue Reports - Admin Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+
+
+    <!-- DataTables CSS -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/css/issuelist.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="card shadow mb-4 col-md-12">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Issue Reports</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="issueReportTable" width="100%"
+                                            cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Issue ID</th>
+                                                    <th>Approved</th>
+                                                    <th>Quotation(Rs)</th>
+                                                    <th>Quotation Type</th>
+                                                    <th>Budget Est (Rs)</th>
+                                                    <th>Parts</th>
+                                                    <th>Device Info</th>
+                                                    <th>Submitted At</th>
+                                                    <th>Submitted By</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="issue-report-table-body">
+                                                <!-- Sample data - will be populated dynamically -->
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Quotation Modal-->
+            <div class="modal fade" id="quotationReportModal" tabindex="-1" aria-labelledby="quotationReportLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-md modal-dialog-centered">
+                    <div class="modal-content shadow-lg border-0 rounded-3">
+                        <!-- Header -->
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title fw-bold" id="quotationReportLabel">Quotation Report</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="modal-body">
+                            <div class="p-3 border rounded bg-light">
+                                <h6 class="text-muted">Report Summary</h6>
+                                <p class="small text-secondary">Please fill in the initial and final quotation details
+                                    below for this report.</p>
+                                <div class="card p-2">
+                                    <div class="card-header"><strong>Basic Info</strong></div>
+                                    <div><strong>ID : </strong><span id="quotation-issue-human-id"></span></div>
+                                    <div><strong>Contact : </strong><span id="quotation-contact"></span></div>
+                                    <div><strong>Address : </strong><span id="quotation-address"></span></div>
+                                    <div><strong>Device Info : </strong><span id="quotation-device-info"></span></div>
+                                </div>
+                                <div class="card p-2 my-2">
+                                    <div class="card-header"><strong>Quotation Info</strong></div>
+                                    <div><strong>Quotation Type : </strong><span id="quotation-type"></span></div>
+                                    <div><strong>Ammount :</strong><span id="quotation-ammount"></span></div>
+
+                                </div>
+                                <!-- Form -->
+                                <form id="quotationForm">
+                                    <input type="hidden" name="reportId" id="report-id">
+                                    <div class="mb-3">
+                                        <label for="initialQuotation" class="form-label fw-semibold">Initial
+                                            Quotation</label>
+                                        <input type="number" class="form-control" id="initialQuotation"
+                                            name="initialQuotation" placeholder="Enter initial quotation" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="finalQuotation" class="form-label fw-semibold">Final
+                                            Quotation</label>
+                                        <input type="number" class="form-control" id="finalQuotation"
+                                            name="finalQuotation" placeholder="Enter final quotation" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="remarks" class="form-label fw-semibold">Remarks (optional)</label>
+                                        <textarea class="form-control" id="remarks" rows="3"
+                                            placeholder="Enter any additional notes..."></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" form="quotationForm" id="submitQuotationFormButton" class="btn btn-success">Submit Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+    <!-- Page wrapper end-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+    <script>
+        let table
+        function loadIssueReports() {
+            $.ajax({
+                url: `/get-issue-reports`,
+                type: "GET",
+                success: function (response) {
+                    console.log(response)
+                    loadIssueReportInTable(response.data)
+                },
+                error: function (xhr) {
+
+                }
+            })
+        }
+
+        function loadIssueReportInTable(issueReportData) {
+            table.clear()
+            $.each(issueReportData, function (_, issueReport) {
+                let statusIdentifier = ""
+                if (issueReport.status === "open") statusIdentifier = "danger"
+                else if (issueReport.status === "bill-generated") statusIdentifier = "warning"
+                else statusIdentifier = "success"
+                let submittedOn = issueReport.createdAt ? new Date(issueReport.createdAt) : ""
+                let quotationTypeIndicator = ""
+                if (issueReport.quotation_type === 'none') quotationTypeIndicator = `<span class='btn btn-danger btn-sm'>None</span>`
+                else if (issueReport.quotation_type === 'initial') quotationTypeIndicator = `<span class='btn btn-primary btn-sm'>Initial</span>`
+                else if (issueReport.quotation_type === 'final') quotationTypeIndicator = `<span class='btn btn-success btn-sm'>Final</span>`
+                let dataText = "-"
+                if (submittedOn) dataText = submittedOn.toLocaleDateString()
+                table.row.add([
+                    `<a href='/issue-details/${issueReport.issue_id}'>${issueReport.issue_human_redable_id || "-"}</a>`,
+                    `<div>${issueReport.is_approved ? "<span class='btn btn-outline-success'>Approved</span>" : "<span class='btn btn-outline-warning btn-sm'>Pending</span>"}</div>`,
+                    `${issueReport.finalQuotation === 0 ? issueReport.initialQuotation : issueReport.finalQuotation}`,
+                    `${quotationTypeIndicator}`,
+                    issueReport.budgetEstimation || "-",
+                    issueReport.requiredParts || "-",
+                    `<div class='d-flex flex-column'><div><strong>Type:</strong>${issueReport.deviceType || "-"}</div> <div><strong>Name:</strong>${issueReport.deviceName || "-"}</div></div>`,
+                    `<strong>${dataText}</strong>`,
+                    `<div class='d-flex flex-column'>
+                        <a href='/technician-details/${issueReport.submitted_by?._id}'>
+                       <span>${issueReport.submitted_by?.firstName} ${issueReport.submitted_by?.lastName}</span>
+                       </a>
+                       <span class='text-muted small'><i class="fas fa-phone"></i> ${issueReport.submitted_by.phone}</span> 
+                    </div>`,
+                    `<div class="btn btn-${statusIdentifier} btn-sm">${issueReport.status.toUpperCase()}</div`,
+                    `<div class="action-buttons">
+                                <button class="btn btn-sm btn-primary view-issue-btn" data-issue-id="${issueReport.issue_human_redable_id}"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-sm ${issueReport.quotation_type === "final" ? "btn-success" : "btn-warning"} approve-issue-report-btn" data-issue-id="${issueReport._id}" data-service-id="${issueReport.serviceCategoryId}" data-human-redable-id="${issueReport.issue_human_redable_id}"><i class="fas fa-file-alt"></i></button>
+                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                    </div>
+                    `
+
+                ])
+            })
+            table.draw()
+        }
+
+        function openQuotationModal(data) {
+            let submitButtonText = ""
+            if (data.quotation_type === "none") submitButtonText = "Submit Quotation"
+            else submitButtonText = "Update Quotation"
+            $('#submitQuotationFormButton').text(submitButtonText)
+            let contactValue = ""
+            contactValue = data.issue_details.contact.name + "," + data.issue_details.contact.phone
+            let addressValue = (data.issue_details.contact.address.line1 || "-") + "," + data.issue_details.contact.address.city + "," + data.issue_details.contact.address.pinCode + "," + data.issue_details.contact.address.state
+            let deviceInfo = (data.deviceName || "-") + "," + (data.deviceModelNumber || "-")
+            $('#quotation-issue-human-id').text(data.issue_human_redable_id)
+            let quotationType = ""
+            if (data.initialQuotation === 0 && data.finalQuotation === 0) quotationType = "None"
+            else if (data.initialQuotation > 0 && data.finalQuotation === 0) quotationType = "Initial"
+            else if (data.finalQuotation > 0) quotationType = "Final"
+            else quotationType = "None"
+            let quotationAmmount = ""
+            if (data.initialQuotation === 0 && data.finalQuotation === 0) quotationAmmount = "0"
+            else if (data.initialQuotation > 0 && data.finalQuotation === 0) quotationAmmount += data.initialQuotation
+            else if (data.finalQuotation > 0) quotationAmmount += data.finalQuotation
+            $('#quotation-contact').text(contactValue)
+            $('#quotation-address').text(addressValue)
+            $('#quotation-type').text(quotationType)
+            $('#quotation-device-info').text(deviceInfo)
+            $('#quotation-ammount').text(quotationAmmount)
+            $('#quotationReportModal').modal('show')
+            $('#initialQuotation').val(data.initialQuotation)
+            $('#finalQuotation').val(data.finalQuotation)
+            $('#report-id').val(data._id)
+        }
+
+        $(document).ready(function () {
+            loadIssueReports()
+            table = $('#issueReportTable').DataTable({
+                paging: true,
+                searching: true,   // enables global search box
+                ordering: true,
+                lengthChange: true,
+                pageLength: 10
+            });
+
+            $('#quotationForm').on('submit', function (e) {
+                e.preventDefault()
+                $.ajax({
+                    url: '/submit-quotation',
+                    type: 'PATCH',
+                    data: $(this).serialize(),
+                    success: function (response) {
+
+                    },
+                    error: function (xhr) {
+
+                    }
+                })
+            })
+        })
+        $(document).on('click', '.approve-issue-report-btn', function (e) {
+            e.preventDefault()
+            const reportId = $(this).data('issue-id')
+            $.ajax({
+                url: `/get-issue-report-details/${reportId}`,
+                type: "GET",
+                success: function (response) {
+                    console.log(response)
+                    openQuotationModal(response.data[0])
+                },
+                error: function (xhr) {
+
+                }
+            })
+        })
+    </script>
+
+</body>
+
+</html>

@@ -17,8 +17,21 @@ technicianRouter.get(
   roleChecker(["technician"]),
   technicianController.getAssignedIssues
 );
+ //Issue Report routes
+technicianRouter.post(
+  "/technician/generate-issue-report",
+  authChecker,
+  roleChecker(["technician"]),
+  technicianController.generateIssueReport
+);
 
-technicianRouter.post('/technician/generate-issue-report',authChecker,roleChecker(['technician']),technicianController.generateIssueReport)
+technicianRouter.get(
+  "/technician/issue-reports-list",
+  authChecker,
+  roleChecker(["technician"]),
+  technicianController.renderIssueReportPage
+);
 
+technicianRouter.get("/technician/get-issue-reports-list",authChecker,roleChecker(["technician"]),technicianController.getIssueReportList);
 
 export default technicianRouter;
