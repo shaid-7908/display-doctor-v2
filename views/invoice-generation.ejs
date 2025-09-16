@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Issue Reports - Admin Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+
+
+    <!-- DataTables CSS -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/css/issuelist.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">
+                                            <i class="fas fa-file-invoice-dollar"></i> Invoice Generation
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <% if (error) { %>
+                                            <div class="alert alert-danger" role="alert">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                <%= error %>
+                                            </div>
+                                            <% } %>
+
+                                                <% if (!issue) { %>
+                                                    <!-- Issue Search Section -->
+                                                    <div id="issue-search-section">
+                                                        <div class="row">
+                                                            <div class="col-md-6 mx-auto">
+                                                                <div class="card">
+                                                                    <div class="card-header">
+                                                                        <h6 class="m-0 font-weight-bold text-info">
+                                                                            <i class="fas fa-search"></i> Search Issue
+                                                                        </h6>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <form id="issue-search-form">
+                                                                            <div class="form-group">
+                                                                                <label for="issue-id">Issue Number
+                                                                                    (Human Readable ID)</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="issue-id" name="issueId"
+                                                                                    placeholder="e.g., ISS2500001"
+                                                                                    required>
+                                                                                <small class="form-text text-muted">
+                                                                                    Enter the issue ID to load customer
+                                                                                    and service details
+                                                                                </small>
+                                                                            </div>
+                                                                            <button type="submit"
+                                                                                class="btn btn-primary btn-block">
+                                                                                <i class="fas fa-search"></i> Search
+                                                                                Issue
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <!-- Invoice Generation Form -->
+                                                        <div id="invoice-form-section"
+                                                            class="<%= !issue ? 'd-none' : '' %>">
+                                                            <% if (issue && issueReport) { %>
+                                                                <!-- Issue Details Display -->
+                                                                <div class="row mb-4">
+                                                                    <div class="col-12">
+                                                                        <div class="alert alert-info">
+                                                                            <h6><i class="fas fa-info-circle"></i> Issue
+                                                                                Details</h6>
+                                                                            <div class="row">
+                                                                                <div class="col-md-6">
+                                                                                    <strong>Issue ID:</strong>
+                                                                                    <%= issue.human_readable_id %><br>
+                                                                                        <strong>Customer:</strong>
+                                                                                        <%= issue.contact.name %><br>
+                                                                                            <strong>Phone:</strong>
+                                                                                            <%= issue.contact.phone %>
+                                                                                                <br>
+                                                                                                <strong>Device:</strong>
+                                                                                                <%= issue.device.brand
+                                                                                                    || 'N/A' %>
+                                                                                                    <%= issue.device.model
+                                                                                                        || 'N/A' %>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <strong>Service:</strong>
+                                                                                    <%= issue.serviceCategoryId ?
+                                                                                        issue.serviceCategoryId.name
+                                                                                        : 'N/A' %><br>
+                                                                                        <strong>Problem:</strong>
+                                                                                        <%= issue.problemDescription.substring(0,
+                                                                                            100) %>...<br>
+                                                                                            <strong>Status:</strong>
+                                                                                            <span
+                                                                                                class="badge badge-info">
+                                                                                                <%= issue.status %>
+                                                                                            </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <% } %>
+
+                                                                    <form id="invoice-generation-form" >
+                                                                        <% if (issue) { %>
+                                                                            <input type="hidden" name="human_readable_issue_id"
+                                                                                value="<%= issue.human_readable_id %>">
+                                                                            <input type="hidden" name="issueId"
+                                                                                value="<%= issue._id %>">
+                                                                            <% } %>
+
+                                                                            <% if (issueReport) { %>
+                                                                                <input type="hidden" name="issue_report_id"
+                                                                                    value="<%= issueReport._id %>">
+                                                                            <% } %>
+                                                                            
+
+                                                                                <div class="row">
+                                                                                    <!-- Left Column -->
+                                                                                    <div class="col-md-6">
+                                                                                        <!-- Customer Information (Pre-filled if issue exists) -->
+                                                                                        <div class="card mb-3">
+                                                                                            <div class="card-header">
+                                                                                                <h6
+                                                                                                    class="m-0 font-weight-bold text-success">
+                                                                                                    <i
+                                                                                                        class="fas fa-user"></i>
+                                                                                                    Customer Information
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                            <div class="card-body">
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="customer-name">Customer
+                                                                                                        Name</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="customer-name"
+                                                                                                        name="customerName"
+                                                                                                        value="<%= issue ? issue.contact.name : '' %>"
+                                                                                                        required>
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="customer-phone">Phone
+                                                                                                        Number</label>
+                                                                                                    <input type="tel"
+                                                                                                        class="form-control"
+                                                                                                        id="customer-phone"
+                                                                                                        name="customerPhone"
+                                                                                                        value="<%= issue ? issue.contact.phone : '' %>"
+                                                                                                        required>
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="customer-email">Email</label>
+                                                                                                    <input type="email"
+                                                                                                        class="form-control"
+                                                                                                        id="customer-email"
+                                                                                                        name="customerEmail"
+                                                                                                        value="<%= issue ? (issue.contact.email || '') : '' %>">
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="customer-address">Address</label>
+                                                                                                    <textarea
+                                                                                                        class="form-control"
+                                                                                                        id="customer-address"
+                                                                                                        name="customerAddress"
+                                                                                                        rows="3"
+                                                                                                        required><%= issue ? `${issue.contact.address.line1}, ${issue.contact.address.city}, ${issue.contact.address.state} - ${issue.contact.address.pinCode}` : '' %></textarea>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                        <!-- Device Information (Pre-filled if issue exists) -->
+                                                                                        <div class="card mb-3">
+                                                                                            <div class="card-header">
+                                                                                                <h6
+                                                                                                    class="m-0 font-weight-bold text-warning">
+                                                                                                    <i
+                                                                                                        class="fas fa-tv"></i>
+                                                                                                    Device Information
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                            <div class="card-body">
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="device-type">Device
+                                                                                                        Type</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="device-type"
+                                                                                                        name="deviceType"
+                                                                                                        value="<%= issue ? issue.device.type : '' %>"
+                                                                                                        required>
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="device-brand">Brand</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="device-brand"
+                                                                                                        name="deviceBrand"
+                                                                                                        value="<%= issue ? (issue.device.brand || '') : '' %>">
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="device-model">Model</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="device-model"
+                                                                                                        name="deviceModel"
+                                                                                                        value="<%= issue ? (issue.device.model || '') : '' %>">
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="device-serial">Serial
+                                                                                                        Number</label>
+                                                                                                    <input type="text"
+                                                                                                        class="form-control"
+                                                                                                        id="device-serial"
+                                                                                                        name="deviceSerial"
+                                                                                                        value="<%= issue ? (issue.device.serialNumber || '') : '' %>">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                    <!-- Right Column -->
+                                                                                    <div class="col-md-6">
+                                                                                        <!-- Service Details -->
+                                                                                        <div class="card mb-3">
+                                                                                            <div class="card-header">
+                                                                                                <h6
+                                                                                                    class="m-0 font-weight-bold text-primary">
+                                                                                                    <i
+                                                                                                        class="fas fa-wrench"></i>
+                                                                                                    Service Details
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                            <div class="card-body">
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="service-description">Service
+                                                                                                        Description
+                                                                                                        *</label>
+                                                                                                    <textarea
+                                                                                                        class="form-control"
+                                                                                                        id="service-description"
+                                                                                                        name="serviceDescription"
+                                                                                                        rows="4"
+                                                                                                        placeholder="Describe the service performed..."
+                                                                                                        required><%= issue ? issue.problemDescription : '' %></textarea>
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="parts-used">Parts
+                                                                                                        Used *</label>
+                                                                                                    <textarea
+                                                                                                        class="form-control"
+                                                                                                        id="parts-used"
+                                                                                                        name="partsUsed"
+                                                                                                        rows="3"
+                                                                                                        placeholder="List all parts used with quantities..."
+                                                                                                        required><%= issueReport ? issueReport.requiredParts : '' %></textarea>
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="warranty-months">Warranty
+                                                                                                        Period (Months)
+                                                                                                        *</label>
+                                                                                                    <select
+                                                                                                        class="form-control"
+                                                                                                        id="warranty-months"
+                                                                                                        name="warrantyMonths"
+                                                                                                        required>
+                                                                                                        <option
+                                                                                                            value="">
+                                                                                                            Select
+                                                                                                            warranty
+                                                                                                            period
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="1">1
+                                                                                                            Month
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="3">3
+                                                                                                            Months
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="6">6
+                                                                                                            Months
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="12">
+                                                                                                            12 Months
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="24">
+                                                                                                            24 Months
+                                                                                                        </option>
+                                                                                                        <option
+                                                                                                            value="0">No
+                                                                                                            Warranty
+                                                                                                        </option>
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!--Quotation information-->
+                                                                                        <div class="card mb-3">
+                                                                                            <div class="card-header">
+                                                                                                <h6
+                                                                                                    class="m-0 font-weight-bold text-success">
+                                                                                                    <i
+                                                                                                        class="fas fa-rupee-sign"></i>
+                                                                                                    Quotation Details
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                            <div class="card-body">
+                                                                                                <div>
+                                                                                                    <strong>Initial Quotation (Rs) : <%= issueReport ? issueReport.initialQuotation : '' %></strong>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <strong>Final Quotation (Rs) : <%= issueReport ? issueReport.finalQuotation : '' %> </strong>
+                                                                                                    <input type="hidden" id="accepted-quotation" value="<%= issueReport ? issueReport.finalQuotation : '' %>">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Pricing Information -->
+                                                                                        <div class="card mb-3">
+                                                                                            <div class="card-header">
+                                                                                                <h6
+                                                                                                    class="m-0 font-weight-bold text-success">
+                                                                                                    <i
+                                                                                                        class="fas fa-rupee-sign"></i>
+                                                                                                    Pricing Details
+                                                                                                </h6>
+                                                                                                <span id="quotation-error" class="text-danger"></span>
+                                                                                            </div>
+                                                                                            <div class="card-body">
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="labor-charge">Labor
+                                                                                                        Charge
+                                                                                                        (₹)</label>
+                                                                                                    <input type="number"
+                                                                                                        class="form-control"
+                                                                                                        id="labor-charge"
+                                                                                                        name="laborCharge"
+                                                                                                        min="0"
+                                                                                                        step="0.01"
+                                                                                                        placeholder="0.00">
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="parts-cost">Parts
+                                                                                                        Cost (₹)</label>
+                                                                                                    <input type="number"
+                                                                                                        class="form-control"
+                                                                                                        id="parts-cost"
+                                                                                                        name="partsCost"
+                                                                                                        min="0"
+                                                                                                        step="0.01"
+                                                                                                        placeholder="0.00">
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="visit-charge">Visit
+                                                                                                        Charge
+                                                                                                        (₹)</label>
+                                                                                                    <input type="number"
+                                                                                                        class="form-control"
+                                                                                                        id="visit-charge"
+                                                                                                        name="visitCharge"
+                                                                                                        min="0"
+                                                                                                        step="0.01"
+                                                                                                        placeholder="0.00">
+                                                                                                </div>
+                                                                                                <div class="form-group">
+                                                                                                    <label
+                                                                                                        for="discount">Discount
+                                                                                                        (₹)</label>
+                                                                                                    <input type="number"
+                                                                                                        class="form-control"
+                                                                                                        id="discount"
+                                                                                                        name="discount"
+                                                                                                        min="0"
+                                                                                                        step="0.01"
+                                                                                                        placeholder="0.00">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!-- Total Calculation Display -->
+                                                                                <div class="row">
+                                                                                    <div class="col-md-6 ml-auto">
+                                                                                        <div class="card">
+                                                                                            <div
+                                                                                                class="card-header bg-primary text-white">
+                                                                                                <h6
+                                                                                                    class="m-0 font-weight-bold">
+                                                                                                    <i
+                                                                                                        class="fas fa-calculator"></i>
+                                                                                                    Bill Summary
+                                                                                                </h6>
+                                                                                            </div>
+                                                                                            <div class="card-body">
+                                                                                                <div
+                                                                                                    class="d-flex justify-content-between">
+                                                                                                    <span>Subtotal:</span>
+                                                                                                    <span
+                                                                                                        id="subtotal-display">₹0.00</span>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="d-flex justify-content-between">
+                                                                                                    <span>GST
+                                                                                                        (18%):</span>
+                                                                                                    <span
+                                                                                                        id="gst-display">₹0.00</span>
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="d-flex justify-content-between">
+                                                                                                    <span>Discount:</span>
+                                                                                                    <span
+                                                                                                        id="discount-display">-₹0.00</span>
+                                                                                                </div>
+                                                                                                <hr>
+                                                                                                <div
+                                                                                                    class="d-flex justify-content-between font-weight-bold">
+                                                                                                    <span>Total:</span>
+                                                                                                    <span
+                                                                                                        id="total-display">₹0.00</span>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <!-- Action Buttons -->
+                                                                                <div class="row mt-4">
+                                                                                    <div class="col-12 text-center">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-secondary mr-2"
+                                                                                            onclick="window.history.back()">
+                                                                                            <i
+                                                                                                class="fas fa-arrow-left"></i>
+                                                                                            Back
+                                                                                        </button>
+                                                                                        <button type="submit"
+                                                                                            class="btn btn-success mr-2">
+                                                                                            <i
+                                                                                                class="fas fa-file-invoice"></i>
+                                                                                            Generate Invoice
+                                                                                        </button>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-info"
+                                                                                            onclick="previewInvoice()">
+                                                                                            <i class="fas fa-eye"></i>
+                                                                                            Preview
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                    </form>
+                                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!---- Scripts Section ---->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Invoice Generation Custom Scripts -->
+    <script>
+        const issueReport = `<%= issueReport ? issueReport.requiredParts : ''    %>`;
+        console.log(issueReport);
+        $(document).ready(function () {
+            // Issue search form submission
+            $('#issue-search-form').on('submit', function (e) {
+                e.preventDefault();
+                const issueId = $('#issue-id').val().trim();
+
+                if (!issueId) {
+                    alert('Please enter an issue ID');
+                    return;
+                }
+
+                // Redirect to the route with issue ID
+                window.location.href = `/invoice-generation/${issueId}`;
+            });
+
+            // Calculate totals when pricing fields change
+            $('#labor-charge, #parts-cost, #visit-charge, #discount').on('input', function () {
+                calculateTotals();
+            });
+
+            // Initial calculation
+            calculateTotals();
+            $('#invoice-generation-form').on('submit', function (e) {
+                e.preventDefault();
+                const formData = $(this).serialize();
+                console.log(formData);
+                $.ajax({
+                    url: '/generate-invoice/123',
+                    method: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response){
+                        console.log(response);
+                    },
+                    error: function(xhr){
+                        console.log(xhr.responseJSON);
+                    }
+                    
+                })
+
+            });
+        });
+
+        function calculateTotals() {
+            const laborCharge = parseFloat($('#labor-charge').val()) || 0;
+            const partsCost = parseFloat($('#parts-cost').val()) || 0;
+            const visitCharge = parseFloat($('#visit-charge').val()) || 0;
+            const discount = parseFloat($('#discount').val()) || 0;
+            const acceptedQuotation = parseFloat($('#accepted-quotation').val()) || 0;
+            const subtotal = laborCharge + partsCost + visitCharge;
+            const gst = subtotal * 0.18;
+            const total = subtotal + gst - discount;
+            if(subtotal !== acceptedQuotation && (laborCharge > 0 || partsCost > 0 || visitCharge > 0)){
+                $('#quotation-error').text('Subtotal should be same as final quotation');
+            }else{
+                $('#quotation-error').text('');
+            }
+            $('#subtotal-display').text(`₹${subtotal.toFixed(2)}`);
+            $('#gst-display').text(`₹${gst.toFixed(2)}`);
+            $('#discount-display').text(`-₹${discount.toFixed(2)}`);
+            $('#total-display').text(`₹${total.toFixed(2)}`);
+        }
+
+        function previewInvoice() {
+            // Validate required fields first
+            const form = document.getElementById('invoice-generation-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            alert('Preview functionality will be implemented in the next phase. Please proceed with Generate Invoice for now.');
+        }
+    </script>
+</body>
+
+</html>

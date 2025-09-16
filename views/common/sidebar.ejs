@@ -272,6 +272,30 @@
                                             </li>
                                          
                                     <% } %>
+                                    <% if(default_user.role === 'admin' || default_user.role ==='technician'){ %>
+                                        <li class="nav-item">
+                                            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseInvoiceManagement"
+                                                aria-expanded="false" aria-controls="collapseInvoiceManagement">
+                                                <i class="fas fa-dollar-sign"></i>
+                                                <span>Invoice Management</span>
+                                            </a>
+                                            <div id="collapseInvoiceManagement" class="collapse" aria-labelledby="headingInvoiceManagement"
+                                                data-parent="#accordionSidebar">
+                                                <div class="bg-white py-2 collapse-inner rounded shadow-sm">
+                                                    <a class="collapse-item d-flex align-items-center py-2 px-3" href="/invoice-generation">
+                                                        <i class="fas fa-file-invoice-dollar text-primary mr-2"></i>
+                                                        <span class="text-gray-700">Invoice Generation</span>
+                                                    </a>
+                                                    <hr class="sidebar-divider my-1">
+                                                    <a class="collapse-item d-flex align-items-center py-2 px-3" href="/invoice-list">
+                                                        <i class="fas fa-list text-info mr-2"></i>
+                                                        <span class="text-gray-700">Invoice List</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                    <%}%>
                                     <!-- Divider -->
                                     <hr class="sidebar-divider d-none d-md-block">
 

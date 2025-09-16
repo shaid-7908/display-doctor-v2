@@ -348,7 +348,7 @@ const issueSchema = new Schema<IssueDocument, IssueModel>(
         ],
 
         createdBy: {
-            userId: { type: Schema.Types.ObjectId, ref: "users",required:true },
+            userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
             role: { type: String, enum: ["customer", "caller", "admin", "manager", "technician"], required: true },
         },
 

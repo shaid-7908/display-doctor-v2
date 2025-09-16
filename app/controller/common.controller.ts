@@ -8,6 +8,8 @@ import { sendSuccess, sendError } from "../utils/unified.response";
 import STATUS_CODES from "../utils/status.codes";
 import { ServiceCategoryModel } from "../model/service.model";
 import { z } from "zod";
+import { IssueReportModel } from "../model/issuereport.model";
+import { InvoiceModel } from "../model/invoice.model";
 
 class CommonController {
   renderCreateIssue = asyncHandler(async (req: Request, res: Response) => {
@@ -344,9 +346,8 @@ class CommonController {
           action: "assigned",
           from: oldStatus,
           to: "assigned",
-          note: `Assigned to ${technician.firstName} ${technician.lastName}${
-            notes ? ` - ${notes}` : ""
-          }`,
+          note: `Assigned to ${technician.firstName} ${technician.lastName}${notes ? ` - ${notes}` : ""
+            }`,
         });
 
         // Save the issue
@@ -488,7 +489,369 @@ class CommonController {
       STATUS_CODES.OK
     );
   });
-  
+
+  // Render invoice page with hardcoded data
+  renderInvoicePage = asyncHandler(async (req: Request, res: Response) => {
+    const issueId = req.params.issueId;
+    console.log(req.body)
+    // Hardcoded invoice data for now
+    const invoiceData = {
+      // Company Info
+      companyName: "TechFix Solutions",
+      companyAddress: "123 Service Street, Tech City, TC 12345",
+      companyPhone: "(555) 123-4567",
+      companyEmail: "info@techfix.com",
+      companyGST: "12ABCDE3456F7G8",
+
+      // Customer Info
+      customerName: "John Doe",
+      customerPhone: "+91 9876543210",
+      customerAddress: "123 Main Street, Mumbai, Maharashtra - 400001",
+
+      // Invoice Details
+      invoiceNo: `INV-2024-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+      issueId: "TF-001",
+      date: new Date().toLocaleDateString('en-IN'),
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
+
+      // Service Details
+      serviceDescription: "Laptop Screen Replacement & Software Installation",
+      deviceInfo: "HP Pavilion 15 - Model: DV6-3000",
+      partsUsed: "15.6\" LED Display, Thermal Paste",
+      serviceAmount: 8500,
+
+      // Payment Info
+      bankName: "Tech Bank Ltd.",
+      accountNo: "1234567890",
+
+      // Technician Info
+      technicianName: "Rajesh Kumar",
+      technicianTitle: "Certified Technician"
+    };
+
+    // Calculate totals
+    const subtotal = invoiceData.serviceAmount;
+    const gst = Math.round(subtotal * 0.18);
+    const total = subtotal + gst;
+
+    const finalInvoiceData = {
+      ...invoiceData,
+      subtotal,
+      gst,
+      total
+    };
+
+    res.render("invoice", {
+      invoice: finalInvoiceData,
+      default_user: req.user
+    });
+  });
+
+  generateInvoice = asyncHandler(async (req, res) => {
+    console.log(req.body)
+    
+    const { issueId, customerName, human_readable_issue_id, customerPhone, customerEmail, customerAddress, deviceType, deviceBrand, deviceModel, deviceSerial, serviceDescription, partsUsed, warrantyMonths, laborCharge, partsCost, visitCharge, discount,issue_report_id } = req.body
+
+    const existingInvoice = await InvoiceModel.findOne({ human_readable_issue_id: human_readable_issue_id, issueId: issueId })
+
+    if(existingInvoice){
+      return sendError(res, "Invoice already exists", null, STATUS_CODES.BAD_REQUEST);
+    }
+
+    const existingReport = await IssueReportModel.findOne({ issue_human_redable_id: human_readable_issue_id, issue_id: issueId })
+
+    if(!existingReport){
+      return sendError(res, "Report not found", null, STATUS_CODES.BAD_REQUEST);
+    }
+
+    let numLabourCharge = parseFloat(laborCharge) || 0
+    let numPartsCost = parseFloat(partsCost) || 0
+    let numVisitCharge = parseFloat(visitCharge) || 0
+    let numDiscount = parseFloat(discount) || 0
+    let subtotal = numLabourCharge + numPartsCost + numVisitCharge
+    if (subtotal < existingReport.finalQuotation.valueOf()){
+      return sendError(res, "Subtotal is less than final quotation", null, STATUS_CODES.BAD_REQUEST);
+    }
+    let gst = subtotal * 0.18
+    let finalAmount = subtotal + gst - numDiscount
+    const newInvoice = await InvoiceModel.create({
+      issueId,
+      issue_report_id,
+      human_readable_issue_id,
+      customerName,
+      customerPhone,
+      customerEmail,
+      customerAddress,
+      deviceType,
+      deviceBrand:deviceBrand || "NA",
+      deviceModel:deviceModel || "NA",
+      deviceSerial:deviceSerial || "NA",
+      serviceDescription:serviceDescription || "NA",
+      partsUsed:partsUsed,
+      finalQuotation: existingReport.finalQuotation.valueOf(),
+      labourCharge: numLabourCharge,
+      partsCost: numPartsCost,
+      visitCharge: numVisitCharge,
+      discount: numDiscount,
+      finalAmount: finalAmount,
+      warrantyMonths,
+      warrantyStart: new Date(),
+      warrantyEnd: new Date(Date.now() + warrantyMonths * 30 * 24 * 60 * 60 * 1000),
+      invoiceDate: new Date(),
+      status: "pending"
+    })
+    if (!newInvoice) {
+      return sendError(res, "Failed to generate invoice", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+    } else {
+      const updateIssueReport = await IssueReportModel.updateOne({ issue_human_redable_id: newInvoice.issueId }, { $set: { status: "bill-generated" } })
+      const issue = await IssueModel.findOne({ human_readable_id: newInvoice.issueId })
+      if(issue){
+        const previousStatus = issue.status
+        issue.status = "awaiting_payment"
+        issue.history.push({
+          at: new Date(),
+          by: req.user?.id,
+          action: "status_changed",
+          from: previousStatus,
+          to: "awaiting_payment",
+          note: "Status changed to awaiting payment after invoice generation"
+        })
+        await issue.save()
+      }
+      return sendSuccess(res, "Invoice generated successfully", newInvoice, STATUS_CODES.OK);
+    }
+
+  })
+
+  // Generate and download PDF using Puppeteer
+  downloadInvoicePdf = asyncHandler(async (req: Request, res: Response) => {
+    const issueId = req.params.issueId;
+
+    try {
+      const puppeteer = require('puppeteer');
+
+      // Launch browser
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
+
+      const page = await browser.newPage();
+
+      const invoiceData = {
+        // Company Info
+        companyName: "TechFix Solutions",
+        companyAddress: "123 Service Street, Tech City, TC 12345",
+        companyPhone: "(555) 123-4567",
+        companyEmail: "info@techfix.com",
+        companyGST: "12ABCDE3456F7G8",
+
+        // Customer Info
+        customerName: "John Doe",
+        customerPhone: "+91 9876543210",
+        customerAddress: "123 Main Street, Mumbai, Maharashtra - 400001",
+
+        // Invoice Details
+        invoiceNo: `INV-2024-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+        issueId: "TF-001",
+        date: new Date().toLocaleDateString('en-IN'),
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
+
+        // Service Details
+        serviceDescription: "Laptop Screen Replacement & Software Installation",
+        deviceInfo: "HP Pavilion 15 - Model: DV6-3000",
+        partsUsed: "15.6\" LED Display, Thermal Paste",
+        serviceAmount: 8500,
+
+        // Payment Info
+        bankName: "Tech Bank Ltd.",
+        accountNo: "1234567890",
+
+        // Technician Info
+        technicianName: "Rajesh Kumar",
+        technicianTitle: "Certified Technician"
+      };
+
+      // Calculate totals
+      const subtotal = invoiceData.serviceAmount;
+      const gst = Math.round(subtotal * 0.18);
+      const total = subtotal + gst;
+
+      const finalInvoiceData = {
+        ...invoiceData,
+        subtotal,
+        gst,
+        total
+      };
+
+      // Navigate to the invoice page
+      // const invoiceUrl = `${req.protocol}://${req.get('host')}/generate-invoice/${issueId}`;
+      // await page.goto(invoiceUrl, {
+      //   waitUntil: 'networkidle0',
+      //   timeout: 30000
+      // });
+
+      // // Generate PDF
+      // const pdf = await page.pdf({
+      //   format: 'A4',
+      //   printBackground: true,
+      //   margin: {
+      //     top: '20px',
+      //     right: '20px',
+      //     bottom: '20px',
+      //     left: '20px'
+      //   }
+      // });
+      const html = await new Promise((resolve, reject) => {
+        res.render("invoice", {
+          invoice: finalInvoiceData,
+          default_user: req.user
+        }, (err, html) => {
+          if (err) reject(err);
+          else resolve(html);
+        });
+      });
+      await page.setContent(html, { waitUntil: "networkidle0" });
+      const pdf = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px'
+        }
+      });
+      await browser.close();
+
+      // Set response headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=Invoice-${issueId}.pdf`);
+      res.setHeader('Content-Length', pdf.length);
+
+      // Send PDF
+      res.send(pdf);
+
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      return sendError(res, "Failed to generate PDF", error, STATUS_CODES.INTERNAL_SERVER_ERROR);
+    }
+  });
+  renderInvoiceGenerationPage = asyncHandler(async (req: Request, res: Response) => {
+    res.render("invoice-generation", {
+      default_user: req.user,
+      issue: null,
+      issueReport: null,
+      error: null
+    });
+  });
+
+  renderInvoiceGenerationPageWithIssue = asyncHandler(async (req: Request, res: Response) => {
+
+
+    const issueId = req.params.id;
+    try {
+      const issueReport = await IssueReportModel.findOne({ issue_human_redable_id: issueId })
+      if (!issueReport) {
+        return res.render("invoice-generation", {
+          default_user: req.user,
+          issue: null,
+          issueReport: null,
+          error: `Issue Report is not Generated for this issue ${issueId} !`
+        });
+      }
+
+      const issue = await IssueReportModel.aggregate(
+        [
+          { $match: { issue_human_redable_id: issueId, is_approved: true, finalQuotation: { $ne: 0 } } },
+          { $lookup: { from: "issues", localField: "issue_id", foreignField: "_id", as: "issue" } },
+          { $unwind: "$issue" },
+        ]
+      )
+      if (!issue || issue.length === 0) {
+        return res.render("invoice-generation", {
+          default_user: req.user,
+          issue: null,
+          issueReport: null,
+          error: `Report for issue ID ${issueId} not found ornot approved or final quotation is not set`
+        });
+      }
+      console.log(issue[0]);
+      res.render("invoice-generation", {
+        default_user: req.user,
+        issue: issue[0].issue,
+        issueReport: issue[0],
+        error: null
+      });
+    } catch (error) {
+      console.error('Error fetching issue:', error);
+      res.render("invoice-generation", {
+        default_user: req.user,
+        issue: null,
+        issueReport: null,
+        error: 'Failed to fetch issue details'
+      });
+    }
+
+    // try {
+    //   // Find issue by human_readable_id
+    //   const issue = await IssueModel.findOne({
+    //     human_readable_id: issueId,
+    //     isDeleted: false
+    //   })
+    //     .populate('serviceCategoryId', 'name')
+    //     .populate('assignment.technicianId', 'firstName lastName phone email');
+
+    //   if (!issue) {
+    //     return res.render("invoice-generation", {
+    //       default_user: req.user,
+    //       issue: null,
+    //       error: `Issue with ID ${issueId} not found`
+    //     });
+    //   }
+
+    //   res.render("invoice-generation", {
+    //     default_user: req.user,
+    //     issue: issue,
+    //     error: null
+    //   });
+    // } catch (error) {
+    //   console.error('Error fetching issue:', error);
+    //   res.render("invoice-generation", {
+    //     default_user: req.user,
+    //     issue: null,
+    //     error: 'Failed to fetch issue details'
+    //   });
+    // }
+
+  });
+
+  searchIssueForInvoice = asyncHandler(async (req: Request, res: Response) => {
+    const { issueId } = req.body;
+
+    if (!issueId) {
+      return sendError(res, "Issue ID is required", null, STATUS_CODES.BAD_REQUEST);
+    }
+
+    try {
+      // Find issue by human_readable_id
+      const issue = await IssueModel.findOne({
+        human_readable_id: issueId,
+        isDeleted: false
+      })
+        .populate('serviceCategoryId', 'name')
+        .populate('assignment.technicianId', 'firstName lastName phone email');
+
+      if (!issue) {
+        return sendError(res, `Issue with ID ${issueId} not found`, null, STATUS_CODES.NOT_FOUND);
+      }
+
+      return sendSuccess(res, "Issue found", issue, STATUS_CODES.OK);
+    } catch (error) {
+      console.error('Error searching issue:', error);
+      return sendError(res, "Failed to search issue", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+    }
+  });
 }
 
 const commonController = new CommonController();
