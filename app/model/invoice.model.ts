@@ -2,7 +2,7 @@ import { Document, Types, Schema, model } from "mongoose";
 
 export interface IInvoice extends Document {
     issueId: Types.ObjectId,
-    issue_report_id:Types.ObjectId,
+    issue_report_id: Types.ObjectId,
     human_readable_issue_id: String,
     serviceCategoryId: Types.ObjectId,
     deviceType: String,
@@ -65,7 +65,8 @@ invoiceSchema.pre('save', async function (next) {
         const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
 
         // Find the latest invoice for the current month to get the next sequence number
-        const latestInvoice = await model('invoices').findOne({
+        const InvoiceModel = this.constructor as any;
+        const latestInvoice = await InvoiceModel.findOne({
             human_readable_invoice_id: new RegExp(`^INV-${currentYear}${currentMonth}-`)
         }).sort({ human_readable_invoice_id: -1 });
 

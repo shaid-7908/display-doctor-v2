@@ -31,4 +31,6 @@ commonRouter.get("/invoice-generation", authChecker, roleChecker(["technician", 
 commonRouter.get("/invoice-generation/:id", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceGenerationPageWithIssue);
 commonRouter.post("/search-issue-for-invoice", authChecker, roleChecker(["technician", "admin"]), commonController.searchIssueForInvoice);
 
+commonRouter.get("/invoice-list", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceList);
+commonRouter.get("/get-all-invoices", authChecker, roleChecker(["technician", "admin"]), commonController.getInvoiceList);
 export default commonRouter;

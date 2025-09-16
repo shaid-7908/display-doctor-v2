@@ -852,6 +852,36 @@ class CommonController {
       return sendError(res, "Failed to search issue", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
     }
   });
+
+  renderInvoiceList = asyncHandler(async (req,res)=>{
+    res.render("invoice-list", {
+      default_user: req.user,
+      invoices: null,
+      error: null
+    });
+  })
+
+  getInvoiceList = asyncHandler(async (req,res)=>{
+    const invoices = await IssueModel.aggregate([
+      {$match:{"assignment.technicianId":new mongoose.Types.ObjectId(req.user.id)}},
+      {$lookup:{
+        from:"issue_reports",
+        localField:"human_readable_id",
+        foreignField:"issue_human_redable_id",
+        as:"issue_report"
+      }},
+      {$unwind:"$issue_report"},
+      {$lookup:{
+        from:"invoices",
+        localField:"human_readable_id",
+        foreignField:"human_readable_issue_id",
+        as:"invoice"
+      }},
+      {$unwind:"$invoice"},
+    ])
+    
+    return sendSuccess(res, "Invoice list", invoices, STATUS_CODES.OK);
+  })
 }
 
 const commonController = new CommonController();
