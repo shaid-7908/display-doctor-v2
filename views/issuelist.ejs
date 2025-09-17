@@ -223,6 +223,16 @@
                                                                 <%= issue.status %>
                                                             </span> 
                                                             <% } %>
+                                                            <% if(issue.status === 'in_progress') { %>
+                                                                <span class="badge status-badge status-in-progress">
+                                                                    <%= issue.status %>
+                                                                </span>
+                                                            <% } %>
+                                                            <% if(issue.status === 'awaiting_payment'){ %>
+                                                                <span class="badge status-badge status-awaiting_payment">
+                                                                    Awaiting Payment
+                                                                </span>
+                                                            <% } %>
                                                         </td>
                                                         <td>
                                                             <%= issue.priority %>

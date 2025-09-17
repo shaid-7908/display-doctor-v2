@@ -7,7 +7,7 @@ import STATUS_CODES from "../utils/status.codes";
 import { Request, Response } from "express";
 class TechnicianController {
   renderAssignedIssuePage = asyncHandler(async (req, res) => {
-    res.render("assigned-issue-techni", { default_user: req.user });
+    res.render("technician-assigned-issue-page", { default_user: req.user });
   });
 
   getAssignedIssues = asyncHandler(async (req, res) => {

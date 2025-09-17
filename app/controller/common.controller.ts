@@ -909,27 +909,52 @@ class CommonController {
   })
 
   getInvoiceList = asyncHandler(async (req, res) => {
-    const invoices = await IssueModel.aggregate([
-      { $match: { "assignment.technicianId": new mongoose.Types.ObjectId(req.user.id) } },
-      {
-        $lookup: {
-          from: "issue_reports",
-          localField: "human_readable_id",
-          foreignField: "issue_human_redable_id",
-          as: "issue_report"
-        }
-      },
-      { $unwind: "$issue_report" },
-      {
-        $lookup: {
-          from: "invoices",
-          localField: "human_readable_id",
-          foreignField: "human_readable_issue_id",
-          as: "invoice"
-        }
-      },
-      { $unwind: "$invoice" },
-    ])
+    let pipeline: any[] = [];
+    if (req.user.role === "admin") {
+      pipeline = [
+        {
+          $lookup: {
+            from: "issue_reports",
+            localField: "human_readable_id",
+            foreignField: "issue_human_redable_id",
+            as: "issue_report"
+          }
+        },
+        { $unwind: "$issue_report" },
+        {
+          $lookup: {
+            from: "invoices",
+            localField: "human_readable_id",
+            foreignField: "human_readable_issue_id",
+            as: "invoice"
+          }
+        },
+        { $unwind: "$invoice" }
+      ]
+    } else {
+      pipeline = [
+        { $match: { "assignment.technicianId": new mongoose.Types.ObjectId(req.user.id) } },
+        {
+          $lookup: {
+            from: "issue_reports",
+            localField: "human_readable_id",
+            foreignField: "issue_human_redable_id",
+            as: "issue_report"
+          }
+        },
+        { $unwind: "$issue_report" },
+        {
+          $lookup: {
+            from: "invoices",
+            localField: "human_readable_id",
+            foreignField: "human_readable_issue_id",
+            as: "invoice"
+          }
+        },
+        { $unwind: "$invoice" }
+      ]
+    }
+    const invoices = await IssueModel.aggregate(pipeline)
 
     return sendSuccess(res, "Invoice list", invoices, STATUS_CODES.OK);
   })
@@ -975,6 +1000,89 @@ class CommonController {
     }
     return sendSuccess(res, "Invoice details", invoice[0], STATUS_CODES.OK);
   })
+
+  // Update invoice status (mocked for now)
+  updateInvoiceStatus = asyncHandler(async (req: Request, res: Response) => {
+    const invoiceId = req.params.id;
+    const { newStatus, note } = req.body;
+
+    try {
+      // Validation
+      if (!newStatus) {
+        return sendError(res, "New status is required", null, STATUS_CODES.BAD_REQUEST);
+      }
+
+      const validStatuses = ["pending", "paid", "cancelled"];
+      if (!validStatuses.includes(newStatus)) {
+        return sendError(res, "Invalid status value", null, STATUS_CODES.BAD_REQUEST);
+      }
+
+      // Mock - Find the invoice (in real implementation, use InvoiceModel)
+      console.log(`Mock: Updating invoice ${invoiceId} status to ${newStatus}`);
+      console.log(`Mock: Note: ${note || 'No note provided'}`);
+      console.log(`Mock: Updated by user: ${req.user?.id} (${req.user?.role})`);
+
+      // Simulate database update delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Mock response data
+      const mockResponse = {
+        invoiceId: invoiceId,
+        previousStatus: "pending", // Mock previous status
+        newStatus: newStatus,
+        updatedBy: req.user?.id,
+        updatedAt: new Date(),
+        note: note || null
+      };
+
+      return sendSuccess(res, "Invoice status updated successfully", mockResponse, STATUS_CODES.OK);
+
+    } catch (error) {
+      console.error('Error updating invoice status:', error);
+      return sendError(res, "Failed to update invoice status", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+    }
+  });
+
+  // Delete invoice (mocked for now - admin only)
+  deleteInvoice = asyncHandler(async (req: Request, res: Response) => {
+    const invoiceId = req.params.id;
+    const { reason } = req.body;
+
+    try {
+      // Validation
+      if (!reason || reason.trim().length < 10) {
+        return sendError(res, "Deletion reason is required (minimum 10 characters)", null, STATUS_CODES.BAD_REQUEST);
+      }
+
+      // Check if user is admin (additional security check)
+      if (req.user?.role !== "admin") {
+        return sendError(res, "Unauthorized. Only admins can delete invoices", null, STATUS_CODES.FORBIDDEN);
+      }
+
+      // Mock - Find the invoice (in real implementation, use InvoiceModel)
+      console.log(`Mock: Deleting invoice ${invoiceId}`);
+      console.log(`Mock: Reason: ${reason}`);
+      console.log(`Mock: Deleted by admin: ${req.user?.id}`);
+
+      // Simulate database deletion delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Mock response data
+      const mockResponse = {
+        invoiceId: invoiceId,
+        deletedBy: req.user?.id,
+        deletedAt: new Date(),
+        reason: reason.trim(),
+        status: "deleted"
+      };
+
+      return sendSuccess(res, "Invoice deleted successfully", mockResponse, STATUS_CODES.OK);
+
+    } catch (error) {
+      console.error('Error deleting invoice:', error);
+      return sendError(res, "Failed to delete invoice", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+    }
+  });
 
 }
 
