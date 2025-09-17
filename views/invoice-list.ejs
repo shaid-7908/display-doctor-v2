@@ -84,6 +84,7 @@
         .invoice-modal-service-section {
             margin-bottom: 25px;
         }
+
         .invoice-modal-warranty-section {
             margin-bottom: 25px;
         }
@@ -113,21 +114,24 @@
             margin-right: 8px;
             color: #3498db;
         }
+
         .invoice-modal-warranty-table {
             border: 1px solid #dee2e6;
             border-radius: 6px;
             overflow: hidden;
         }
+
         .invoice-modal-warranty-table thead {
             background: #34495e;
             color: white;
         }
+
         .invoice-modal-warranty-table thead th {
             font-weight: 500;
             padding: 10px 12px;
             border: none;
             font-size: 0.85rem;
-        }   
+        }
 
         .invoice-modal-service-table {
             border: 1px solid #dee2e6;
@@ -474,9 +478,9 @@
 
             // Modal footer button handlers
             $('#downloadInvoiceBtn').on('click', function () {
-                const invoiceId = $(this).data('current-invoice-id');
-                if (invoiceId) {
-                    window.open(`/download-invoice-pdf/${invoiceId}`, '_blank');
+                const issueId = $(this).data('current-invoice-id');
+                if (issueId) {
+                    window.open(`/download-invoice-pdf/${issueId}`, '_blank');
                 }
             });
 
@@ -505,7 +509,7 @@
                     console.log("Error fetching invoice:", xhr);
                     // Use dummy data for now
                     const errorMessage = xhr.responseJSON.message;
-                    
+
                     setTimeout(() => {
                         $('#invoiceModalBody').html(`
                         <div class="text-center py-5">
@@ -519,7 +523,8 @@
 
         // Function to populate invoice modal with data
         function populateInvoiceModal(invoiceData) {
-            $('#downloadInvoiceBtn, #printInvoiceBtn').data('current-invoice-id', invoiceData.invoiceId);
+            // Set the issue ID for download functionality
+            $('#downloadInvoiceBtn, #printInvoiceBtn').data('current-invoice-id', invoiceData.human_readable_issue_id);
             console.log(invoiceData);
             const invoiceDate = invoiceData.invoiceDate ? new Date(invoiceData.invoiceDate).toLocaleString("en-GB", {
                 day: "2-digit",

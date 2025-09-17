@@ -549,18 +549,18 @@ class CommonController {
 
   generateInvoice = asyncHandler(async (req, res) => {
     console.log(req.body)
-    
-    const { issueId, customerName, human_readable_issue_id, customerPhone, customerEmail, customerAddress, deviceType, deviceBrand, deviceModel, deviceSerial, serviceDescription, partsUsed, warrantyMonths, laborCharge, partsCost, visitCharge, discount,issue_report_id } = req.body
+
+    const { issueId, customerName, human_readable_issue_id, customerPhone, customerEmail, customerAddress, deviceType, deviceBrand, deviceModel, deviceSerial, serviceDescription, partsUsed, warrantyMonths, laborCharge, partsCost, visitCharge, discount, issue_report_id } = req.body
 
     const existingInvoice = await InvoiceModel.findOne({ human_readable_issue_id: human_readable_issue_id, issueId: issueId })
 
-    if(existingInvoice){
+    if (existingInvoice) {
       return sendError(res, "Invoice already exists", null, STATUS_CODES.BAD_REQUEST);
     }
 
     const existingReport = await IssueReportModel.findOne({ issue_human_redable_id: human_readable_issue_id, issue_id: issueId })
 
-    if(!existingReport){
+    if (!existingReport) {
       return sendError(res, "Report not found", null, STATUS_CODES.BAD_REQUEST);
     }
 
@@ -569,7 +569,7 @@ class CommonController {
     let numVisitCharge = parseFloat(visitCharge) || 0
     let numDiscount = parseFloat(discount) || 0
     let subtotal = numLabourCharge + numPartsCost + numVisitCharge
-    if (subtotal < existingReport.finalQuotation.valueOf()){
+    if (subtotal < existingReport.finalQuotation.valueOf()) {
       return sendError(res, "Subtotal is less than final quotation", null, STATUS_CODES.BAD_REQUEST);
     }
     let gst = subtotal * 0.18
@@ -583,11 +583,11 @@ class CommonController {
       customerEmail,
       customerAddress,
       deviceType,
-      deviceBrand:deviceBrand || "NA",
-      deviceModel:deviceModel || "NA",
-      deviceSerial:deviceSerial || "NA",
-      serviceDescription:serviceDescription || "NA",
-      partsUsed:partsUsed,
+      deviceBrand: deviceBrand || "NA",
+      deviceModel: deviceModel || "NA",
+      deviceSerial: deviceSerial || "NA",
+      serviceDescription: serviceDescription || "NA",
+      partsUsed: partsUsed,
       finalQuotation: existingReport.finalQuotation.valueOf(),
       labourCharge: numLabourCharge,
       partsCost: numPartsCost,
@@ -605,7 +605,7 @@ class CommonController {
     } else {
       const updateIssueReport = await IssueReportModel.updateOne({ issue_human_redable_id: newInvoice.issueId }, { $set: { status: "bill-generated" } })
       const issue = await IssueModel.findOne({ human_readable_id: newInvoice.issueId })
-      if(issue){
+      if (issue) {
         const previousStatus = issue.status
         issue.status = "awaiting_payment"
         issue.history.push({
@@ -628,109 +628,156 @@ class CommonController {
     const issueId = req.params.issueId;
 
     try {
-      const puppeteer = require('puppeteer');
+      // Fetch invoice data from database
+      const invoice = await InvoiceModel.aggregate([
+        { $match: { "human_readable_issue_id": issueId } },
+        {
+          $lookup: {
+            from: "issues",
+            localField: "human_readable_issue_id",
+            foreignField: "human_readable_id",
+            as: "issue"
+          }
+        },
+        { $unwind: "$issue" },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'issue.assignment.technicianId',
+            foreignField: '_id',
+            as: 'technician'
+          }
+        },
+        { $unwind: "$technician" },
+        {
+          $project: {
+            "technician.password": 0,
+            "technician.isVerified": 0,
+            "technician.status": 0,
+            "technician.createdAt": 0,
+            "technician.updatedAt": 0,
+            "technician.role": 0,
+            "technician.dateOfBirth": 0,
+          }
+        }
+      ]);
 
-      // Launch browser
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
+      if (!invoice || invoice.length === 0) {
+        return sendError(res, "Invoice not found", null, STATUS_CODES.NOT_FOUND);
+      }
 
-      const page = await browser.newPage();
+      const invoiceData = invoice[0];
 
-      const invoiceData = {
+      // Calculate totals for the template
+      const subtotal = invoiceData.labourCharge + invoiceData.partsCost + invoiceData.visitCharge - invoiceData.discount;
+      const gst = Math.round(subtotal * 0.18);
+      const total = invoiceData.finalAmount;
+
+      // Format the data for the invoice template
+      const formattedInvoiceData = {
         // Company Info
-        companyName: "TechFix Solutions",
-        companyAddress: "123 Service Street, Tech City, TC 12345",
-        companyPhone: "(555) 123-4567",
-        companyEmail: "info@techfix.com",
-        companyGST: "12ABCDE3456F7G8",
+        companyName: "Display Doctor",
+        companyAddress: "123, Main Street, Anytown, USA",
+        companyPhone: "+1-800-EMERGENCY",
+        companyEmail: "support@emergencyresponse.com",
+        companyGST: "1234567890",
 
         // Customer Info
-        customerName: "John Doe",
-        customerPhone: "+91 9876543210",
-        customerAddress: "123 Main Street, Mumbai, Maharashtra - 400001",
+        customerName: invoiceData.customerName,
+        customerPhone: invoiceData.customerPhone,
+        customerAddress: invoiceData.customerAddress,
 
-        // Invoice Details
-        invoiceNo: `INV-2024-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-        issueId: "TF-001",
-        date: new Date().toLocaleDateString('en-IN'),
+        // Invoice Details (matching the template expectations)
+        invoiceNo: invoiceData.human_readable_invoice_id,
+        issueId: invoiceData.human_readable_issue_id,
+        date: new Date(invoiceData.invoiceDate).toLocaleDateString('en-IN'),
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
 
-        // Service Details
-        serviceDescription: "Laptop Screen Replacement & Software Installation",
-        deviceInfo: "HP Pavilion 15 - Model: DV6-3000",
-        partsUsed: "15.6\" LED Display, Thermal Paste",
-        serviceAmount: 8500,
+        // Service Details (matching template expectations)
+        serviceDescription: invoiceData.serviceDescription,
+        deviceInfo: `${invoiceData.deviceBrand} ${invoiceData.deviceModel} (${invoiceData.deviceType})`,
+        partsUsed: invoiceData.partsUsed,
+        serviceAmount: subtotal, // This is what the template expects for the service amount
+
+        // Individual charges for detailed breakdown
+        labourCharge: invoiceData.labourCharge,
+        partsCost: invoiceData.partsCost,
+        visitCharge: invoiceData.visitCharge,
+        discount: invoiceData.discount,
+
+        // Warranty Info
+        warrantyMonths: invoiceData.warrantyMonths,
+        warrantyStart: invoiceData.warrantyStart,
+        warrantyEnd: invoiceData.warrantyEnd,
+
+        // Totals (matching template expectations)
+        subtotal: subtotal,
+        gst: gst,
+        total: total,
+
+        // Technician Info (matching template expectations)
+        technicianName: `${invoiceData.technician.firstName} ${invoiceData.technician.lastName}`,
+        technicianTitle: "Certified Technician",
 
         // Payment Info
-        bankName: "Tech Bank Ltd.",
-        accountNo: "1234567890",
-
-        // Technician Info
-        technicianName: "Rajesh Kumar",
-        technicianTitle: "Certified Technician"
+        bankName: "State Bank of India",
+        accountNo: "1234567890"
       };
 
-      // Calculate totals
-      const subtotal = invoiceData.serviceAmount;
-      const gst = Math.round(subtotal * 0.18);
-      const total = subtotal + gst;
+      const puppeteer = require('puppeteer');
+      let browser;
 
-      const finalInvoiceData = {
-        ...invoiceData,
-        subtotal,
-        gst,
-        total
-      };
-
-      // Navigate to the invoice page
-      // const invoiceUrl = `${req.protocol}://${req.get('host')}/generate-invoice/${issueId}`;
-      // await page.goto(invoiceUrl, {
-      //   waitUntil: 'networkidle0',
-      //   timeout: 30000
-      // });
-
-      // // Generate PDF
-      // const pdf = await page.pdf({
-      //   format: 'A4',
-      //   printBackground: true,
-      //   margin: {
-      //     top: '20px',
-      //     right: '20px',
-      //     bottom: '20px',
-      //     left: '20px'
-      //   }
-      // });
-      const html = await new Promise((resolve, reject) => {
-        res.render("invoice", {
-          invoice: finalInvoiceData,
-          default_user: req.user
-        }, (err, html) => {
-          if (err) reject(err);
-          else resolve(html);
+      try {
+        // Launch browser
+        browser = await puppeteer.launch({
+          headless: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
-      });
-      await page.setContent(html, { waitUntil: "networkidle0" });
-      const pdf = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: {
-          top: '20px',
-          right: '20px',
-          bottom: '20px',
-          left: '20px'
+
+        const page = await browser.newPage();
+
+        // Render the invoice HTML
+        const html = await new Promise((resolve, reject) => {
+          res.render("invoice", {
+            invoice: formattedInvoiceData,
+            default_user: req.user
+          }, (err, html) => {
+            if (err) {
+              console.error('Error rendering invoice template:', err);
+              reject(err);
+            } else {
+              resolve(html);
+            }
+          });
+        });
+
+        await page.setContent(html, { waitUntil: "networkidle0" });
+
+        const pdf = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: {
+            top: '20px',
+            right: '20px',
+            bottom: '20px',
+            left: '20px'
+          }
+        });
+
+        // Set response headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Invoice-${invoiceData.human_readable_invoice_id}.pdf`);
+        res.setHeader('Content-Length', pdf.length);
+
+        // Send PDF
+        res.send(pdf);
+
+      } finally {
+        // Ensure browser is always closed
+        if (browser) {
+          await browser.close();
         }
-      });
-      await browser.close();
-
-      // Set response headers for PDF download
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename=Invoice-${issueId}.pdf`);
-      res.setHeader('Content-Length', pdf.length);
-
-      // Send PDF
-      res.send(pdf);
+      }
 
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -853,7 +900,7 @@ class CommonController {
     }
   });
 
-  renderInvoiceList = asyncHandler(async (req,res)=>{
+  renderInvoiceList = asyncHandler(async (req, res) => {
     res.render("invoice-list", {
       default_user: req.user,
       invoices: null,
@@ -861,63 +908,74 @@ class CommonController {
     });
   })
 
-  getInvoiceList = asyncHandler(async (req,res)=>{
+  getInvoiceList = asyncHandler(async (req, res) => {
     const invoices = await IssueModel.aggregate([
-      {$match:{"assignment.technicianId":new mongoose.Types.ObjectId(req.user.id)}},
-      {$lookup:{
-        from:"issue_reports",
-        localField:"human_readable_id",
-        foreignField:"issue_human_redable_id",
-        as:"issue_report"
-      }},
-      {$unwind:"$issue_report"},
-      {$lookup:{
-        from:"invoices",
-        localField:"human_readable_id",
-        foreignField:"human_readable_issue_id",
-        as:"invoice"
-      }},
-      {$unwind:"$invoice"},
+      { $match: { "assignment.technicianId": new mongoose.Types.ObjectId(req.user.id) } },
+      {
+        $lookup: {
+          from: "issue_reports",
+          localField: "human_readable_id",
+          foreignField: "issue_human_redable_id",
+          as: "issue_report"
+        }
+      },
+      { $unwind: "$issue_report" },
+      {
+        $lookup: {
+          from: "invoices",
+          localField: "human_readable_id",
+          foreignField: "human_readable_issue_id",
+          as: "invoice"
+        }
+      },
+      { $unwind: "$invoice" },
     ])
-    
+
     return sendSuccess(res, "Invoice list", invoices, STATUS_CODES.OK);
   })
 
-  getInvoiceDetails = asyncHandler(async (req,res)=>{
+  getInvoiceDetails = asyncHandler(async (req, res) => {
     const invoiceId = req.params.id;
     const invoice = await InvoiceModel.aggregate(
       [
-        { $match: {"human_readable_invoice_id":invoiceId}},
-        {$lookup:{
-          from:"issues",
-          localField:"human_readable_issue_id",
-          foreignField:"human_readable_id",
-          as:"issue"
-        }},
-        {$unwind:"$issue"},
-        {$lookup:{
-          from:'users',
-          localField:'issue.assignment.technicianId',
-          foreignField:'_id',
-          as:'technician'
-        }},
-        {$unwind:"$technician"},
-        {$project:{
-          "technician.password":0,
-          "technician.isVerified":0,
-          "technician.status":0,
-          "technician.createdAt":0,
-          "technician.updatedAt":0,
-          "technician.role":0,
-          "technician.dateOfBirth":0,
-        }}
+        { $match: { "human_readable_invoice_id": invoiceId } },
+        {
+          $lookup: {
+            from: "issues",
+            localField: "human_readable_issue_id",
+            foreignField: "human_readable_id",
+            as: "issue"
+          }
+        },
+        { $unwind: "$issue" },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'issue.assignment.technicianId',
+            foreignField: '_id',
+            as: 'technician'
+          }
+        },
+        { $unwind: "$technician" },
+        {
+          $project: {
+            "technician.password": 0,
+            "technician.isVerified": 0,
+            "technician.status": 0,
+            "technician.createdAt": 0,
+            "technician.updatedAt": 0,
+            "technician.role": 0,
+            "technician.dateOfBirth": 0,
+          }
+        }
       ]
     );
-    if(!invoice || invoice.length === 0){
+    if (!invoice || invoice.length === 0) {
       return sendError(res, "Invoice not found", null, STATUS_CODES.NOT_FOUND);
     }
     return sendSuccess(res, "Invoice details", invoice[0], STATUS_CODES.OK);
   })
+
 }
 
 const commonController = new CommonController();
