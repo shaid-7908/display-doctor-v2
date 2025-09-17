@@ -882,6 +882,42 @@ class CommonController {
     
     return sendSuccess(res, "Invoice list", invoices, STATUS_CODES.OK);
   })
+
+  getInvoiceDetails = asyncHandler(async (req,res)=>{
+    const invoiceId = req.params.id;
+    const invoice = await InvoiceModel.aggregate(
+      [
+        { $match: {"human_readable_invoice_id":invoiceId}},
+        {$lookup:{
+          from:"issues",
+          localField:"human_readable_issue_id",
+          foreignField:"human_readable_id",
+          as:"issue"
+        }},
+        {$unwind:"$issue"},
+        {$lookup:{
+          from:'users',
+          localField:'issue.assignment.technicianId',
+          foreignField:'_id',
+          as:'technician'
+        }},
+        {$unwind:"$technician"},
+        {$project:{
+          "technician.password":0,
+          "technician.isVerified":0,
+          "technician.status":0,
+          "technician.createdAt":0,
+          "technician.updatedAt":0,
+          "technician.role":0,
+          "technician.dateOfBirth":0,
+        }}
+      ]
+    );
+    if(!invoice || invoice.length === 0){
+      return sendError(res, "Invoice not found", null, STATUS_CODES.NOT_FOUND);
+    }
+    return sendSuccess(res, "Invoice details", invoice[0], STATUS_CODES.OK);
+  })
 }
 
 const commonController = new CommonController();
