@@ -1005,42 +1005,34 @@ class CommonController {
   updateInvoiceStatus = asyncHandler(async (req: Request, res: Response) => {
     const invoiceId = req.params.id;
     const { newStatus, note } = req.body;
-
-    try {
-      // Validation
-      if (!newStatus) {
-        return sendError(res, "New status is required", null, STATUS_CODES.BAD_REQUEST);
-      }
-
-      const validStatuses = ["pending", "paid", "cancelled"];
-      if (!validStatuses.includes(newStatus)) {
-        return sendError(res, "Invalid status value", null, STATUS_CODES.BAD_REQUEST);
-      }
-
-      // Mock - Find the invoice (in real implementation, use InvoiceModel)
-      console.log(`Mock: Updating invoice ${invoiceId} status to ${newStatus}`);
-      console.log(`Mock: Note: ${note || 'No note provided'}`);
-      console.log(`Mock: Updated by user: ${req.user?.id} (${req.user?.role})`);
-
-      // Simulate database update delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Mock response data
-      const mockResponse = {
-        invoiceId: invoiceId,
-        previousStatus: "pending", // Mock previous status
-        newStatus: newStatus,
-        updatedBy: req.user?.id,
-        updatedAt: new Date(),
-        note: note || null
-      };
-
-      return sendSuccess(res, "Invoice status updated successfully", mockResponse, STATUS_CODES.OK);
-
-    } catch (error) {
-      console.error('Error updating invoice status:', error);
-      return sendError(res, "Failed to update invoice status", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+    if (!newStatus) {
+      return sendError(res, "New status is required", null, STATUS_CODES.BAD_REQUEST);
     }
+    
+    const invoice = await InvoiceModel.findOne({ _id: invoiceId });
+    if(!invoice){
+      return sendError(res, "Invoice not found", null, STATUS_CODES.NOT_FOUND);
+    }
+    invoice.status = newStatus;
+    invoice.save()
+
+    await IssueReportModel.findByIdAndUpdate(invoice.issue_report_id,{$set:{status:'closed'}})
+    const issue = await IssueModel.findOne({_id:invoice.issueId});
+    if(!issue){
+      return sendError(res, "Issue not found", null, STATUS_CODES.NOT_FOUND);
+    }
+    const oldStatus = issue.status;
+    issue.status = 'resolved';
+    issue.history.push({
+      at: new Date(),
+      by: req.user?._id,
+      action: 'status_changed',
+      from: oldStatus,
+      to: 'resolved',
+      note: note
+    });
+    issue.save();
+    return sendSuccess(res, "Invoice status updated successfully", invoice, STATUS_CODES.OK);
   });
 
   // Delete invoice (mocked for now - admin only)

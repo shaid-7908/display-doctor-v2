@@ -233,6 +233,11 @@
                                                                     Awaiting Payment
                                                                 </span>
                                                             <% } %>
+                                                            <% if(issue.status === 'resolved'){ %>
+                                                                <span class="badge status-badge status-resolved">
+                                                                    <%= issue.status %>
+                                                                </span>
+                                                            <% } %>
                                                         </td>
                                                         <td>
                                                             <%= issue.priority %>
