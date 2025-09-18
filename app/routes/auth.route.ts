@@ -23,4 +23,6 @@ authRouter.get("/", authChecker, authController.renderDashboard);
 
 authRouter.post("/logout", authChecker, authController.logout);
 
+authRouter.get("/profile-details/:id", authChecker, authController.renderProfile);
+
 export default authRouter;

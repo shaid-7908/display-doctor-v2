@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../utils/async.hadler";
 import { sendError, sendSuccess } from "../utils/unified.response";
 import STATUS_CODES from "../utils/status.codes";
+import mongoose from "mongoose";
 import { comparePassword, hashPassword } from "../utils/hash.password";
 import {
   generateAccessToken,
@@ -272,6 +273,30 @@ class AuthController {
     req.flash("success_msg", "Logged out successfully");
     res.redirect("/login");
   });
+
+  renderProfile = asyncHandler(async (req: Request, res: Response)=>{
+      const userid = req.params.id;
+      const userDetails = await UserModel.aggregate([
+        {$match:{_id:new mongoose.Types.ObjectId(userid)}},
+        {$lookup:{
+          from:"address_proofs",
+          localField:"_id",
+          foreignField:"userId",
+          as:"address_proof"
+        }},
+        {$unwind:{
+          path:"$address_proof",
+          preserveNullAndEmptyArrays:true
+        }},
+        {$project:{
+          password:0
+        }}
+      ])
+      if(!userDetails || userDetails.length === 0){
+        res.render("profile-page",{default_user:req.user,userDetails:null});
+      }
+      res.render("profile-page",{default_user:req.user,userDetails:userDetails[0]});
+  })
 }
 
 export default new AuthController();

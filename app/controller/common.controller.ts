@@ -996,17 +996,17 @@ class CommonController {
     if (!newStatus) {
       return sendError(res, "New status is required", null, STATUS_CODES.BAD_REQUEST);
     }
-    
+
     const invoice = await InvoiceModel.findOne({ _id: invoiceId });
-    if(!invoice){
+    if (!invoice) {
       return sendError(res, "Invoice not found", null, STATUS_CODES.NOT_FOUND);
     }
     invoice.status = newStatus;
     invoice.save()
 
-    await IssueReportModel.findByIdAndUpdate(invoice.issue_report_id,{$set:{status:'closed'}})
-    const issue = await IssueModel.findOne({_id:invoice.issueId});
-    if(!issue){
+    await IssueReportModel.findByIdAndUpdate(invoice.issue_report_id, { $set: { status: 'closed' } })
+    const issue = await IssueModel.findOne({ _id: invoice.issueId });
+    if (!issue) {
       return sendError(res, "Issue not found", null, STATUS_CODES.NOT_FOUND);
     }
     const oldStatus = issue.status;
