@@ -177,7 +177,20 @@ class CommonController {
       .populate("assignment.technicianId", "firstName lastName phone email")
       .populate("serviceCategoryId", "name")
       .sort({ createdAt: -1 });
-    res.render("issuelist", { default_user: req.user, issues });
+    const totalIssues = await IssueModel.countDocuments({ isDeleted: false });
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0); // 00:00:00.000
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999); // 23:59:59.999
+
+    const scheduledToday = await IssueModel.countDocuments({
+      isDeleted: false,
+      status: "scheduled",
+      schedule: { $gte: startOfToday, $lte: endOfToday }
+    });
+    res.render("issuelist", { default_user: req.user, issues, totalIssues:totalIssues ,scheduledToday:scheduledToday});
   });
   getTechniciansToAssign = asyncHandler(async (req: Request, res: Response) => {
     const serviceCategoryId = req.params.id;

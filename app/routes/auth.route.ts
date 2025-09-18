@@ -1,6 +1,7 @@
 import express from "express";
 import authController from "../controller/auth.controller";
 import { authChecker } from "../middelware/auth.middleware";
+import { upload, uploadProfileImageToS3 } from "../middelware/multer.middleware";
 
 const authRouter = express.Router();
 
@@ -24,5 +25,7 @@ authRouter.get("/", authChecker, authController.renderDashboard);
 authRouter.post("/logout", authChecker, authController.logout);
 
 authRouter.get("/profile-details/:id", authChecker, authController.renderProfile);
-
+authRouter.post("/update-profile-image", authChecker ,upload.single('profileImage'),uploadProfileImageToS3, authController.updateProfileImage);
+authRouter.get("/settings", authChecker, authController.renderSettingsPage);
+authRouter.post("/update-password", authChecker, authController.updatePassword);
 export default authRouter;

@@ -85,7 +85,7 @@ export const uploadTechnicianFilesToS3 = async (
   }
 };
 
-export const uploadMulitplePhotoToS3 = async(req:Request,res:Response,next:NextFunction):Promise<void>=>{
+export const uploadMulitplePhotoToS3 = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const photos = files?.photos;
@@ -116,6 +116,45 @@ export const uploadMulitplePhotoToS3 = async(req:Request,res:Response,next:NextF
 
     // Add URLs to request body
     req.body.photosUrls = uploadedUrls;
+
+    next();
+  } catch (error) {
+    console.error("S3 Upload Error:", error);
+    res.status(500).json({ message: "S3 upload failed", error });
+  }
+}
+
+//Single file upload to change profile image
+export const uploadProfileImageToS3 = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ message: "No profile image uploaded" });
+      return;
+    }
+
+    // Validate file type
+    if (!file.mimetype.startsWith('image/')) {
+      res.status(400).json({ message: "Only image files are allowed" });
+      return;
+    }
+
+    // Upload to S3
+    const ext = file.mimetype.split("/")[1];
+    const key = `profile-images/${uuid()}.${ext}`;
+
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: envConfig.AWS_S3_BUCKET_NAME!,
+        Key: key,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      })
+    );
+
+    // Add S3 URL to request body
+    req.body.profileImageUrl = `https://${envConfig.AWS_S3_BUCKET_NAME}.s3.${envConfig.AWS_REGION}.amazonaws.com/${key}`;
 
     next();
   } catch (error) {

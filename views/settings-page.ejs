@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Settings - Password Update</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include("common/sidebar") %>
+            <!-- End of Sidebar -->
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <!-- End of Topbar -->
+
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid">
+
+                        <!-- Page Heading -->
+                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                            <h1 class="h3 mb-0 text-gray-800">Account Settings</h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Settings</li>
+                                </ol>
+                            </nav>
+                        </div>
+
+                        <!-- Password Update Form -->
+                        <div class="row justify-content-center">
+                            <div class="col-xl-8 col-lg-10 col-md-12">
+                                <div class="card shadow mb-4">
+                                    <div
+                                        class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-primary">
+                                            <i class="fas fa-lock mr-2"></i>Change Password
+                                        </h6>
+                                        <div class="dropdown no-arrow">
+                                            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                                aria-labelledby="dropdownMenuLink">
+                                                <div class="dropdown-header">Security Options:</div>
+                                                <a class="dropdown-item" href="#" onclick="resetForm()">Reset Form</a>
+                                                <a class="dropdown-item" href="#"
+                                                    onclick="generateStrongPassword()">Generate Strong Password</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Alert container for messages -->
+                                        <div id="passwordAlert" style="display: none;"></div>
+
+                                        <!-- Password strength indicator -->
+                                        <div class="mb-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle"></i>
+                                                Password must be at least 8 characters long and contain uppercase,
+                                                lowercase, numbers, and special characters.
+                                            </small>
+                                        </div>
+
+                                        <form id="passwordUpdateForm">
+                                            <!-- Current Password -->
+                                            <div class="form-group">
+                                                <label for="currentPassword" class="font-weight-bold text-gray-800">
+                                                    Current Password <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control" id="currentPassword"
+                                                        name="currentPassword" placeholder="Enter your current password"
+                                                        required>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="togglePasswordVisibility('currentPassword')">
+                                                            <i class="fas fa-eye" id="currentPasswordIcon"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="invalid-feedback" id="currentPasswordError"></div>
+                                            </div>
+
+                                            <!-- New Password -->
+                                            <div class="form-group">
+                                                <label for="newPassword" class="font-weight-bold text-gray-800">
+                                                    New Password <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control" id="newPassword"
+                                                        name="newPassword" placeholder="Enter your new password"
+                                                        required onkeyup="checkPasswordStrength()">
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="togglePasswordVisibility('newPassword')">
+                                                            <i class="fas fa-eye" id="newPasswordIcon"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="invalid-feedback" id="newPasswordError"></div>
+
+                                                <!-- Password Strength Indicator -->
+                                                <div class="mt-2">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div id="passwordStrengthBar" class="progress-bar"
+                                                            role="progressbar" style="width: 0%" aria-valuenow="0"
+                                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                    <small id="passwordStrengthText" class="text-muted">Password
+                                                        strength: None</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Confirm Password -->
+                                            <div class="form-group">
+                                                <label for="confirmPassword" class="font-weight-bold text-gray-800">
+                                                    Confirm New Password <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="password" class="form-control" id="confirmPassword"
+                                                        name="confirmPassword" placeholder="Confirm your new password"
+                                                        required onkeyup="checkPasswordMatch()">
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="togglePasswordVisibility('confirmPassword')">
+                                                            <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="invalid-feedback" id="confirmPasswordError"></div>
+                                                <div class="valid-feedback" id="confirmPasswordMatch"
+                                                    style="display: none;">
+                                                    <i class="fas fa-check"></i> Passwords match!
+                                                </div>
+                                            </div>
+
+                                            <!-- Security Options -->
+
+                                            <!-- Form Actions -->
+                                            <div class="form-group mb-0">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <button type="button" class="btn btn-secondary mr-2"
+                                                            onclick="resetForm()">
+                                                            <i class="fas fa-undo"></i> Reset
+                                                        </button>
+                                                        <button type="button" class="btn btn-info"
+                                                            onclick="generateStrongPassword()">
+                                                            <i class="fas fa-key"></i> Generate Password
+                                                        </button>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary"
+                                                        id="updatePasswordBtn">
+                                                        <i class="fas fa-save"></i> Update Password
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Security Tips Card -->
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-success">
+                                            <i class="fas fa-shield-alt mr-2"></i>Security Tips
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check text-success mr-2"></i>
+                                                        Use at least 8 characters
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check text-success mr-2"></i>
+                                                        Include uppercase letters (A-Z)
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check text-success mr-2"></i>
+                                                        Include lowercase letters (a-z)
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check text-success mr-2"></i>
+                                                        Include numbers (0-9)
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check text-success mr-2"></i>
+                                                        Include special characters (!@#$%^&*)
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-check text-success mr-2"></i>
+                                                        Avoid common words or personal info
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+    </div>
+
+    <!-- Page wrapper end-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+    
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+    
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Password Form JavaScript -->
+    <script>
+        // Toggle password visibility
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + 'Icon');
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Check password strength
+        function checkPasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+
+            let strength = 0;
+            let feedback = [];
+
+            // Check length
+            if (password.length >= 8) {
+                strength += 20;
+            } else {
+                feedback.push('At least 8 characters');
+            }
+
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                strength += 20;
+            } else {
+                feedback.push('Uppercase letter');
+            }
+
+            // Check lowercase
+            if (/[a-z]/.test(password)) {
+                strength += 20;
+            } else {
+                feedback.push('Lowercase letter');
+            }
+
+            // Check numbers
+            if (/[0-9]/.test(password)) {
+                strength += 20;
+            } else {
+                feedback.push('Number');
+            }
+
+            // Check special characters
+            if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                strength += 20;
+            } else {
+                feedback.push('Special character');
+            }
+
+            // Update progress bar
+            strengthBar.style.width = strength + '%';
+            strengthBar.setAttribute('aria-valuenow', strength);
+
+            // Update colors and text
+            if (strength < 40) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.textContent = 'Password strength: Weak';
+                strengthText.className = 'text-danger';
+            } else if (strength < 80) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.textContent = 'Password strength: Medium';
+                strengthText.className = 'text-warning';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.textContent = 'Password strength: Strong';
+                strengthText.className = 'text-success';
+            }
+
+            // Show missing requirements
+            if (feedback.length > 0 && password.length > 0) {
+                strengthText.textContent += ' (Missing: ' + feedback.join(', ') + ')';
+            }
+
+            // Check password match if confirm password has value
+            if (document.getElementById('confirmPassword').value) {
+                checkPasswordMatch();
+            }
+        }
+
+        // Check if passwords match
+        function checkPasswordMatch() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchIndicator = document.getElementById('confirmPasswordMatch');
+            const errorIndicator = document.getElementById('confirmPasswordError');
+            const confirmField = document.getElementById('confirmPassword');
+
+            if (confirmPassword.length > 0) {
+                if (newPassword === confirmPassword) {
+                    matchIndicator.style.display = 'block';
+                    errorIndicator.style.display = 'none';
+                    confirmField.classList.remove('is-invalid');
+                    confirmField.classList.add('is-valid');
+                } else {
+                    matchIndicator.style.display = 'none';
+                    errorIndicator.style.display = 'block';
+                    errorIndicator.textContent = 'Passwords do not match';
+                    confirmField.classList.remove('is-valid');
+                    confirmField.classList.add('is-invalid');
+                }
+            } else {
+                matchIndicator.style.display = 'none';
+                errorIndicator.style.display = 'none';
+                confirmField.classList.remove('is-valid', 'is-invalid');
+            }
+        }
+
+        // Generate strong password
+        function generateStrongPassword() {
+            const length = 12;
+            const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+            let password = '';
+
+            // Ensure at least one character from each required set
+            const sets = [
+                'abcdefghijklmnopqrstuvwxyz',      // lowercase
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZ',      // uppercase
+                '0123456789',                       // numbers
+                '!@#$%^&*()_+-=[]{}|;:,.<>?'       // special
+            ];
+
+            // Add one character from each set
+            sets.forEach(set => {
+                password += set.charAt(Math.floor(Math.random() * set.length));
+            });
+
+            // Fill the rest randomly
+            for (let i = password.length; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+
+            // Shuffle the password
+            password = password.split('').sort(() => 0.5 - Math.random()).join('');
+
+            // Set the generated password
+            document.getElementById('newPassword').value = password;
+            document.getElementById('confirmPassword').value = password;
+
+            // Update strength indicator
+            checkPasswordStrength();
+            checkPasswordMatch();
+
+            // Show alert
+            showAlert('Strong password generated! Make sure to save it securely.', 'info');
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('passwordUpdateForm').reset();
+
+            // Reset all visual indicators
+            document.getElementById('passwordStrengthBar').style.width = '0%';
+            document.getElementById('passwordStrengthText').textContent = 'Password strength: None';
+            document.getElementById('passwordStrengthText').className = 'text-muted';
+            document.getElementById('confirmPasswordMatch').style.display = 'none';
+            document.getElementById('confirmPasswordError').style.display = 'none';
+
+            // Remove validation classes
+            const fields = ['currentPassword', 'newPassword', 'confirmPassword'];
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                field.classList.remove('is-valid', 'is-invalid');
+                field.type = 'password';
+                document.getElementById(fieldId + 'Icon').className = 'fas fa-eye';
+            });
+
+            showAlert('Form has been reset.', 'info');
+        }
+
+        // Show alert messages
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('passwordAlert');
+            const alertClass = type === 'success' ? 'alert-success' :
+                type === 'error' ? 'alert-danger' :
+                    type === 'warning' ? 'alert-warning' : 'alert-info';
+
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+
+            alertContainer.innerHTML = alertHtml;
+            alertContainer.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                const alert = alertContainer.querySelector('.alert');
+                if (alert) {
+                    $(alert).alert('close');
+                    alertContainer.style.display = 'none';
+                }
+            }, 5000);
+        }
+
+        // Form submission
+       
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            $('#passwordUpdateForm').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/update-password',
+                    type: 'POST',
+                    data: $('#passwordUpdateForm').serialize(),
+                    success: function (response) {
+                        console.log(response);
+                        showAlert(response.message, 'success');
+                        //rest the from
+                        $('#passwordUpdateForm').trigger('reset');
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        showAlert(error.responseJSON.message, 'error');
+                        //rest the from
+                        $('#passwordUpdateForm').trigger('reset');
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

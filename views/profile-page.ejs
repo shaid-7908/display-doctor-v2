@@ -23,6 +23,54 @@
 
     <!-- Custom styles for this page -->
     <link href="/css/issuelist.css" rel="stylesheet">
+
+    <!-- Custom styles for profile page -->
+    <style>
+        .profile-image-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-image-container:hover .camera-overlay {
+            opacity: 1;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .camera-overlay i {
+            color: white;
+            font-size: 2rem;
+        }
+
+        .camera-btn {
+            transition: all 0.3s ease;
+        }
+
+        .camera-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .drag-highlight {
+            background-color: rgba(0, 123, 255, 0.1) !important;
+            border: 2px dashed #007bff !important;
+            border-radius: 50% !important;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -262,64 +310,98 @@
                                         <h6 class="m-0 font-weight-bold text-primary">Profile Picture</h6>
                                     </div>
                                     <div class="card-body text-center">
-                                        <% if (userDetails.profileImage) { %>
-                                            <img src="<%= userDetails.profileImage %>" alt="Profile Picture"
-                                                class="img-profile rounded-circle mb-3"
-                                                style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;"
-                                                onclick="openImageModal(this.src)">
-                                            <% } else { %>
-                                                <div class="bg-gradient-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                                                    style="width: 150px; height: 150px;">
-                                                    <i class="fas fa-user fa-4x text-white"></i>
+                                        <div class="profile-image-container" data-toggle="tooltip"
+                                            data-placement="bottom"
+                                            title="Click to change profile picture or drag & drop an image">
+                                            <% if (userDetails.profileImage) { %>
+                                                <img id="profileImageDisplay" src="<%= userDetails.profileImage %>"
+                                                    alt="Profile Picture" class="img-profile rounded-circle mb-3"
+                                                    style="width: 150px; height: 150px; object-fit: cover; cursor: pointer;"
+                                                    onclick="openImageModal(this.src)">
+                                                <% } else { %>
+                                                    <div id="profileImageDisplay"
+                                                        class="bg-gradient-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                                                        style="width: 150px; height: 150px; cursor: pointer;"
+                                                        onclick="openImageModal('/images/default-avatar.png')">
+                                                        <i class="fas fa-user fa-4x text-white"></i>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <!-- Hover overlay for better UX -->
+                                                        <div class="camera-overlay"
+                                                            onclick="document.getElementById('profileImageInput').click()">
+                                                            <i class="fas fa-camera"></i>
+                                                        </div>
+
+                                                        <!-- Edit button overlay -->
+                                                        <button type="button"
+                                                            class="btn btn-primary btn-sm position-absolute camera-btn"
+                                                            style="bottom: 10px; right: 10px; border-radius: 50%; width: 35px; height: 35px; padding: 0;"
+                                                            onclick="document.getElementById('profileImageInput').click()"
+                                                            title="Change Profile Picture">
+                                                            <i class="fas fa-camera"></i>
+                                                        </button>
+
+                                                        <!-- Hidden file input -->
+                                                        <input type="file" id="profileImageInput" accept="image/*"
+                                                            style="display: none;"
+                                                            onchange="handleProfileImageChange(event)">
+                                        </div>
+
+                                        <!-- Upload Status -->
+                                        <div id="uploadStatus" class="mt-2" style="display: none;">
+                                            <div class="progress mb-2" style="height: 5px;">
+                                                <div id="uploadProgress" class="progress-bar bg-primary"
+                                                    role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small id="uploadMessage" class="text-muted">Uploading...</small>
+                                        </div>
+
+                                        <h5 class="font-weight-bold text-gray-800">
+                                            <%= userDetails.firstName %>
+                                                <%= userDetails.lastName %>
+                                        </h5>
+                                        <p class="text-gray-600 text-capitalize">
+                                            <%= userDetails.role %>
+                                        </p>
+                                        <hr>
+                                        <div class="row no-gutters">
+                                            <div class="col-12 text-center">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Account Status
                                                 </div>
-                                                <% } %>
-                                                    <h5 class="font-weight-bold text-gray-800">
-                                                        <%= userDetails.firstName %>
-                                                            <%= userDetails.lastName %>
-                                                    </h5>
-                                                    <p class="text-gray-600 text-capitalize">
-                                                        <%= userDetails.role %>
-                                                    </p>
-                                                    <hr>
-                                                    <div class="row no-gutters">
-                                                        <div class="col-12 text-center">
-                                                            <div
-                                                                class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                                Account Status
-                                                            </div>
-                                                            <% if (userDetails.status==='active' ) { %>
-                                                                <div class="h5 mb-0 font-weight-bold text-success">
-                                                                    Active</div>
-                                                                <% } else { %>
-                                                                    <div class="h5 mb-0 font-weight-bold text-danger">
-                                                                        Inactive</div>
-                                                                    <% } %>
-                                                        </div>
+                                                <% if (userDetails.status==='active' ) { %>
+                                                    <div class="h5 mb-0 font-weight-bold text-success">
+                                                        Active</div>
+                                                    <% } else { %>
+                                                        <div class="h5 mb-0 font-weight-bold text-danger">
+                                                            Inactive</div>
+                                                        <% } %>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row no-gutters">
+                                            <div class="col-12 text-center">
+                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    Verification Status
+                                                </div>
+                                                <% if (userDetails.isVerified) { %>
+                                                    <div class="h5 mb-0 font-weight-bold text-success">
+                                                        <i class="fas fa-check-circle"></i> Verified
                                                     </div>
-                                                    <hr>
-                                                    <div class="row no-gutters">
-                                                        <div class="col-12 text-center">
-                                                            <div
-                                                                class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                                Verification Status
-                                                            </div>
-                                                            <% if (userDetails.isVerified) { %>
-                                                                <div class="h5 mb-0 font-weight-bold text-success">
-                                                                    <i class="fas fa-check-circle"></i> Verified
-                                                                </div>
-                                                                <% } else { %>
-                                                                    <div class="h5 mb-0 font-weight-bold text-warning">
-                                                                        <i class="fas fa-exclamation-circle"></i>
-                                                                        Pending
-                                                                    </div>
-                                                                    <% } %>
+                                                    <% } else { %>
+                                                        <div class="h5 mb-0 font-weight-bold text-warning">
+                                                            <i class="fas fa-exclamation-circle"></i>
+                                                            Pending
                                                         </div>
-                                                    </div>
+                                                        <% } %>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Quick Actions Card -->
-                                <div class="card shadow mb-4">
+                                <!-- <div class="card shadow mb-4">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
                                     </div>
@@ -344,7 +426,7 @@
                                                             <% } %>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 
@@ -390,6 +472,238 @@
             document.getElementById('modalImage').src = imageSrc;
             $('#imageModal').modal('show');
         }
+
+        // Store original image URL for error recovery
+        let originalImageUrl = null;
+
+        // Function to handle profile image change
+        function handleProfileImageChange(event) {
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'error');
+                return;
+            }
+
+            // Validate file size (5MB limit)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showAlert('File size must be less than 5MB.', 'error');
+                return;
+            }
+
+            // Store current image URL for potential revert
+            const currentImage = document.getElementById('profileImageDisplay');
+            if (currentImage.tagName === 'IMG') {
+                originalImageUrl = currentImage.src;
+            } else {
+                originalImageUrl = null; // Was default avatar
+            }
+
+            // Preview the image immediately
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                updateProfileImageDisplay(e.target.result);
+            };
+            reader.readAsDataURL(file);
+
+            // Upload the image
+            uploadProfileImage(file);
+        }
+
+        // Function to update profile image display
+        function updateProfileImageDisplay(imageSrc) {
+            const displayElement = document.getElementById('profileImageDisplay');
+
+            // If current display is the default avatar div, replace it with img
+            if (displayElement.tagName === 'DIV') {
+                const newImg = document.createElement('img');
+                newImg.id = 'profileImageDisplay';
+                newImg.src = imageSrc;
+                newImg.alt = 'Profile Picture';
+                newImg.className = 'img-profile rounded-circle mb-3';
+                newImg.style.cssText = 'width: 150px; height: 150px; object-fit: cover; cursor: pointer;';
+                newImg.onclick = function () { openImageModal(this.src); };
+
+                displayElement.parentNode.replaceChild(newImg, displayElement);
+            } else {
+                // Update existing img src
+                displayElement.src = imageSrc;
+            }
+        }
+
+        // Function to upload profile image to server
+        function uploadProfileImage(file) {
+            const uploadStatus = document.getElementById('uploadStatus');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadMessage = document.getElementById('uploadMessage');
+
+            // Show upload status
+            uploadStatus.style.display = 'block';
+            uploadMessage.textContent = 'Uploading...';
+            uploadProgress.style.width = '0%';
+
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('profileImage', file);
+
+            // Make actual API call
+            fetch('/update-profile-image', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    uploadProgress.style.width = '100%';
+                    uploadMessage.textContent = 'Upload complete!';
+                    uploadMessage.className = 'text-success';
+
+                    if (data.success) {
+                        // Update the profile image display with the new URL
+                        if (data.data && data.data.profileImageUrl) {
+                            updateProfileImageDisplay(data.data.profileImageUrl);
+                        }
+
+                        // Hide status after 2 seconds
+                        setTimeout(() => {
+                            uploadStatus.style.display = 'none';
+                            uploadMessage.className = 'text-muted';
+                            showAlert('Profile picture updated successfully!', 'success');
+                        }, 2000);
+                    } else {
+                        uploadStatus.style.display = 'none';
+                        console.log(data);
+                        showAlert(data.message || 'Failed to update profile picture.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                    uploadStatus.style.display = 'none';
+
+                    // Reset the image display to previous state on error
+                    if (originalImageUrl) {
+                        updateProfileImageDisplay(originalImageUrl);
+                    } else {
+                        // Revert to default avatar
+                        revertToDefaultAvatar();
+                    }
+
+                    showAlert('Failed to update profile picture. Please try again.', 'error');
+                });
+        }
+
+        // Function to revert to default avatar
+        function revertToDefaultAvatar() {
+            const displayElement = document.getElementById('profileImageDisplay');
+
+            // Create default avatar div
+            const defaultAvatar = document.createElement('div');
+            defaultAvatar.id = 'profileImageDisplay';
+            defaultAvatar.className = 'bg-gradient-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center';
+            defaultAvatar.style.cssText = 'width: 150px; height: 150px; cursor: pointer;';
+            defaultAvatar.onclick = function () { openImageModal('/images/default-avatar.png'); };
+            defaultAvatar.innerHTML = '<i class="fas fa-user fa-4x text-white"></i>';
+
+            displayElement.parentNode.replaceChild(defaultAvatar, displayElement);
+        }
+
+        // Function to show alert messages
+        function showAlert(message, type = 'info') {
+            // Remove existing alerts
+            const existingAlert = document.querySelector('.custom-alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            // Create alert element
+            const alertClass = type === 'success' ? 'alert-success' :
+                type === 'error' ? 'alert-danger' :
+                    type === 'warning' ? 'alert-warning' : 'alert-info';
+
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show custom-alert" role="alert" 
+                     style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+
+            // Insert alert into DOM
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.custom-alert');
+                if (alert) {
+                    $(alert).alert('close');
+                }
+            }, 5000);
+        }
+
+        // Handle drag and drop for profile image
+        function initializeDragAndDrop() {
+            const profileImageDisplay = document.getElementById('profileImageDisplay');
+            const dropZone = profileImageDisplay.parentElement;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('drag-highlight');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('drag-highlight');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    const file = files[0];
+                    document.getElementById('profileImageInput').files = files;
+                    handleProfileImageChange({ target: { files: [file] } });
+                }
+            }
+        }
+
+        // Initialize drag and drop when page loads
+        $(document).ready(function () {
+            initializeDragAndDrop();
+
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+        });
     </script>
 </body>
 

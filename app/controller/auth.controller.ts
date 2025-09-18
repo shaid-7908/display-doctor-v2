@@ -263,7 +263,7 @@ class AuthController {
 
   renderDashboard = asyncHandler(async (req: Request, res: Response) => {
     const currentUser = req.user;
-    res.render("index",{default_user:currentUser});
+    res.render("index", { default_user: currentUser });
   });
 
   logout = asyncHandler(async (req: Request, res: Response) => {
@@ -274,28 +274,81 @@ class AuthController {
     res.redirect("/login");
   });
 
-  renderProfile = asyncHandler(async (req: Request, res: Response)=>{
-      const userid = req.params.id;
-      const userDetails = await UserModel.aggregate([
-        {$match:{_id:new mongoose.Types.ObjectId(userid)}},
-        {$lookup:{
-          from:"address_proofs",
-          localField:"_id",
-          foreignField:"userId",
-          as:"address_proof"
-        }},
-        {$unwind:{
-          path:"$address_proof",
-          preserveNullAndEmptyArrays:true
-        }},
-        {$project:{
-          password:0
-        }}
-      ])
-      if(!userDetails || userDetails.length === 0){
-        res.render("profile-page",{default_user:req.user,userDetails:null});
+  renderProfile = asyncHandler(async (req: Request, res: Response) => {
+    const userid = req.params.id;
+    const userDetails = await UserModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userid) } },
+      {
+        $lookup: {
+          from: "address_proofs",
+          localField: "_id",
+          foreignField: "userId",
+          as: "address_proof"
+        }
+      },
+      {
+        $unwind: {
+          path: "$address_proof",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          password: 0
+        }
       }
-      res.render("profile-page",{default_user:req.user,userDetails:userDetails[0]});
+    ])
+    if (!userDetails || userDetails.length === 0) {
+      res.render("profile-page", { default_user: req.user, userDetails: null });
+    }
+    res.render("profile-page", { default_user: req.user, userDetails: userDetails[0] });
+  })
+
+  updateProfileImage = asyncHandler(async (req: Request, res: Response) => {
+    const { profileImageUrl } = req.body;
+    const currentUser = req.user;
+
+    if (!profileImageUrl) {
+      return sendError(res, "Profile image is required", null, STATUS_CODES.BAD_REQUEST);
+    }
+
+    if (!currentUser || !currentUser.id) {
+      return sendError(res, "User authentication required", null, STATUS_CODES.UNAUTHORIZED);
+    }
+
+    const user = await UserModel.findByIdAndUpdate(
+      currentUser.id,
+      { $set: { profileImage: profileImageUrl } },
+      { new: true }
+    );
+
+    if (!user) {
+      return sendError(res, "User not found", null, STATUS_CODES.NOT_FOUND);
+    }
+
+    return sendSuccess(res, "Profile image updated successfully", { profileImageUrl }, STATUS_CODES.OK);
+  })
+  renderSettingsPage = asyncHandler(async (req: Request, res: Response) => {
+    res.render("settings-page",{default_user:req.user});
+  })
+
+  updatePassword = asyncHandler(async (req: Request, res: Response) => {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const currentUser = req.user;
+    if (!currentUser || !currentUser.id) {
+      return sendError(res, "User authentication required", null, STATUS_CODES.UNAUTHORIZED);
+    }
+    const user = await UserModel.findById(currentUser.id);
+    if (!user) {
+      return sendError(res, "User not found", null, STATUS_CODES.NOT_FOUND);
+    }
+    const isPassword = await comparePassword(currentPassword, user.password);
+    if (!isPassword) {
+      return sendError(res, "Invalid current password", null, STATUS_CODES.BAD_REQUEST);
+    }
+    const hashedPassword = await hashPassword(newPassword);
+    await UserModel.findByIdAndUpdate(currentUser.id, { $set: { password: hashedPassword } });
+    return sendSuccess(res, "Password updated successfully", null, STATUS_CODES.OK);
   })
 }
 
