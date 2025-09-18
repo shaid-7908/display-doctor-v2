@@ -19,8 +19,8 @@ const envConfig = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
   GOOGLE_REDIDERCT_URI: process.env.GOOGLE_REDIDERCT_URI as string,
   HOST_ENVIORMENT: process.env.HOST_ENVIORMENT as string,
-  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
-  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY as string,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_KEY as string,
   AWS_REGION: process.env.AWS_REGION as string,
   AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME as string,
 };

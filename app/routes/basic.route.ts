@@ -1,6 +1,6 @@
 import express from 'express'
 import basicController from '../controller/basic.controller'
-import { upload } from '../middelware/multer.middleware'
+//import { upload } from '../middelware/multer.middleware'
 
 const basicRouter = express.Router()
 
@@ -9,7 +9,7 @@ basicRouter.get('/error-response', basicController.eaxmpleErrorControllerFunctio
 
 //file uploads 
 //multi file upload
-basicRouter.post('/multi-image', upload.fields([{ name: 'one-image', maxCount: 1 }, { name: 'two-image', maxCount: 2 }]), basicController.exampleMultiFileUploda)
+//basicRouter.post('/multi-image', upload.fields([{ name: 'one-image', maxCount: 1 }, { name: 'two-image', maxCount: 2 }]), basicController.exampleMultiFileUploda)
 
 
 

@@ -60,28 +60,11 @@ class AdminController {
     })
 
     createTechnician = asyncHandler(async (req: Request, res: Response) => {
-        const { firstName, lastName, email, phone, dateOfBirth, aadhaarNumber, city, state, pinCode, specialization, experienceLevel, service_category, sub_categories, licenseNumber, role, fatherName, addressLine1 } = req.body;
+        const { firstName, lastName, email, phone, dateOfBirth, aadhaarNumber, city, state, pinCode, specialization, experienceLevel, service_category, sub_categories, licenseNumber, role, fatherName, addressLine1, aadhaarPhotoUrl, profilePhotoUrl } = req.body;
 
-        // Handle file uploads with proper typing
-        let aadhaarPhoto: Express.Multer.File | undefined;
-        let profilePhoto: Express.Multer.File | undefined;
+        
 
-        if (req.files && typeof req.files === 'object') {
-            const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-            if (files.aadhaarPhoto && files.aadhaarPhoto.length > 0) {
-                aadhaarPhoto = files.aadhaarPhoto[0];
-            }
-            if (files.profilePhoto && files.profilePhoto.length > 0) {
-                profilePhoto = files.profilePhoto[0];
-            }
-        }
-
-        if (!aadhaarPhoto || !profilePhoto) {
-            return sendError(res, "Aadhaar photo and profile photo are required", null, STATUS_CODES.BAD_REQUEST);
-        }
-
-        const aadhaarPhotoPath = path.join(__dirname, "../../uploads", aadhaarPhoto.filename);
-        const profilePhotoPath = path.join(__dirname, "../../uploads", profilePhoto.filename);
+        
 
         const existingTechnician = await UserModel.findOne({ email });
         if (existingTechnician) {
@@ -100,7 +83,7 @@ class AdminController {
             dateOfBirth,
             role,
             password: hashedPassword,
-            profileImage: profilePhoto.filename
+            profileImage: profilePhotoUrl
         });
 
         const savedTechnician = await newTechnician.save();
@@ -110,7 +93,7 @@ class AdminController {
             city,
             state,
             pin_code: pinCode,
-            adhar_front_image: aadhaarPhoto.filename,
+            adhar_front_image: aadhaarPhotoUrl,
             son_or_daughter_of: fatherName,
             address_line_1: addressLine1
         });
@@ -333,72 +316,74 @@ class AdminController {
         return sendSuccess(res, "Service sub category created successfully", null, STATUS_CODES.CREATED);
     })
 
-    renderIssueReportPage = asyncHandler(async (req:Request,res:Response)=>{
-     res.render('issue-report-page',{default_user:req.user})
+    renderIssueReportPage = asyncHandler(async (req: Request, res: Response) => {
+        res.render('issue-report-page', { default_user: req.user })
     })
 
-    getIssueReports = asyncHandler(async (req,res)=>{
-       const issueReports = await IssueReportModel.aggregate([
-        {
-            $lookup:{
-                from:'users',
-                localField:'technicianId',
-                foreignField:'_id',
-                as:'submitted_by'
+    getIssueReports = asyncHandler(async (req, res) => {
+        const issueReports = await IssueReportModel.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'technicianId',
+                    foreignField: '_id',
+                    as: 'submitted_by'
+                }
+            },
+            { $unwind: '$submitted_by' },
+            {
+                $project: {
+                    "submitted_by.password": 0,
+                    "submitted_by.createdAt": 0,
+                    "submitted_by.__v": 0,
+                    "submitted_by.updatedAt": 0,
+                    "submitted_by.dateOfBirth": 0
+                }
             }
-        },
-        {$unwind:'$submitted_by'},
-        {$project:{
-            "submitted_by.password":0,
-            "submitted_by.createdAt":0,
-            "submitted_by.__v":0,
-            "submitted_by.updatedAt":0,
-            "submitted_by.dateOfBirth":0
-        }}
-       ])
-       return sendSuccess(res,'Issue reports fetched Successfully',issueReports,STATUS_CODES.OK)
+        ])
+        return sendSuccess(res, 'Issue reports fetched Successfully', issueReports, STATUS_CODES.OK)
     })
 
-    getIssueReportById = asyncHandler(async (req,res)=>{
+    getIssueReportById = asyncHandler(async (req, res) => {
         const reportId = req.params.id
         const fullReport = await IssueReportModel.aggregate([
             {
-                $match:{"_id":new mongoose.Types.ObjectId(reportId)}
+                $match: { "_id": new mongoose.Types.ObjectId(reportId) }
             },
             {
-                $lookup:{
-                    from:'issues',
-                    localField:'issue_id',
-                    foreignField:'_id',
-                    as:'issue_details'
+                $lookup: {
+                    from: 'issues',
+                    localField: 'issue_id',
+                    foreignField: '_id',
+                    as: 'issue_details'
                 }
             },
-            {$unwind:"$issue_details"}
+            { $unwind: "$issue_details" }
         ])
-       return sendSuccess(res,"Full Issue details",fullReport,STATUS_CODES.OK)
+        return sendSuccess(res, "Full Issue details", fullReport, STATUS_CODES.OK)
     })
 
-    submitQuotation = asyncHandler(async (req,res)=>{
+    submitQuotation = asyncHandler(async (req, res) => {
         const reportId = req.body.reportId
         const initialQuotation = Number(req.body.initialQuotation)
         const finalQuotation = Number(req.body.finalQuotation)
         let quotationType = ""
-        if(finalQuotation === 0) quotationType = "initial"
-        else if (finalQuotation > 0) quotationType ="final"
+        if (finalQuotation === 0) quotationType = "initial"
+        else if (finalQuotation > 0) quotationType = "final"
         else if (initialQuotation === 0 && finalQuotation === 0) quotationType = "none"
         else if (finalQuotation > 0 && initialQuotation > 0) quotationType = "final"
-        const report = await IssueReportModel.findOne({_id:reportId})
-        if(!report){
-            return sendError(res,"Report not found",null,STATUS_CODES.NOT_FOUND)
+        const report = await IssueReportModel.findOne({ _id: reportId })
+        if (!report) {
+            return sendError(res, "Report not found", null, STATUS_CODES.NOT_FOUND)
         }
-        const updatedReport = await IssueReportModel.findByIdAndUpdate(reportId,{$set:{initialQuotation:initialQuotation,finalQuotation:finalQuotation,quotation_type:quotationType,is_approved:true}},{new:true})
-        if(!updatedReport){
-            return sendError(res,"Failed to update quotation",null,STATUS_CODES.INTERNAL_SERVER_ERROR)
+        const updatedReport = await IssueReportModel.findByIdAndUpdate(reportId, { $set: { initialQuotation: initialQuotation, finalQuotation: finalQuotation, quotation_type: quotationType, is_approved: true } }, { new: true })
+        if (!updatedReport) {
+            return sendError(res, "Failed to update quotation", null, STATUS_CODES.INTERNAL_SERVER_ERROR)
         }
         const issue_id = updatedReport.issue_id
-        await IssueModel.findByIdAndUpdate(issue_id,{$set:{status:'in_progress'}})
+        await IssueModel.findByIdAndUpdate(issue_id, { $set: { status: 'in_progress' } })
         console.log('yup')
-        return sendSuccess(res,"Quotation submitted successfully",updatedReport,STATUS_CODES.ACCEPTED)
+        return sendSuccess(res, "Quotation submitted successfully", updatedReport, STATUS_CODES.ACCEPTED)
     })
 
 }

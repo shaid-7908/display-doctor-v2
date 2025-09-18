@@ -23,14 +23,6 @@ class CommonController {
     // Validate request body using the schema from issue model
     const issueData = req.body;
 
-    // Handle file uploads for photos
-    let photoUrls: string[] = [];
-    if (req.files && typeof req.files === "object") {
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      if (files.photos && files.photos.length > 0) {
-        photoUrls = files.photos.map((file) => file.filename);
-      }
-    }
 
     // Parse nested form data (contact.name, contact.address.line1, etc.)
     const parsedData = {
@@ -56,7 +48,7 @@ class CommonController {
         warrantyStatus: issueData["device.warrantyStatus"] || undefined,
       },
       problemDescription: issueData.problemDescription,
-      photos: photoUrls.length > 0 ? photoUrls : undefined,
+      photos: req.body.photosUrls,
       source: issueData.source || "call_center",
       campaignId: issueData.campaignId || undefined,
       priority: issueData.priority || "normal",
@@ -71,10 +63,6 @@ class CommonController {
         role: req.user?.role || "admin",
       },
     };
-    console.log(
-      parsedData,
-      "======================================================="
-    );
     // Validate the parsed data using the schema from issue model
     const validationResult = z
       .object({

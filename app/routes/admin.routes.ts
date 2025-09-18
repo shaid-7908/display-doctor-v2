@@ -1,7 +1,8 @@
 import express from "express";
 import adminController from "../controller/admin.controller";
 import { authChecker, roleChecker } from "../middelware/auth.middleware";
-import { upload } from "../middelware/multer.middleware";
+//import { upload } from "../middelware/multer.middleware";
+import { technicianProfileUpload, uploadTechnicianFilesToS3, singelUpload } from "../middelware/multer.middleware";
 
 const adminRouter = express.Router();
 
@@ -11,8 +12,8 @@ adminRouter.post("/create-caller", authChecker, roleChecker(["admin"]), adminCon
 
 //technician routes
 adminRouter.get("/create-technician", authChecker, roleChecker(["admin"]), adminController.renderCreateTechnician);
-adminRouter.post("/create-technician", authChecker, roleChecker(["admin"]), upload.fields([{ name: 'aadhaarPhoto', maxCount: 1 }, { name: 'profilePhoto', maxCount: 1 }]), adminController.createTechnician);
-adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]), upload.single('image'), adminController.renderCreateSpecialization);
+adminRouter.post("/create-technician", authChecker, roleChecker(["admin"]), technicianProfileUpload, uploadTechnicianFilesToS3, adminController.createTechnician);
+adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]), singelUpload, adminController.renderCreateSpecialization);
 adminRouter.get("/technician-list", authChecker, roleChecker(["admin"]), adminController.renderTechnicianList);
 
 
@@ -38,9 +39,9 @@ adminRouter.get("/get-sub-categories-by-service/:service_id", authChecker, roleC
 
 
 //Issue Report Routes
-adminRouter.get('/issue-reports',authChecker,roleChecker(["admin"]),adminController.renderIssueReportPage)
-adminRouter.get('/get-issue-reports',authChecker,roleChecker(["admin"]),adminController.getIssueReports)
-adminRouter.get('/get-issue-report-details/:id',authChecker,roleChecker(["admin"]),adminController.getIssueReportById)
-adminRouter.patch('/submit-quotation',authChecker,roleChecker(['admin']),adminController.submitQuotation)
+adminRouter.get('/issue-reports', authChecker, roleChecker(["admin"]), adminController.renderIssueReportPage)
+adminRouter.get('/get-issue-reports', authChecker, roleChecker(["admin"]), adminController.getIssueReports)
+adminRouter.get('/get-issue-report-details/:id', authChecker, roleChecker(["admin"]), adminController.getIssueReportById)
+adminRouter.patch('/submit-quotation', authChecker, roleChecker(['admin']), adminController.submitQuotation)
 
 export default adminRouter; 
