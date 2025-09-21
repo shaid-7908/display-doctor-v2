@@ -8,8 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
+     <% if(default_user.role === "admin") { %>
+    <title>Admin - Dashboard</title>
+    <% } else if(default_user.role === "caller") { %>
+    <title>Caller - Dashboard</title>
+    <% } else if(default_user.role === "manager") { %>
+    <title>Manager - Dashboard</title>
+    <% } else if(default_user.role === "technician") { %>
+    <title>Technician - Dashboard</title>
+    <% } else { %>
     <title>SB Admin 2 - Dashboard</title>
+    <% } %>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -76,6 +85,7 @@
                     </div>
 
                     <!-- Content Row -->
+                     <% if(default_user.role === "admin" || default_user.role === "caller") { %>
                     <div class="row">
 
                         <!-- Earnings (Monthly) Card Example -->
@@ -85,11 +95,11 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Earnings (Monthly)</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                                Total Issues</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalIssues"></div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                            <i class="fas fa-list-alt fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -104,10 +114,10 @@
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                                 Earnings (Annual)</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalEarnings">$215,000</div>
                                         </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                        <div class="col-auto">  
+                                            <i class="fas fa-rupee-sign fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -120,23 +130,18 @@
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Resolved Issues
                                             </div>
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col-auto">
-                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800" id="resolvedIssues"></div>
                                                 </div>
                                                 <div class="col">
-                                                    <div class="progress progress-sm mr-2">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                                            aria-valuemax="100"></div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                                            <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -150,17 +155,18 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Pending Requests</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                                Unassigned Issues</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="unassignedIssues">18</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-comments fa-2x text-gray-300"></i>
+                                            <i class="fas fa-hourglass-start fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <% } %>
 
                     <!-- Content Row -->
 
@@ -439,6 +445,75 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script>
+        function getUnassignedIssues(){
+            $.ajax({
+                url:"/get-all-unassigned-issues",
+                type:"GET",
+                success:function(response){
+                    const numberOfUnassignedIssues = response.data.length;
+                    $("#unassignedIssues").text(numberOfUnassignedIssues);
+                }
+            })
+        }
+        function getTotalIssues(){
+            $.ajax({
+                url:"/get-all-issues",
+                type:"GET",
+                success:function(response){
+                    const numberOfIssues = response.data.length;
+                    $("#totalIssues").text(numberOfIssues);
+                }
+            })
+        }
+
+        function getResolvedIssues(){
+            $.ajax({
+                url:"/get-all-resolved-issues",
+                type:"GET",
+                success:function(response){
+                    const numberOfResolvedIssues = response.data.length;
+                    $("#resolvedIssues").text(numberOfResolvedIssues);
+                }
+            })
+        }
+        function getTotalEarning (){
+            $.ajax({
+                url:"/get-total-earnings",
+                type:"GET",
+                success:function(response){
+                    const totalEarnings = response.data;
+                    console.log(response)
+                    $("#totalEarnings").text(totalEarnings);
+                }
+            })
+        }
+
+        function getRecentInvoices(){
+            $.ajax({
+                url:"/get-recent-invoices",
+                type:"GET",
+                success:function(response){
+                    const recentInvoices = response.data;
+                    console.log(response)
+                }
+            })
+        }
+
+
+        $(document).ready(function(){
+            const role = "<%= default_user.role %>";
+            if(role === "admin" || role === "caller"){
+                getUnassignedIssues();
+                getTotalIssues();
+                getResolvedIssues();
+                getTotalEarning();
+                
+            }
+            getRecentInvoices();
+        });
+    </script>
 
 </body>
 

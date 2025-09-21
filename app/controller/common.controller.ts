@@ -190,7 +190,7 @@ class CommonController {
       status: "scheduled",
       schedule: { $gte: startOfToday, $lte: endOfToday }
     });
-    res.render("issuelist", { default_user: req.user, issues, totalIssues:totalIssues ,scheduledToday:scheduledToday});
+    res.render("issuelist", { default_user: req.user, issues, totalIssues: totalIssues, scheduledToday: scheduledToday });
   });
   getTechniciansToAssign = asyncHandler(async (req: Request, res: Response) => {
     const serviceCategoryId = req.params.id;
@@ -1077,6 +1077,64 @@ class CommonController {
     }
   });
 
+  getAllUnassignedIssues = asyncHandler(async (req: Request, res: Response) => {
+    const issues = await IssueModel.find({
+      $or: [
+        { assignment: { $exists: false } },
+        { assignment: null }
+      ]
+    });
+    return sendSuccess(res, "Unassigned issues", issues, STATUS_CODES.OK);
+  });
+
+  getAllIssues = asyncHandler(async (req: Request, res: Response) => {
+    const issues = await IssueModel.find({});
+    return sendSuccess(res, "All issues", issues, STATUS_CODES.OK);
+  })
+
+  getAllResolvedIssues = asyncHandler(async (req: Request, res: Response) => {
+    const issues = await IssueModel.find({ status: "resolved" });
+    return sendSuccess(res, "All resolved issues", issues, STATUS_CODES.OK);
+  })
+  getTotalEarnings = asyncHandler(async (req: Request, res: Response) => {
+    const invoices = await InvoiceModel.find({ status: "paid" });
+    let totalEarnings = 0
+    invoices.forEach(invoice => {
+      totalEarnings += invoice.finalAmount as number;
+    });
+    return sendSuccess(res, "Total earnings", totalEarnings, STATUS_CODES.OK);
+  })
+  getRecentInvoices = asyncHandler(async (req: Request, res: Response) => {
+    const currentUser = req.user
+    let pipeline: any[] = [];
+    if(currentUser.role === "technician"){
+      pipeline = [
+        {$lookup : {
+          from :"issue_reports",
+          localField:"issue_report_id",
+          foreignField:"_id",
+          as:"issue_report"
+        }},
+        {$unwind:"$issue_report"},
+        {$match:{"issue_report.technicianId":new mongoose.Types.ObjectId(currentUser.id)}}
+      ]
+
+    }else{
+      pipeline = [
+        {
+          $lookup: {
+            from: "issue_reports",
+            localField: "issue_report_id",
+            foreignField: "_id",
+            as: "issue_report"
+          }
+        },
+        { $unwind: "$issue_report" }
+      ]
+    }
+    const invoices = await InvoiceModel.aggregate(pipeline)
+    return sendSuccess(res, "Recent invoices", invoices, STATUS_CODES.OK);
+  })
 }
 
 const commonController = new CommonController();
