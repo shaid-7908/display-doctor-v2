@@ -1116,7 +1116,8 @@ class CommonController {
           as:"issue_report"
         }},
         {$unwind:"$issue_report"},
-        {$match:{"issue_report.technicianId":new mongoose.Types.ObjectId(currentUser.id)}}
+        {$match:{"issue_report.technicianId":new mongoose.Types.ObjectId(currentUser.id)}},
+        {$limit:5}
       ]
 
     }else{
@@ -1129,11 +1130,29 @@ class CommonController {
             as: "issue_report"
           }
         },
-        { $unwind: "$issue_report" }
+        { $unwind: "$issue_report" },
+        {$limit:5}
       ]
     }
     const invoices = await InvoiceModel.aggregate(pipeline)
     return sendSuccess(res, "Recent invoices", invoices, STATUS_CODES.OK);
+  })
+  getRecentPendingReports = asyncHandler(async(req:Request,res:Response)=>{
+    const currentUser = req.user
+    let pipeline:any[] = [];
+    if(currentUser.role === "technician"){
+      pipeline =[
+        {$match:{"technicianId":new mongoose.Types.ObjectId(currentUser.id),
+          "is_approved":false
+        }}
+      ]
+    }else{
+      pipeline =[
+        {$match:{"is_approved":false}}
+      ]
+    }
+    const reports = await IssueReportModel.aggregate(pipeline)
+    return sendSuccess(res, "Recent pending reports", reports, STATUS_CODES.OK);
   })
 }
 

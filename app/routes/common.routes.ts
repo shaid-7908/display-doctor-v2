@@ -43,6 +43,6 @@ commonRouter.get("/get-total-earnings", authChecker, roleChecker(["admin", "call
 commonRouter.get("/get-recent-invoices", authChecker, roleChecker(["technician", "admin","caller"]), commonController.getRecentInvoices);
 //Admin and caller dashboard routes
 commonRouter.get("/get-all-unassigned-issues", authChecker, roleChecker(["admin", "caller"]), commonController.getAllUnassignedIssues);
-
+commonRouter.get("/get-recent-pending-reports", authChecker, roleChecker(["technician", "admin","caller"]), commonController.getRecentPendingReports);
 
 export default commonRouter;
