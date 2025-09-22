@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Issue Details - Admin Dashboard</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/css/issuelist.css" rel="stylesheet">
+
+    <style>
+        .issue-details-container {
+            background: #f8f9fc;
+        }
+
+        .section-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: all 0.3s;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.2);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 12px 0 0;
+            padding: 1rem 1.5rem;
+            color: white;
+            border: none;
+        }
+
+        .section-header.customer {
+            background: linear-gradient(135deg, #4e73df 0%, #36b9cc 100%);
+        }
+
+        .section-header.device {
+            background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        }
+
+        .section-header.assignment {
+            background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+        }
+
+        .section-header.reports {
+            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+        }
+
+        .section-header.invoice {
+            background: linear-gradient(135deg, #36b9cc 0%, #3085d6 100%);
+        }
+
+        .section-header.timeline {
+            background: linear-gradient(135deg, #858796 0%, #60616f 100%);
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .info-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #5a5c69;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            color: #3a3b45;
+            line-height: 1.4;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .timeline-item {
+            border-left: 3px solid #e3e6f0;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4e73df;
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .timeline-content {
+            margin-top: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .photo-thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e3e6f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .photo-thumbnail:hover {
+            border-color: #4e73df;
+            transform: scale(1.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .section-card {
+                margin-bottom: 1rem;
+            }
+
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                        <!-- Sidebar Toggle (Topbar) -->
+                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                            <i class="fa fa-bars"></i>
+                        </button>
+
+                        <!-- Topbar Search -->
+                        <form
+                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light border-0 small"
+                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-search fa-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Topbar Navbar -->
+                        <%- include("common/topnavbar") %>
+
+                    </nav>
+                    <!-- End of Topbar -->
+
+                    <!-- Begin Page Content -->
+                    <div class="container-fluid issue-details-container">
+
+                        <!-- Page Header -->
+                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <h1 class="h3 mb-0 text-gray-800">Issue Details</h1>
+                                <small class="text-muted">Complete information about issue <span
+                                        id="issueIdHeader"></span></small>
+                            </div>
+                            <div class="action-buttons">
+                                <% if (default_user.role === "admin"){ %>
+                                <a href="/issue-list" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left mr-2"></i>Back to List
+                                </a>
+                                <% }%>
+                                <% if (default_user.role === "technician"){ %>
+                                    <a href="/technician/assigend-issue" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left mr-2"></i>Back to List
+                                    </a>
+                                <% }%>
+                                <button class="btn btn-primary" id="refreshBtn">
+                                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Issue Overview Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card section-card">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-info-circle"></i>Issue Overview
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <div class="info-label">Issue ID</div>
+                                                    <div class="info-value" id="issueId"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <div class="info-label">Status</div>
+                                                    <div class="info-value">
+                                                        <span class="status-badge" id="issueStatus"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <div class="info-label">Priority</div>
+                                                    <div class="info-value">
+                                                        <span class="priority-badge" id="issuePriority"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="info-item">
+                                                    <div class="info-label">Created On</div>
+                                                    <div class="info-value" id="createdAt"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <div class="info-item">
+                                                    <div class="info-label">Source</div>
+                                                    <div class="info-value" id="issueSource"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item">
+                                                    <div class="info-label">Created By</div>
+                                                    <div class="info-value" id="createdBy"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Customer Information Section -->
+                        <div class="row mb-4">
+                            <div class="col-lg-6">
+                                <div class="card section-card">
+                                    <div class="section-header customer">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-user"></i>Customer Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="info-item">
+                                            <div class="info-label">Name</div>
+                                            <div class="info-value" id="customerName"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Phone</div>
+                                            <div class="info-value">
+                                                <a href="#" id="customerPhone" class="text-decoration-none"></a>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Email</div>
+                                            <div class="info-value">
+                                                <a href="#" id="customerEmail" class="text-decoration-none"></a>
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Address</div>
+                                            <div class="info-value" id="customerAddress"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Device Information Section -->
+                            <div class="col-lg-6">
+                                <div class="card section-card">
+                                    <div class="section-header device">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-tv"></i>Device Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="info-item">
+                                            <div class="info-label">Device Type</div>
+                                            <div class="info-value" id="deviceType"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Brand</div>
+                                            <div class="info-value" id="deviceBrand"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Model</div>
+                                            <div class="info-value" id="deviceModel"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Serial Number</div>
+                                            <div class="info-value" id="deviceSerial"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Warranty Status</div>
+                                            <div class="info-value" id="warrantyStatus"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Problem Description Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card section-card">
+                                    <div class="section-header">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-exclamation-triangle"></i>Problem Description
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="info-item">
+                                            <div class="info-value" id="problemDescription"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Photos</div>
+                                            <div class="photo-gallery" id="photoGallery">
+                                                <!-- Photos will be populated here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assignment & Schedule Section -->
+                        <div class="row mb-4">
+                            <div class="col-lg-6">
+                                <div class="card section-card">
+                                    <div class="section-header assignment">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-user-cog"></i>Assignment Details
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="info-item">
+                                            <div class="info-label">Assigned Technician</div>
+                                            <div class="info-value" id="assignedTechnician"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Assigned By</div>
+                                            <div class="info-value" id="assignedBy"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Assigned On</div>
+                                            <div class="info-value" id="assignedAt"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Assignment Notes</div>
+                                            <div class="info-value" id="assignmentNotes"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Schedule Information -->
+                            <div class="col-lg-6">
+                                <div class="card section-card">
+                                    <div class="section-header assignment">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-calendar-alt"></i>Schedule Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="info-item">
+                                            <div class="info-label">Preferred Date</div>
+                                            <div class="info-value" id="preferredDate"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Time Window</div>
+                                            <div class="info-value" id="timeWindow"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Scheduled Start</div>
+                                            <div class="info-value" id="scheduledStart"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Arrival Time</div>
+                                            <div class="info-value" id="arrivalAt"></div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Completed At</div>
+                                            <div class="info-value" id="completedAt"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Reports Section -->
+                        <div class="row mb-4" id="reportsSection" style="display: none;">
+                            <div class="col-12">
+                                <div class="card section-card">
+                                    <div class="section-header reports">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-clipboard-list"></i>Technical Reports
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="info-item">
+                                                    <div class="info-label">Device Details</div>
+                                                    <div class="info-value" id="reportDeviceInfo"></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Required Parts</div>
+                                                    <div class="info-value" id="requiredParts"></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Budget Estimation</div>
+                                                    <div class="info-value">₹<span id="budgetEstimation"></span></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item">
+                                                    <div class="info-label">Initial Quotation</div>
+                                                    <div class="info-value">₹<span id="initialQuotation"></span></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Final Quotation</div>
+                                                    <div class="info-value">₹<span id="finalQuotation"></span></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Report Status</div>
+                                                    <div class="info-value">
+                                                        <span class="status-badge" id="reportStatus"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <div class="info-item">
+                                                    <div class="info-label">Technical Notes</div>
+                                                    <div class="info-value" id="techNotes"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Section -->
+                        <div class="row mb-4" id="invoiceSection" style="display: none;">
+                            <div class="col-12">
+                                <div class="card section-card">
+                                    <div class="section-header invoice">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-file-invoice"></i>Invoice Information
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="info-item">
+                                                    <div class="info-label">Invoice ID</div>
+                                                    <div class="info-value" id="invoiceId"></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Invoice Date</div>
+                                                    <div class="info-value" id="invoiceDate"></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Invoice Status</div>
+                                                    <div class="info-value">
+                                                        <span class="status-badge" id="invoiceStatus"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="info-item">
+                                                    <div class="info-label">Labour Charge</div>
+                                                    <div class="info-value">₹<span id="labourCharge"></span></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Parts Cost</div>
+                                                    <div class="info-value">₹<span id="partsCost"></span></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Visit Charge</div>
+                                                    <div class="info-value">₹<span id="visitCharge"></span></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="info-item">
+                                                    <div class="info-label">Discount</div>
+                                                    <div class="info-value">₹<span id="invoiceDiscount"></span></div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Final Amount</div>
+                                                    <div class="info-value">
+                                                        <strong>₹<span id="invoiceFinalAmount"></span></strong>
+                                                    </div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Actions</div>
+                                                    <div class="info-value">
+                                                        <a href="#" id="viewInvoiceBtn" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye mr-1"></i>View Invoice
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card section-card">
+                                    <div class="section-header timeline">
+                                        <h6 class="section-title">
+                                            <i class="fas fa-history"></i>Issue Timeline
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="issueTimeline">
+                                            <!-- Timeline items will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="/js/sb-admin-2.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <script>
+        const issueData = '<%- JSON.stringify(issue) %>';
+        const parsedIssue = JSON.parse(issueData);
+        console.log('Issue Data:', parsedIssue);
+
+        function getStatusBadgeClass(status) {
+            const statusClasses = {
+                'new': 'badge-primary',
+                'screening': 'badge-info',
+                'scheduled': 'badge-warning',
+                'assigned': 'badge-info',
+                'en_route': 'badge-warning',
+                'in_progress': 'badge-warning',
+                'on_hold_parts': 'badge-secondary',
+                'on_hold_customer': 'badge-secondary',
+                'awaiting_payment': 'badge-warning',
+                'resolved': 'badge-success',
+                'closed': 'badge-dark',
+                'cancelled': 'badge-danger'
+            };
+            return statusClasses[status] || 'badge-secondary';
+        }
+
+        function getPriorityBadgeClass(priority) {
+            const priorityClasses = {
+                'low': 'badge-success',
+                'normal': 'badge-info',
+                'high': 'badge-warning',
+                'urgent': 'badge-danger'
+            };
+            return priorityClasses[priority] || 'badge-info';
+        }
+
+        function populateIssueDetails(issue) {
+            // Basic Issue Information
+            $('#issueIdHeader').text(issue.human_readable_id || 'N/A');
+            $('#issueId').text(issue.human_readable_id || 'N/A');
+            $('#issueStatus').text(issue.status || 'N/A').addClass(getStatusBadgeClass(issue.status));
+            $('#issuePriority').text(issue.priority || 'N/A').addClass(getPriorityBadgeClass(issue.priority));
+            $('#createdAt').text(issue.createdAt ? new Date(issue.createdAt).toLocaleString() : 'N/A');
+            $('#issueSource').text(issue.source || 'N/A');
+            $('#createdBy').text(issue.createdBy ? `${issue.createdBy.role}` : 'N/A');
+
+            // Customer Information
+            if (issue.contact) {
+                $('#customerName').text(issue.contact.name || 'N/A');
+                $('#customerPhone').text(issue.contact.phone || 'N/A').attr('href', `tel:${issue.contact.phone}`);
+                $('#customerEmail').text(issue.contact.email || 'N/A').attr('href', `mailto:${issue.contact.email}`);
+
+                if (issue.contact.address) {
+                    const address = `${issue.contact.address.line1}, ${issue.contact.address.city}, ${issue.contact.address.state} - ${issue.contact.address.pinCode}`;
+                    $('#customerAddress').text(address);
+                }
+            }
+
+            // Device Information
+            if (issue.device) {
+                $('#deviceType').text(issue.device.type || 'N/A');
+                $('#deviceBrand').text(issue.device.brand || 'N/A');
+                $('#deviceModel').text(issue.device.model || 'N/A');
+                $('#deviceSerial').text(issue.device.serialNumber || 'N/A');
+                $('#warrantyStatus').text(issue.device.warrantyStatus || 'N/A');
+            }
+
+            // Problem Description
+            $('#problemDescription').text(issue.problemDescription || 'N/A');
+
+            // Photos
+            if (issue.photos && issue.photos.length > 0) {
+                const photoGallery = $('#photoGallery');
+                photoGallery.empty();
+                issue.photos.forEach(photo => {
+                    photoGallery.append(`<img src="${photo}" class="photo-thumbnail" onclick="window.open('${photo}', '_blank')">`);
+                });
+            } else {
+                $('#photoGallery').html('<span class="text-muted">No photos available</span>');
+            }
+
+            // Assignment Information
+            if (issue.assignment) {
+                $('#assignedTechnician').text(issue.assignment.technicianId || 'Not assigned');
+                $('#assignedBy').text(issue.assignment.assignedBy || 'N/A');
+                $('#assignedAt').text(issue.assignment.assignedAt ? new Date(issue.assignment.assignedAt).toLocaleString() : 'N/A');
+                $('#assignmentNotes').text(issue.assignment.notes || 'No notes');
+            } else {
+                $('#assignedTechnician').text('Not assigned');
+                $('#assignedBy').text('N/A');
+                $('#assignedAt').text('N/A');
+                $('#assignmentNotes').text('No notes');
+            }
+
+            // Schedule Information
+            if (issue.schedule) {
+                $('#preferredDate').text(issue.schedule.preferredDate ? new Date(issue.schedule.preferredDate).toLocaleDateString() : 'N/A');
+                $('#timeWindow').text(issue.schedule.window || 'N/A');
+                $('#scheduledStart').text(issue.schedule.scheduledStart ? new Date(issue.schedule.scheduledStart).toLocaleString() : 'N/A');
+                $('#arrivalAt').text(issue.schedule.arrivalAt ? new Date(issue.schedule.arrivalAt).toLocaleString() : 'N/A');
+                $('#completedAt').text(issue.schedule.completedAt ? new Date(issue.schedule.completedAt).toLocaleString() : 'N/A');
+            } else {
+                $('#preferredDate').text('N/A');
+                $('#timeWindow').text('N/A');
+                $('#scheduledStart').text('N/A');
+                $('#arrivalAt').text('N/A');
+                $('#completedAt').text('N/A');
+            }
+
+            // Reports Information
+            if (issue.reports) {
+                $('#reportsSection').show();
+                $('#reportDeviceInfo').text(`${issue.reports.deviceName || 'N/A'} - ${issue.reports.deviceModelNumber || 'N/A'}`);
+                $('#requiredParts').text(issue.reports.requiredParts || 'N/A');
+                $('#budgetEstimation').text(issue.reports.budgetEstimation || '0');
+                $('#initialQuotation').text(issue.reports.initialQuotation || '0');
+                $('#finalQuotation').text(issue.reports.finalQuotation || '0');
+                $('#reportStatus').text(issue.reports.is_approved ? 'Approved' : 'Pending')
+                    .addClass(issue.reports.is_approved ? 'badge-success' : 'badge-warning');
+                $('#techNotes').text(issue.reports.techNote || 'No technical notes');
+            }
+
+            // Invoice Information
+            if (issue.invoice) {
+                $('#invoiceSection').show();
+                $('#invoiceId').text(issue.invoice.human_readable_invoice_id || 'N/A');
+                $('#invoiceDate').text(issue.invoice.invoiceDate ? new Date(issue.invoice.invoiceDate).toLocaleDateString() : 'N/A');
+                $('#invoiceStatus').text(issue.invoice.status || 'N/A')
+                    .addClass(issue.invoice.status === 'paid' ? 'badge-success' : 'badge-warning');
+                $('#labourCharge').text(issue.invoice.labourCharge || '0');
+                $('#partsCost').text(issue.invoice.partsCost || '0');
+                $('#visitCharge').text(issue.invoice.visitCharge || '0');
+                $('#invoiceDiscount').text(issue.invoice.discount || '0');
+                $('#invoiceFinalAmount').text(issue.invoice.finalAmount || '0');
+                $('#viewInvoiceBtn').attr('href', `/view-invoice/${issue.human_readable_id}`);
+            }
+
+            // Timeline Information
+            if (issue.history && issue.history.length > 0) {
+                const timeline = $('#issueTimeline');
+                timeline.empty();
+                issue.history.forEach(item => {
+                    const timelineItem = `
+                    <div class="timeline-item">
+                        <div class="timeline-date">${new Date(item.at).toLocaleString()}</div>
+                        <div class="timeline-content">
+                            <strong>${item.action.replace('_', ' ').toUpperCase()}</strong>
+                            ${item.from ? `<br>From: ${item.from}` : ''}
+                            ${item.to ? `<br>To: ${item.to}` : ''}
+                            ${item.note ? `<br>Note: ${item.note}` : ''}
+                        </div>
+                    </div>
+                `;
+                    timeline.append(timelineItem);
+                });
+            } else {
+                $('#issueTimeline').html('<span class="text-muted">No timeline data available</span>');
+            }
+        }
+
+        $(document).ready(function () {
+            if (parsedIssue) {
+                populateIssueDetails(parsedIssue);
+            } else {
+                console.error('No issue data found');
+            }
+
+            // Refresh button functionality
+            $('#refreshBtn').on('click', function () {
+                location.reload();
+            });
+        });
+    </script>
+</body>
+
+</html>

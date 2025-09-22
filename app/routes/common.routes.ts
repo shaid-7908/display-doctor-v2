@@ -13,6 +13,7 @@ commonRouter.post("/create-issue", authChecker, roleChecker(["caller", "admin"])
 commonRouter.get("/issue-list", authChecker, roleChecker(["caller", "admin"]), commonController.renderIssueList);
 commonRouter.get("/get-technicians-to-assign/:id", authChecker, roleChecker(["caller", "admin"]), commonController.getTechniciansToAssign);
 commonRouter.get("/get-issue-details/:id", authChecker, roleChecker(["caller", "admin", "technician"]), commonController.getIssueDetails);
+commonRouter.get("/full-issue-details/:id", authChecker, roleChecker(["caller", "admin", "technician"]), commonController.renderFullIssueDetails);
 commonRouter.post("/assign-issue-to-technician/:id", authChecker, roleChecker(["caller", "admin"]), commonController.assignIssueToTechnician);
 commonRouter.get("/get-all-issues", authChecker, roleChecker(["caller", "admin"]), commonController.getAllIssues);
 commonRouter.get("/get-all-resolved-issues", authChecker, roleChecker(["caller", "admin"]), commonController.getAllResolvedIssues);
@@ -41,6 +42,7 @@ commonRouter.put("/update-invoice-status/:id", authChecker, roleChecker(["techni
 commonRouter.delete("/delete-invoice/:id", authChecker, roleChecker(["admin"]), commonController.deleteInvoice);
 commonRouter.get("/get-total-earnings", authChecker, roleChecker(["admin", "caller"]), commonController.getTotalEarnings);
 commonRouter.get("/get-recent-invoices", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getRecentInvoices);
+commonRouter.get('/view-invoice/:id', authChecker, roleChecker(["technician", "admin", "caller"]), commonController.renderViewInvoicePage);
 //Admin and caller dashboard routes
 commonRouter.get("/get-all-unassigned-issues", authChecker, roleChecker(["admin", "caller"]), commonController.getAllUnassignedIssues);
 commonRouter.get("/get-recent-pending-reports", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getRecentPendingReports);

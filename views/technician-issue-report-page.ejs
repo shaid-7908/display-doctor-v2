@@ -162,8 +162,8 @@
                 let dataText = "-"
                 if (submittedOn) dataText = submittedOn.toLocaleDateString()
                 let billgenerationButton = ""
-                if (issueReport.status !== "bill-generated" && issueReport.quotation_type === "final" && issueReport.is_approved) billgenerationButton = `<button class="btn btn-sm btn-warning bill-generation-btn" data-issue-id="${issueReport._id}"><i class="fas fa-receipt"></i></button>`
-                else if (issueReport.status === "bill-generated") billgenerationButton = `<button class="btn btn-sm btn-success bill-generation-btn" data-issue-id="${issueReport._id}"><i class="fas fa-receipt"></i></button>`
+                if (issueReport.status === "open" && issueReport.quotation_type === "final" && issueReport.is_approved) billgenerationButton = `<a href="/invoice-generation/${issueReport.issue_human_redable_id}" class="btn btn-sm btn-warning bill-generation-btn" data-issue-id="${issueReport._id}" title="Generate Invoice"><i class="fas fa-cogs"></i></a>`
+                else if (issueReport.status !== "open") billgenerationButton = `<a href="/view-invoice/${issueReport.issue_human_redable_id}" class="btn btn-sm btn-success bill-generation-btn" data-issue-id="${issueReport._id}" title="View Invoice"><i class="fas fa-file-alt"></i></a>`
 
                 table.row.add([
                     issueReport.issue_human_redable_id || "-",
@@ -177,7 +177,6 @@
                     `<div class="btn btn-${statusIdentifier} btn-sm">${issueReport.status.toUpperCase()}</div>`,
                     `<div class="action-buttons">
                                 <button class="btn btn-sm btn-primary view-issue-btn" data-issue-id="${issueReport.issue_human_redable_id}"><i class="fas fa-eye"></i></button>
-                                <button class="btn btn-sm ${issueReport.quotation_type === "final" ? "btn-success" : "btn-warning"} report-issue-btn" data-issue-id="${issueReport._id}" data-service-id="${issueReport.serviceCategoryId}" data-human-redable-id="${issueReport.issue_human_redable_id}"><i class="fas fa-file-alt"></i></button>
                                 <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                 ${billgenerationButton}
                                 </div>
@@ -200,14 +199,7 @@
                 pageLength: 10
             });
 
-            // Event handler for bill generation button
-            $(document).on('click', '.bill-generation-btn', function (e) {
-                e.preventDefault();
-                const issueId = $(this).data('issue-id');
-
-                // Send request to backend to generate invoice page
-                window.open(`/generate-invoice/${issueId}`, '_blank');
-            });
+           
         })
 
     </script>

@@ -255,6 +255,32 @@ class CommonController {
     return sendSuccess(res, "Issue details", issue, STATUS_CODES.OK);
   });
 
+  renderFullIssueDetails = asyncHandler(async (req:Request, res:Response)=>{
+      const issue_human_redable_id = req.params.id;
+      const issue = await IssueModel.aggregate([
+        { $match: { human_readable_id: issue_human_redable_id } },
+        { $lookup: { from: "issue_reports", localField: "_id", foreignField: "issue_id", as: "reports" } },
+        {$unwind : {
+          path: "$reports",
+          preserveNullAndEmptyArrays: true
+        }},
+        {$lookup:{
+          from:'invoices',
+          localField: "_id",
+          foreignField: "issue_id",
+          as: "invoice"
+        }},
+        {$unwind:{
+          path: "$invoice",
+          preserveNullAndEmptyArrays: true
+        }}
+      ])
+      res.render("issue-details-page", {
+        default_user: req.user,
+        issue: issue[0]
+      });
+  })
+
   assignIssueToTechnician = asyncHandler(
     async (req: Request, res: Response) => {
       const issueId = req.params.id;
@@ -1185,6 +1211,15 @@ class CommonController {
     }
 
     return sendSuccess(res, "Issue report details retrieved successfully", issueReport, STATUS_CODES.OK);
+  })
+
+  renderViewInvoicePage = asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const invoice = await InvoiceModel.findOne({ human_readable_issue_id: id });
+    res.render("view-invoice-page", {
+      default_user: req.user,
+      invoice: invoice
+    });
   })
 }
 

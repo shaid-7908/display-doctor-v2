@@ -58,6 +58,17 @@ class TechnicianController {
 
     return sendSuccess(res, "Issue found", issues, STATUS_CODES.OK);
   });
+  
+  getRecentlyAssignedIssues = asyncHandler(async (req, res) => {
+    const issues = await IssueModel.aggregate([
+      { $match: { "assignment.technicianId": new mongoose.Types.ObjectId(req.user?.id) } },
+      { $lookup: { from: "issue_reports", localField: "_id", foreignField: "issue_id", as: "reports" } },
+      { $addFields: { hasIssueReport: { $gt: [{ $size: "$reports" }, 0] } } },
+      { $sort: { "createdAt": -1 } },
+      { $limit: 5 },
+    ]);
+    return sendSuccess(res, "Issue found", issues, STATUS_CODES.OK);
+  });
 
   generateIssueReport = asyncHandler(async (req, res) => {
     const {
