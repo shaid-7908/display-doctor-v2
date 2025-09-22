@@ -225,6 +225,149 @@
             text-align: center;
             border: 1px solid #bdc3c7;
         }
+        /* Search Results Styling */
+                                .search-results-container {
+                                    max-height: 300px;
+                                    overflow-y: auto;
+                                    border: 1px solid #e3e6f0;
+                                    border-radius: 0.35rem;
+                                    background-color: #f8f9fc;
+                                }
+
+                                .search-result-item {
+                                    padding: 0.75rem 1rem;
+                                    margin-bottom: 0.5rem;
+                                    background: white;
+                                    border: 1px solid #e3e6f0;
+                                    border-radius: 0.35rem;
+                                    transition: all 0.2s ease-in-out;
+                                    cursor: pointer;
+                                    text-decoration: none;
+                                    color: inherit;
+                                    display: block;
+                                }
+
+                                .search-result-item:hover {
+                                    background: #f8f9fc;
+                                    border-color: #4e73df;
+                                    transform: translateY(-1px);
+                                    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+                                    text-decoration: none;
+                                    color: inherit;
+                                }
+
+                                .search-result-title {
+                                    font-weight: 600;
+                                    color: #5a5c69;
+                                    margin-bottom: 0.25rem;
+                                }
+
+                                .search-result-meta {
+                                    font-size: 0.875rem;
+                                    color: #858796;
+                                    margin-bottom: 0.25rem;
+                                }
+
+                                .search-result-status {
+                                    display: inline-block;
+                                    padding: 0.25rem 0.5rem;
+                                    font-size: 0.75rem;
+                                    font-weight: 600;
+                                    border-radius: 0.35rem;
+                                    text-transform: uppercase;
+                                }
+
+                                .status-new {
+                                    background-color: #d1ecf1;
+                                    color: #0c5460;
+                                }
+
+                                .status-assigned {
+                                    background-color: #fff3cd;
+                                    color: #856404;
+                                }
+
+                                .status-in-progress {
+                                    background-color: #cce5ff;
+                                    color: #004085;
+                                }
+
+                                .status-resolved {
+                                    background-color: #d4edda;
+                                    color: #155724;
+                                }
+
+                                .status-cancelled {
+                                    background-color: #f8d7da;
+                                    color: #721c24;
+                                }
+
+                                .status-scheduled {
+                                    background-color: #e2e3e5;
+                                    color: #383d41;
+                                }
+
+                                .invoice-status-paid {
+                                    background-color: #d4edda;
+                                    color: #155724;
+                                }
+
+                                .invoice-status-pending {
+                                    background-color: #fff3cd;
+                                    color: #856404;
+                                }
+
+                                .invoice-status-overdue {
+                                    background-color: #f8d7da;
+                                    color: #721c24;
+                                }
+
+                                .search-empty-state {
+                                    text-align: center;
+                                    padding: 2rem 1rem;
+                                    color: #858796;
+                                }
+
+                                .search-empty-state i {
+                                    opacity: 0.5;
+                                    margin-bottom: 0.5rem;
+                                }
+
+                                .search-loading {
+                                    text-align: center;
+                                    padding: 1rem;
+                                    color: #858796;
+                                }
+
+                                .border-right {
+                                    border-right: 1px solid #e3e6f0 !important;
+                                }
+
+                                @media (max-width: 768px) {
+                                    .border-right {
+                                        border-right: none !important;
+                                        border-bottom: 1px solid #e3e6f0;
+                                        padding-bottom: 1rem;
+                                        margin-bottom: 1rem;
+                                    }
+                                }
+
+                                /* Animation for showing/hiding results */
+                                #results {
+                                    animation: slideDown 0.3s ease-out;
+                                }
+
+                                @keyframes slideDown {
+                                    from {
+                                        opacity: 0;
+                                        transform: translateY(-10px);
+                                    }
+
+                                    to {
+                                        opacity: 1;
+                                        transform: translateY(0);
+                                    }
+                                }
     </style>
 </head>
 
@@ -253,7 +396,7 @@
                         <form
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control bg-light border-0 small"
+                                <input type="text" id="overall-search" class="form-control bg-light border-0 small"
                                     placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button">
@@ -268,7 +411,52 @@
 
                     </nav>
                     <div class="container-fluid">
-
+                        <div id="results" class="row" style="display: none;">
+                            <div class="col-md-12 mb-4">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="m-0 font-weight-bold text-primary">Search Results</h6>
+                                        <button type="button" class="btn btn-sm btn-light" id="close-search-results">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="border-right pr-3">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <i class="fas fa-ticket-alt text-primary mr-2"></i>
+                                                        <h6 class="m-0 font-weight-bold text-dark">Issues</h6>
+                                                        <span class="badge badge-primary ml-2" id="issues-count">0</span>
+                                                    </div>
+                                                    <div id="issues-results-from-search" class="search-results-container">
+                                                        <div class="text-muted text-center py-3">
+                                                            <i class="fas fa-search fa-2x mb-2"></i>
+                                                            <p>No issues found</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="pl-3">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <i class="fas fa-file-invoice text-success mr-2"></i>
+                                                        <h6 class="m-0 font-weight-bold text-dark">Invoices</h6>
+                                                        <span class="badge badge-success ml-2" id="invoices-count">0</span>
+                                                    </div>
+                                                    <div id="invoices-results-from-search" class="search-results-container">
+                                                        <div class="text-muted text-center py-3">
+                                                            <i class="fas fa-search fa-2x mb-2"></i>
+                                                            <p>No invoices found</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="card shadow mb-4 col-md-12">
                                 <div class="card-header py-3">
@@ -1016,6 +1204,180 @@
                 technicianTitle: "Senior Hardware Technician"
             };
         }
+    </script>
+    <script>
+        let typingTimer;
+        let debounceTime = 500;
+        $(document).ready(function () {
+
+            $('#overall-search').on('input', function () {
+                clearTimeout(typingTimer); // reset timer
+                let query = $(this).val().trim();
+
+                typingTimer = setTimeout(function () {
+                    if (query.length > 0) {
+                        // Show loading state
+                        showLoadingState();
+                        $('#results').show();
+
+                        // Make AJAX request
+                        $.ajax({
+                            url: '/search', // your backend route
+                            method: 'GET',
+                            data: { q: query },
+                            success: function (response) {
+                                const data = response.data;
+                                renderSearchResults(data);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Search error:', error);
+                                showErrorState();
+                            }
+                        });
+                    } else {
+                        $('#results').hide();
+                        clearSearchResults();
+                    }
+                }, debounceTime);
+            })
+
+            // Close search results
+            $(document).on('click', '#close-search-results', function () {
+                $('#results').hide();
+                $('#overall-search').val('');
+                clearSearchResults();
+            });
+
+            function showLoadingState() {
+                $('#issues-results-from-search').html(`
+                        <div class="search-loading">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                            <p>Searching...</p>
+                        </div>
+                    `);
+                $('#invoices-results-from-search').html(`
+                        <div class="search-loading">
+                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                            <p>Searching...</p>
+                        </div>
+                    `);
+                $('#issues-count').text('...');
+                $('#invoices-count').text('...');
+            }
+
+            function showErrorState() {
+                $('#issues-results-from-search').html(`
+                        <div class="search-empty-state">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                            <p>Error occurred while searching</p>
+                        </div>
+                    `);
+                $('#invoices-results-from-search').html(`
+                        <div class="search-empty-state">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                            <p>Error occurred while searching</p>
+                        </div>
+                    `);
+            }
+
+            function clearSearchResults() {
+                $('#issues-results-from-search').html(`
+                        <div class="search-empty-state">
+                            <i class="fas fa-search fa-2x mb-2"></i>
+                            <p>No issues found</p>
+                        </div>
+                    `);
+                $('#invoices-results-from-search').html(`
+                        <div class="search-empty-state">
+                            <i class="fas fa-search fa-2x mb-2"></i>
+                            <p>No invoices found</p>
+                        </div>
+                    `);
+                $('#issues-count').text('0');
+                $('#invoices-count').text('0');
+            }
+
+            function renderSearchResults(data) {
+                // Render Issues
+                if (data?.issues?.length > 0) {
+                    let issuesHtml = '';
+                    data.issues.forEach(issue => {
+                        const statusClass = `status-${issue.status.replace(/_/g, '-')}`;
+                        const createdDate = new Date(issue.createdAt).toLocaleDateString();
+
+                        issuesHtml += `
+                                <a href="/issue/${issue.human_readable_id}" class="search-result-item">
+                                    <div class="search-result-title">
+                                        <i class="fas fa-ticket-alt mr-2"></i>
+                                        ${issue.human_readable_id}
+                                    </div>
+                                    <div class="search-result-meta">
+                                        <strong>Customer:</strong> ${issue.contact?.name || 'N/A'}
+                                    </div>
+                                    <div class="search-result-meta">
+                                        <strong>Problem:</strong> ${issue.problemDescription?.substring(0, 60)}${issue.problemDescription?.length > 60 ? '...' : ''}
+                                    </div>
+                                    <div class="search-result-meta">
+                                        <strong>Created:</strong> ${createdDate}
+                                        <span class="search-result-status ${statusClass} ml-2">${issue.status}</span>
+                                    </div>
+                                </a>
+                            `;
+                    });
+                    $('#issues-results-from-search').html(issuesHtml);
+                    $('#issues-count').text(data.issues.length);
+                } else {
+                    $('#issues-results-from-search').html(`
+                            <div class="search-empty-state">
+                                <i class="fas fa-search fa-2x mb-2"></i>
+                                <p>No issues found</p>
+                            </div>
+                        `);
+                    $('#issues-count').text('0');
+                }
+
+                // Render Invoices
+                if (data?.invoices?.length > 0) {
+                    let invoicesHtml = '';
+                    data.invoices.forEach(invoice => {
+                        const statusClass = `invoice-status-${invoice.status}`;
+                        const invoiceDate = new Date(invoice.invoiceDate).toLocaleDateString();
+                        const amount = invoice.finalAmount || 0;
+
+                        invoicesHtml += `
+                                <a href="/invoice/${invoice.human_readable_invoice_id}" class="search-result-item">
+                                    <div class="search-result-title">
+                                        <i class="fas fa-file-invoice mr-2"></i>
+                                        ${invoice.human_readable_invoice_id || invoice.human_readable_issue_id}
+                                    </div>
+                                    <div class="search-result-meta">
+                                        <strong>Customer:</strong> ${invoice.customerName || 'N/A'}
+                                    </div>
+                                    <div class="search-result-meta">
+                                        <strong>Amount:</strong> ₹${amount.toLocaleString()}
+                                    </div>
+                                    <div class="search-result-meta">
+                                        <strong>Date:</strong> ${invoiceDate}
+                                        <span class="search-result-status ${statusClass} ml-2">${invoice.status}</span>
+                                    </div>
+                                </a>
+                            `;
+                    });
+                    $('#invoices-results-from-search').html(invoicesHtml);
+                    $('#invoices-count').text(data.invoices.length);
+                } else {
+                    $('#invoices-results-from-search').html(`
+                            <div class="search-empty-state">
+                                <i class="fas fa-search fa-2x mb-2"></i>
+                                <p>No invoices found</p>
+                            </div>
+                        `);
+                    $('#invoices-count').text('0');
+                }
+            }
+
+
+        })
     </script>
 </body>
 
