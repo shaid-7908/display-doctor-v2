@@ -1107,20 +1107,7 @@ class CommonController {
   getRecentInvoices = asyncHandler(async (req: Request, res: Response) => {
     const currentUser = req.user
     let pipeline: any[] = [];
-    if(currentUser.role === "technician"){
-      pipeline = [
-        {$lookup : {
-          from :"issue_reports",
-          localField:"issue_report_id",
-          foreignField:"_id",
-          as:"issue_report"
-        }},
-        {$unwind:"$issue_report"},
-        {$match:{"issue_report.technicianId":new mongoose.Types.ObjectId(currentUser.id)}},
-        {$limit:5}
-      ]
-
-    }else{
+    if (currentUser.role === "technician") {
       pipeline = [
         {
           $lookup: {
@@ -1131,28 +1118,73 @@ class CommonController {
           }
         },
         { $unwind: "$issue_report" },
-        {$limit:5}
+        { $match: { "issue_report.technicianId": new mongoose.Types.ObjectId(currentUser.id) } },
+        { $limit: 5 }
+      ]
+
+    } else {
+      pipeline = [
+        {
+          $lookup: {
+            from: "issue_reports",
+            localField: "issue_report_id",
+            foreignField: "_id",
+            as: "issue_report"
+          }
+        },
+        { $unwind: "$issue_report" },
+        { $limit: 5 }
       ]
     }
     const invoices = await InvoiceModel.aggregate(pipeline)
     return sendSuccess(res, "Recent invoices", invoices, STATUS_CODES.OK);
   })
-  getRecentPendingReports = asyncHandler(async(req:Request,res:Response)=>{
+  getRecentPendingReports = asyncHandler(async (req: Request, res: Response) => {
     const currentUser = req.user
-    let pipeline:any[] = [];
-    if(currentUser.role === "technician"){
-      pipeline =[
-        {$match:{"technicianId":new mongoose.Types.ObjectId(currentUser.id),
-          "is_approved":false
-        }}
+    let pipeline: any[] = [];
+    if (currentUser.role === "technician") {
+      pipeline = [
+        {
+          $match: {
+            "technicianId": new mongoose.Types.ObjectId(currentUser.id),
+            "is_approved": false
+          }
+        }
       ]
-    }else{
-      pipeline =[
-        {$match:{"is_approved":false}}
+    } else {
+      pipeline = [
+        { $match: { "is_approved": false } }
       ]
     }
     const reports = await IssueReportModel.aggregate(pipeline)
     return sendSuccess(res, "Recent pending reports", reports, STATUS_CODES.OK);
+  })
+
+  getIssueReportDetailsForModal = asyncHandler(async (req: Request, res: Response) => {
+    const reportId = req.params.id;
+
+    // Get the issue report with populated issue details
+    const issueReport = await IssueReportModel.findById(reportId)
+      .populate({
+        path: 'issue_id',
+        model: 'issues'
+      })
+      .populate({
+        path: 'technicianId',
+        model: 'users',
+        select: 'name email phone'
+      })
+      .populate({
+        path: 'serviceCategoryId',
+        model: 'serviceCategories',
+        select: 'name'
+      });
+
+    if (!issueReport) {
+      return sendError(res, "Issue report not found", STATUS_CODES.NOT_FOUND);
+    }
+
+    return sendSuccess(res, "Issue report details retrieved successfully", issueReport, STATUS_CODES.OK);
   })
 }
 

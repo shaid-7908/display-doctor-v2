@@ -39,10 +39,11 @@ commonRouter.get("/get-invoice-details/:id", authChecker, roleChecker(["technici
 // Invoice management routes
 commonRouter.put("/update-invoice-status/:id", authChecker, roleChecker(["technician", "admin"]), commonController.updateInvoiceStatus);
 commonRouter.delete("/delete-invoice/:id", authChecker, roleChecker(["admin"]), commonController.deleteInvoice);
-commonRouter.get("/get-total-earnings", authChecker, roleChecker(["admin", "caller"]), commonController.getTotalEarnings); 
-commonRouter.get("/get-recent-invoices", authChecker, roleChecker(["technician", "admin","caller"]), commonController.getRecentInvoices);
+commonRouter.get("/get-total-earnings", authChecker, roleChecker(["admin", "caller"]), commonController.getTotalEarnings);
+commonRouter.get("/get-recent-invoices", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getRecentInvoices);
 //Admin and caller dashboard routes
 commonRouter.get("/get-all-unassigned-issues", authChecker, roleChecker(["admin", "caller"]), commonController.getAllUnassignedIssues);
-commonRouter.get("/get-recent-pending-reports", authChecker, roleChecker(["technician", "admin","caller"]), commonController.getRecentPendingReports);
+commonRouter.get("/get-recent-pending-reports", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getRecentPendingReports);
+commonRouter.get("/get-issue-report-details-modal/:id", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getIssueReportDetailsForModal);
 
 export default commonRouter;

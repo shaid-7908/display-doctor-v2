@@ -28,6 +28,31 @@
 
                             <!-- Custom styles for this template-->
                             <link href="css/sb-admin-2.min.css" rel="stylesheet">
+                            <style>
+                                /* Fix modal scroll issues when nesting modals */
+                                .modal {
+                                    overflow-y: auto !important;
+                                }
+
+                                .modal-dialog {
+                                    margin: 1.75rem auto;
+                                }
+
+                                /* Ensure proper backdrop handling */
+                                .modal-backdrop {
+                                    z-index: 1040;
+                                }
+
+                                .modal {
+                                    z-index: 1050;
+                                }
+
+                                /* Force scroll on modal body when content overflows */
+                                .modal-body {
+                                    max-height: calc(100vh - 200px);
+                                    overflow-y: auto;
+                                }
+                            </style>
 
 </head>
 
@@ -205,6 +230,9 @@
                                                     </tbody>
                                                 </table>
                                                 
+                                            </div>
+                                            <div class="card-footer">
+                                                <a href="/issue-reports" class="btn btn-primary btn-sm">View All</a>
                                             </div>
                                         </div>
                                     </div>
@@ -421,6 +449,117 @@
 
     <!-- Logout Modal-->
 
+    <!-- Issue Report Details Modal -->
+    <div class="modal fade" id="issueReportModal" tabindex="-1" role="dialog" aria-labelledby="issueReportModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+                <div class="modal-header"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 1.5rem 2rem;">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white rounded-circle p-2 mr-3"
+                            style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-file-alt text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title text-white mb-0" id="issueReportModalLabel"
+                                style="font-weight: 600; font-size: 1.25rem;">Issue Report Details</h5>
+                            <small class="text-white-50" style="font-size: 0.85rem;">Comprehensive issue and report
+                                information</small>
+                        </div>
+                    </div>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                        style="font-size: 1.5rem; opacity: 0.8; transition: opacity 0.3s;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0" id="modalBodyContent" style="background-color: #f8f9fc; min-height: 400px;">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <h6 class="text-muted">Loading report details...</h6>
+                        <p class="text-muted small mb-0">Please wait while we fetch the information</p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-0"
+                    style="padding: 1.5rem 2rem; border-top: 1px solid #e3e6f0 !important;" id="issueReportModalFooter">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approve Report Modal-->
+    <div class="modal fade" id="quotationReportModal" tabindex="-1" aria-labelledby="quotationReportLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-3">
+                <!-- Header -->
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="quotationReportLabel">Quotation Report</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="p-3 border rounded bg-light">
+                        <h6 class="text-muted">Report Summary</h6>
+                        <p class="small text-secondary">Please fill in the initial and final quotation details
+                            below for this report.</p>
+                        <div class="card p-2">
+                            <div class="card-header"><strong>Basic Info</strong></div>
+                            <div><strong>ID : </strong><span id="quotation-issue-human-id"></span></div>
+                            <div><strong>Contact : </strong><span id="quotation-contact"></span></div>
+                            <div><strong>Address : </strong><span id="quotation-address"></span></div>
+                            <div><strong>Device Info : </strong><span id="quotation-device-info"></span></div>
+                        </div>
+                        <div class="card p-2 my-2">
+                            <div class="card-header"><strong>Quotation Info</strong></div>
+                            <div><strong>Quotation Type : </strong><span id="quotation-type"></span></div>
+                            <div><strong>Ammount :</strong><span id="quotation-ammount"></span></div>
+
+                        </div>
+                        <!-- Form -->
+                        <form id="quotationForm">
+                            <input type="hidden" name="reportId" id="report-id">
+                            <div class="mb-3">
+                                <label for="initialQuotation" class="form-label fw-semibold">Initial
+                                    Quotation</label>
+                                <input type="number" class="form-control" id="initialQuotation" name="initialQuotation"
+                                    placeholder="Enter initial quotation" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="finalQuotation" class="form-label fw-semibold">Final
+                                    Quotation</label>
+                                <input type="number" class="form-control" id="finalQuotation" name="finalQuotation"
+                                    placeholder="Enter final quotation" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="remarks" class="form-label fw-semibold">Remarks (optional)</label>
+                                <textarea class="form-control" id="remarks" rows="3"
+                                    placeholder="Enter any additional notes..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" form="quotationForm" id="submitQuotationFormButton"
+                        class="btn btn-success">Submit
+                        Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
@@ -444,6 +583,28 @@
     <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
 
     <script>
+
+        function showNotification(message, type = 'info') {
+                // Create a simple notification
+                const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+                const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+
+                $('body').append(notification);
+
+                // Auto-remove after 5 seconds
+                setTimeout(function () {
+                    notification.alert('close');
+                }, 5000);
+            }
+
         function getUnassignedIssues() {
             $.ajax({
                 url: "/get-all-unassigned-issues",
@@ -520,20 +681,384 @@
                 }
             })
         }
+        function approveReport(reportId) {
+            // Check if the issue report modal is currently open
+            const isModalOpen = $('#issueReportModal').hasClass('show');
+
+            if (isModalOpen) {
+                // Handle modal transition properly to avoid scroll issues
+                $('#issueReportModal').one('hidden.bs.modal', function () {
+                    // Remove any leftover backdrop and body classes
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open').css('padding-right', '');
+
+                    // Fetch data and open the second modal
+                    fetchDataAndOpenQuotationModal(reportId);
+                });
+                $('#issueReportModal').modal('hide');
+            } else {
+                // Modal is not open, directly fetch data and open quotation modal
+                fetchDataAndOpenQuotationModal(reportId);
+            }
+        }
+
+        function fetchDataAndOpenQuotationModal(reportId) {
+            $.ajax({
+                url: `/get-issue-report-details/${reportId}`,
+                type: "GET",
+                success: function (response) {
+                    const data = response.data[0];
+                    openQuotationModal(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching report details:', error);
+                    alert('Error loading report details. Please try again.');
+                }
+            });
+        }
+        function openQuotationModal(data) {
+            let submitButtonText = ""
+            if (data.quotation_type === "none") submitButtonText = "Submit Quotation"
+            else submitButtonText = "Update Quotation"
+            $('#submitQuotationFormButton').text(submitButtonText)
+            let contactValue = ""
+            contactValue = data.issue_details.contact.name + "," + data.issue_details.contact.phone
+            let addressValue = (data.issue_details.contact.address.line1 || "-") + "," + data.issue_details.contact.address.city + "," + data.issue_details.contact.address.pinCode + "," + data.issue_details.contact.address.state
+            let deviceInfo = (data.deviceName || "-") + "," + (data.deviceModelNumber || "-")
+            $('#quotation-issue-human-id').text(data.issue_human_redable_id)
+            let quotationType = ""
+            if (data.initialQuotation === 0 && data.finalQuotation === 0) quotationType = "None"
+            else if (data.initialQuotation > 0 && data.finalQuotation === 0) quotationType = "Initial"
+            else if (data.finalQuotation > 0) quotationType = "Final"
+            else quotationType = "None"
+            let quotationAmmount = ""
+            if (data.initialQuotation === 0 && data.finalQuotation === 0) quotationAmmount = "0"
+            else if (data.initialQuotation > 0 && data.finalQuotation === 0) quotationAmmount += data.initialQuotation
+            else if (data.finalQuotation > 0) quotationAmmount += data.finalQuotation
+            $('#quotation-contact').text(contactValue)
+            $('#quotation-address').text(addressValue)
+            $('#quotation-type').text(quotationType)
+            $('#quotation-device-info').text(deviceInfo)
+            $('#quotation-ammount').text(quotationAmmount)
+
+            // Ensure proper modal initialization
+            setTimeout(function () {
+                $('#quotationReportModal').modal('show')
+            }, 100);
+
+            $('#initialQuotation').val(data.initialQuotation)
+            $('#finalQuotation').val(data.finalQuotation)
+            $('#report-id').val(data._id)
+        }
 
         function renderRecentPendingReports(recentPendingReports) {
             const recentPendingReportCardBody = $("#pending-report-table-body");
             let html = "";
             recentPendingReports.forEach((report) => {
                 html += `<tr>
-                    <td>${report.issue_human_redable_id}</td>
-                    <td>${report.is_approved ? "Approved" : "Pending"}</td>
-                    <td>${report.finalQuotation > 0 ? report.finalQuotation : report.initialQuotation}</td>
-                    <td>${report.quotation_type}</td>
-                    <td><a href="/issue-report/${report._id}" class="btn btn-primary btn-sm">View</a></td>
-                    </tr>`;
+                     <td>${report.issue_human_redable_id}</td>
+                     <td>${report.is_approved ? "Approved" : "Pending"}</td>
+                     <td>${report.finalQuotation > 0 ? report.finalQuotation : report.initialQuotation}</td>
+                     <td>${report.quotation_type}</td>
+                     <td><button onclick="openIssueReportModal('${report._id}')" class="btn btn-primary btn-sm">View</button>
+                     <button onclick="approveReport('${report._id}')" class="btn btn-success btn-sm">Approve</button>
+                     </td>
+                     </tr>`;
             })
             recentPendingReportCardBody.html(html);
+        }
+
+        function openIssueReportModal(reportId) {
+            // Show the modal
+            $('#issueReportModal').modal('show');
+
+            // Reset modal content to loading state
+            $('#modalBodyContent').html(`
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading report details...</p>
+                </div>
+            `);
+
+            // Fetch the report details
+            $.ajax({
+                url: `/get-issue-report-details-modal/${reportId}`,
+                type: "GET",
+                success: function (response) {
+                    const data = response.data;
+                    const issue = data.issue_id;
+                    const technician = data.technicianId;
+                    const serviceCategory = data.serviceCategoryId;
+
+                    const modalContent = `
+                        <div class="container-fluid p-4">
+                            <!-- Header Section with Key Info -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center bg-white p-4 rounded-lg shadow-sm" style="border-left: 5px solid #4e73df;">
+                                        <div>
+                                            <h4 class="mb-1 text-primary font-weight-bold">${issue.human_readable_id}</h4>
+                                            <p class="mb-2 text-muted">${issue.contact.name} • ${issue.contact.phone}</p>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge badge-${getStatusBadgeColor(issue.status)} mr-2 px-3 py-2" style="font-size: 0.8rem;">${issue.status.toUpperCase()}</span>
+                                                <span class="badge badge-${getPriorityBadgeColor(issue.priority)} px-3 py-2" style="font-size: 0.8rem;">${issue.priority.toUpperCase()}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="mb-1 text-muted small">Report Status</p>
+                                            <span class="badge badge-${data.is_approved ? 'success' : 'warning'} px-3 py-2" style="font-size: 0.9rem;">
+                                                <i class="fas fa-${data.is_approved ? 'check-circle' : 'clock'} mr-1"></i>
+                                                ${data.is_approved ? 'Approved' : 'Pending'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-lg-6">
+                                    <!-- Customer & Contact Info -->
+                                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                                        <div class="card-header bg-gradient-primary text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #4e73df 0%, #36b9cc 100%);">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-user-circle mr-2" style="font-size: 1.2rem;"></i>
+                                                <h6 class="mb-0 font-weight-bold">Customer Information</h6>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">NAME</label>
+                                                        <p class="mb-0 font-weight-bold">${issue.contact.name}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">PHONE</label>
+                                                        <p class="mb-0"><a href="tel:${issue.contact.phone}" class="text-decoration-none">${issue.contact.phone}</a></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">EMAIL</label>
+                                                        <p class="mb-0">${issue.contact.email ? `<a href="mailto:${issue.contact.email}" class="text-decoration-none">${issue.contact.email}</a>` : '<span class="text-muted">Not provided</span>'}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">PRIORITY</label>
+                                                        <p class="mb-0"><span class="badge badge-${getPriorityBadgeColor(issue.priority)}">${issue.priority}</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Device Information -->
+                                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                                        <div class="card-header text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-tv mr-2" style="font-size: 1.2rem;"></i>
+                                                <h6 class="mb-0 font-weight-bold">Device Information</h6>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">TYPE</label>
+                                                        <p class="mb-0 text-capitalize">${issue.device.type}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">BRAND</label>
+                                                        <p class="mb-0">${issue.device.brand || '<span class="text-muted">Not specified</span>'}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">MODEL</label>
+                                                        <p class="mb-0">${issue.device.model || '<span class="text-muted">Not specified</span>'}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">WARRANTY</label>
+                                                        <p class="mb-0">${issue.device.warrantyStatus ? `<span class="badge badge-${issue.device.warrantyStatus === 'in_warranty' ? 'success' : 'secondary'}">${issue.device.warrantyStatus.replace('_', ' ')}</span>` : '<span class="text-muted">Unknown</span>'}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-lg-6">
+                                    <!-- Address Information -->
+                                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                                        <div class="card-header text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-map-marker-alt mr-2" style="font-size: 1.2rem;"></i>
+                                                <h6 class="mb-0 font-weight-bold">Service Address</h6>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="mb-3">
+                                                <label class="text-muted small font-weight-bold">ADDRESS</label>
+                                                <p class="mb-0">${issue.contact.address.line1}</p>
+                                                ${issue.contact.address.landmark ? `<p class="mb-0 text-muted small">Near: ${issue.contact.address.landmark}</p>` : ''}
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">CITY</label>
+                                                        <p class="mb-0">${issue.contact.address.city}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">STATE</label>
+                                                        <p class="mb-0">${issue.contact.address.state}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="text-muted small font-weight-bold">PIN CODE</label>
+                                                <p class="mb-0"><span class="badge badge-light font-weight-bold">${issue.contact.address.pinCode}</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Financial Information -->
+                                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                                        <div class="card-header text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-rupee-sign mr-2" style="font-size: 1.2rem;"></i>
+                                                <h6 class="mb-0 font-weight-bold">Quotation Details</h6>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">INITIAL QUOTE</label>
+                                                        <p class="mb-0 h5 text-success">₹${data.initialQuotation || 0}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">QUOTE TYPE</label>
+                                                        <p class="mb-0"><span class="badge badge-info">${data.quotation_type}</span></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">FINAL QUOTE</label>
+                                                        <p class="mb-0 h5 text-primary">₹${data.finalQuotation || 0}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="text-muted small font-weight-bold">BUDGET EST.</label>
+                                                        <p class="mb-0">₹${data.budgetEstimation || 0}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Problem Description -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                                        <div class="card-header text-white" style="border-radius: 12px 12px 0 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-exclamation-triangle mr-2" style="font-size: 1.2rem;"></i>
+                                                <h6 class="mb-0 font-weight-bold">Problem Description</h6>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <p class="mb-3 lead">${issue.problemDescription}</p>
+                                            
+                                            ${data.techNote ? `
+                                            <div class="mt-4">
+                                                <h6 class="font-weight-bold text-primary mb-3"><i class="fas fa-tools mr-2"></i>Technical Notes</h6>
+                                                <div class="bg-light p-4 rounded" style="border-left: 4px solid #4e73df;">
+                                                    ${data.techNote}
+                                                </div>
+                                            </div>
+                                            ` : ''}
+                                            
+                                            ${data.requiredParts ? `
+                                            <div class="mt-4">
+                                                <h6 class="font-weight-bold text-success mb-3"><i class="fas fa-cogs mr-2"></i>Required Parts</h6>
+                                                <div class="bg-light p-4 rounded" style="border-left: 4px solid #1cc88a;">
+                                                    ${data.requiredParts}
+                                                </div>
+                                            </div>
+                                            ` : ''}
+
+                                            ${technician ? `
+                                            <div class="mt-4">
+                                                <h6 class="font-weight-bold text-info mb-3"><i class="fas fa-user-cog mr-2"></i>Assigned Technician</h6>
+                                                <div class="d-flex align-items-center bg-light p-3 rounded">
+                                                    <div class="bg-info text-white rounded-circle p-2 mr-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="mb-0 font-weight-bold">${technician.name}</p>
+                                                        <p class="mb-0 text-muted small">${technician.email || 'Email not available'}</p>
+                                                        ${technician.phone ? `<p class="mb-0 text-muted small">${technician.phone}</p>` : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    const modalFooter = `
+                    <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal"
+                        style="border-radius: 25px; font-weight: 500;">
+                        <i class="fas fa-times mr-2"></i>Close
+                    </button>
+                    <button  onclick="approveReport('${reportId}')" class="btn btn-primary px-4"
+                        style="border-radius: 25px; font-weight: 500; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        Submit Quotation
+                    </button>
+                    `
+                    $('#issueReportModalFooter').html(modalFooter);
+                    $('#modalBodyContent').html(modalContent);
+                },
+                error: function (xhr, status, error) {
+                    $('#modalBodyContent').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Error loading report details. Please try again.
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function getStatusBadgeColor(status) {
+            const statusColors = {
+                'new': 'primary',
+                'assigned': 'info',
+                'in_progress': 'warning',
+                'resolved': 'success',
+                'closed': 'secondary',
+                'cancelled': 'danger'
+            };
+            return statusColors[status] || 'secondary';
+        }
+
+        function getPriorityBadgeColor(priority) {
+            const priorityColors = {
+                'low': 'success',
+                'normal': 'info',
+                'high': 'warning',
+                'urgent': 'danger'
+            };
+            return priorityColors[priority] || 'info';
         }
 
         $(document).ready(function () {
@@ -545,10 +1070,39 @@
                 getTotalEarning();
 
             }
-            if(role === "admin" || role === "technician"){
+            if (role === "admin" || role === "technician") {
                 getRecentPendingReports();
             }
             getRecentInvoices();
+
+            // Add modal cleanup handlers
+            $('#quotationReportModal').on('hidden.bs.modal', function () {
+                // Clean up any remaining backdrop issues
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css('padding-right', '');
+            });
+
+            $('#issueReportModal').on('hidden.bs.modal', function () {
+                // Clean up any remaining backdrop issues
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css('padding-right', '');
+            });
+            $('#quotationForm').on('submit', function (e) {
+                e.preventDefault()
+                $.ajax({
+                    url: '/submit-quotation',
+                    type: 'PATCH',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                      setTimeout(() => {
+                        location.reload()
+                      }, 1000);
+                    },
+                    error: function (xhr) {
+
+                    }
+                })
+            })
         });
     </script>
 
