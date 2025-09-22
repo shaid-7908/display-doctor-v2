@@ -255,30 +255,36 @@ class CommonController {
     return sendSuccess(res, "Issue details", issue, STATUS_CODES.OK);
   });
 
-  renderFullIssueDetails = asyncHandler(async (req:Request, res:Response)=>{
-      const issue_human_redable_id = req.params.id;
-      const issue = await IssueModel.aggregate([
-        { $match: { human_readable_id: issue_human_redable_id } },
-        { $lookup: { from: "issue_reports", localField: "_id", foreignField: "issue_id", as: "reports" } },
-        {$unwind : {
+  renderFullIssueDetails = asyncHandler(async (req: Request, res: Response) => {
+    const issue_human_redable_id = req.params.id;
+    const issue = await IssueModel.aggregate([
+      { $match: { human_readable_id: issue_human_redable_id } },
+      { $lookup: { from: "issue_reports", localField: "_id", foreignField: "issue_id", as: "reports" } },
+      {
+        $unwind: {
           path: "$reports",
           preserveNullAndEmptyArrays: true
-        }},
-        {$lookup:{
-          from:'invoices',
+        }
+      },
+      {
+        $lookup: {
+          from: 'invoices',
           localField: "_id",
           foreignField: "issue_id",
           as: "invoice"
-        }},
-        {$unwind:{
+        }
+      },
+      {
+        $unwind: {
           path: "$invoice",
           preserveNullAndEmptyArrays: true
-        }}
-      ])
-      res.render("issue-details-page", {
-        default_user: req.user,
-        issue: issue[0]
-      });
+        }
+      }
+    ])
+    res.render("issue-details-page", {
+      default_user: req.user,
+      issue: issue[0]
+    });
   })
 
   assignIssueToTechnician = asyncHandler(
@@ -1220,6 +1226,75 @@ class CommonController {
       default_user: req.user,
       invoice: invoice
     });
+  })
+
+  overAllSearch = asyncHandler(async (req: Request, res: Response) => {
+    const currentUserRole = req.user.role;
+    const query = req.query.q;
+
+    if (!query || typeof query !== 'string') {
+      return sendError(res, "Search query is required", null, STATUS_CODES.BAD_REQUEST);
+    }
+
+    // Create regex pattern for case-insensitive search
+    const searchRegex = new RegExp(query, 'i');
+
+    let issuePipeline: any[] = [
+      {
+        $match: {
+          isDeleted: false,
+          $or: [
+            { "contact.name": { $regex: searchRegex } },
+            { "problemDescription": { $regex: searchRegex } },
+            { "human_readable_id": { $regex: searchRegex } }
+          ]
+        }
+      },
+    ];
+
+    // Filter by technician role if user is technician
+    if (currentUserRole === "technician") {
+      issuePipeline[0].$match["assignment.technicianId"] = new mongoose.Types.ObjectId(req.user.id);
+    }
+
+    let invoicePipeline:any[] = [
+      {
+        $match: {
+          $or: [
+            { "customerName": { $regex: searchRegex } },
+            { "customerPhone": { $regex: searchRegex } },
+            { "human_readable_invoice_id": { $regex: searchRegex } },
+            {"human_readable_issue_id": { $regex: searchRegex }}
+          ]
+        }
+      },
+      {
+        $lookup:{
+          from:'issues',
+          localField:'issueId',
+          foreignField:'_id',
+          as:'issue_details'
+        }
+      },
+      {
+        $unwind: {
+          path: "$issue_details",
+          preserveNullAndEmptyArrays: true
+        }
+      }
+    ]
+
+    if(currentUserRole === "technician"){
+      invoicePipeline.push({
+        $match: {
+          "issue_details.assignment.technicianId": new mongoose.Types.ObjectId(req.user.id)
+        }
+      })
+    }
+    const issues = await IssueModel.aggregate(issuePipeline)
+    const invoices = await InvoiceModel.aggregate(invoicePipeline)
+    return sendSuccess(res, "Search results", { issues, invoices }, STATUS_CODES.OK);
+
   })
 }
 

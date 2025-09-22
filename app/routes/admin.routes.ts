@@ -9,12 +9,14 @@ const adminRouter = express.Router();
 //caller routes
 adminRouter.get("/create-caller", authChecker, roleChecker(["admin"]), adminController.renderCreateCaller);
 adminRouter.post("/create-caller", authChecker, roleChecker(["admin"]), adminController.createCaller);
+adminRouter.get("/caller-list", authChecker, roleChecker(["admin"]), adminController.renderCallerListPage);
+adminRouter.get("/get-callers", authChecker, roleChecker(["admin"]), adminController.getCallers);
 
 //technician routes
 adminRouter.get("/create-technician", authChecker, roleChecker(["admin"]), adminController.renderCreateTechnician);
 adminRouter.post("/create-technician", authChecker, roleChecker(["admin"]), technicianProfileUpload, uploadTechnicianFilesToS3, adminController.createTechnician);
 adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]), singelUpload, adminController.renderCreateSpecialization);
-adminRouter.get("/technician-list", authChecker, roleChecker(["admin"]), adminController.renderTechnicianList);
+adminRouter.get("/technician-list", authChecker, roleChecker(["admin","caller"]), adminController.renderTechnicianList);
 
 
 //skill routes

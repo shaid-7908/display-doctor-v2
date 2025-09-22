@@ -268,44 +268,6 @@
                                         </thead>
                                         <tbody>
                                             <!-- Sample data - will be populated dynamically -->
-                                            <tr>
-                                                <td>
-                                                    <img src="/img/undraw_profile.svg" alt="Profile"
-                                                        class="technician-avatar">
-                                                </td>
-                                                <td>John Doe</td>
-                                                <td>john.doe@example.com</td>
-                                                <td>+1 234-567-8900</td>
-                                                <td><span class="badge badge-primary">TECHNI25000001</span></td>
-                                                <td>
-                                                    <span class="service-category">Electronics</span>
-                                                    <span class="service-category">Appliances</span>
-                                                </td>
-                                                <td><span class="badge badge-success status-badge">Active</span>
-                                                </td>
-                                                <td><span class="badge badge-success status-badge">Verified</span>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group" role="group">
-                                                        <button type="button" class="btn btn-sm btn-info"
-                                                            title="View Details">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-primary"
-                                                            title="Edit">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-warning"
-                                                            title="Toggle Status">
-                                                            <i class="fas fa-toggle-on"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-danger"
-                                                            title="Delete">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
                                             <% technicians.forEach(technician=> { %>
                                                 <tr>
                                                     <td><img src="<%= technician.profileImage %>" alt="Technician Photo"
@@ -348,6 +310,7 @@
                                                                 title="View Details">
                                                                 <i class="fas fa-eye"></i>
                                                             </button>
+                                                            <% if(default_user.role === "admin"){ %>
                                                             <button type="button" class="btn btn-sm btn-primary"
                                                                 title="Edit">
                                                                 <i class="fas fa-edit"></i>
@@ -356,6 +319,7 @@
                                                                 title="Delete">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
+                                                            <% } %>
                                                         </div>
                                                     </td>
                                                     <% }); %>
@@ -569,9 +533,11 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <% if(default_user.role === "admin"){ %>
                     <button type="button" class="btn btn-primary" id="editTechnicianBtn">
                         <i class="fas fa-edit mr-2"></i>Edit Technician
                     </button>
+                    <% } %>
                 </div>
             </div>
         </div>

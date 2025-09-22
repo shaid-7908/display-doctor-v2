@@ -179,7 +179,7 @@
 
                                                 <!-- Phone Number -->
                                                 <div class="form-group">
-                                                    <input type="tel" class="form-control form-control-user" id="phone"
+                                                    <input  class="form-control form-control-user" id="phone"
                                                         name="phone" placeholder="Phone Number" required>
                                                 </div>
 
@@ -429,11 +429,6 @@
                 let value = this.value.replace(/\D/g, '');
                 if (value.length > 10) {
                     value = value.substring(0, 10);
-                }
-                if (value.length >= 6) {
-                    value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-                } else if (value.length >= 3) {
-                    value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
                 }
                 this.value = value;
             });

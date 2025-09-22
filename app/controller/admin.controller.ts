@@ -386,6 +386,15 @@ class AdminController {
         return sendSuccess(res, "Quotation submitted successfully", updatedReport, STATUS_CODES.ACCEPTED)
     })
 
+    renderCallerListPage = asyncHandler(async (req: Request, res: Response) => {
+        res.render("caller-list", { default_user: req.user });
+    })
+
+    getCallers = asyncHandler(async (req: Request, res: Response) => {
+        const callers = await UserModel.find({ role: 'caller' }).select('_id firstName lastName email phone profileImage dateOfBirth role status isVerified');
+        return sendSuccess(res, "Callers fetched successfully", callers, STATUS_CODES.OK);
+    })
+
 }
 
 const adminController = new AdminController();

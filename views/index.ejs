@@ -52,6 +52,150 @@
                                     max-height: calc(100vh - 200px);
                                     overflow-y: auto;
                                 }
+
+                                /* Search Results Styling */
+                                .search-results-container {
+                                    max-height: 300px;
+                                    overflow-y: auto;
+                                    border: 1px solid #e3e6f0;
+                                    border-radius: 0.35rem;
+                                    background-color: #f8f9fc;
+                                }
+
+                                .search-result-item {
+                                    padding: 0.75rem 1rem;
+                                    margin-bottom: 0.5rem;
+                                    background: white;
+                                    border: 1px solid #e3e6f0;
+                                    border-radius: 0.35rem;
+                                    transition: all 0.2s ease-in-out;
+                                    cursor: pointer;
+                                    text-decoration: none;
+                                    color: inherit;
+                                    display: block;
+                                }
+
+                                .search-result-item:hover {
+                                    background: #f8f9fc;
+                                    border-color: #4e73df;
+                                    transform: translateY(-1px);
+                                    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+                                    text-decoration: none;
+                                    color: inherit;
+                                }
+
+                                .search-result-title {
+                                    font-weight: 600;
+                                    color: #5a5c69;
+                                    margin-bottom: 0.25rem;
+                                }
+
+                                .search-result-meta {
+                                    font-size: 0.875rem;
+                                    color: #858796;
+                                    margin-bottom: 0.25rem;
+                                }
+
+                                .search-result-status {
+                                    display: inline-block;
+                                    padding: 0.25rem 0.5rem;
+                                    font-size: 0.75rem;
+                                    font-weight: 600;
+                                    border-radius: 0.35rem;
+                                    text-transform: uppercase;
+                                }
+
+                                .status-new {
+                                    background-color: #d1ecf1;
+                                    color: #0c5460;
+                                }
+
+                                .status-assigned {
+                                    background-color: #fff3cd;
+                                    color: #856404;
+                                }
+
+                                .status-in-progress {
+                                    background-color: #cce5ff;
+                                    color: #004085;
+                                }
+
+                                .status-resolved {
+                                    background-color: #d4edda;
+                                    color: #155724;
+                                }
+
+                                .status-cancelled {
+                                    background-color: #f8d7da;
+                                    color: #721c24;
+                                }
+
+                                .status-scheduled {
+                                    background-color: #e2e3e5;
+                                    color: #383d41;
+                                }
+
+                                .invoice-status-paid {
+                                    background-color: #d4edda;
+                                    color: #155724;
+                                }
+
+                                .invoice-status-pending {
+                                    background-color: #fff3cd;
+                                    color: #856404;
+                                }
+
+                                .invoice-status-overdue {
+                                    background-color: #f8d7da;
+                                    color: #721c24;
+                                }
+
+                                .search-empty-state {
+                                    text-align: center;
+                                    padding: 2rem 1rem;
+                                    color: #858796;
+                                }
+
+                                .search-empty-state i {
+                                    opacity: 0.5;
+                                    margin-bottom: 0.5rem;
+                                }
+
+                                .search-loading {
+                                    text-align: center;
+                                    padding: 1rem;
+                                    color: #858796;
+                                }
+
+                                .border-right {
+                                    border-right: 1px solid #e3e6f0 !important;
+                                }
+
+                                @media (max-width: 768px) {
+                                    .border-right {
+                                        border-right: none !important;
+                                        border-bottom: 1px solid #e3e6f0;
+                                        padding-bottom: 1rem;
+                                        margin-bottom: 1rem;
+                                    }
+                                }
+
+                                /* Animation for showing/hiding results */
+                                #results {
+                                    animation: slideDown 0.3s ease-out;
+                                }
+
+                                @keyframes slideDown {
+                                    from {
+                                        opacity: 0;
+                                        transform: translateY(-10px);
+                                    }
+
+                                    to {
+                                        opacity: 1;
+                                        transform: translateY(0);
+                                    }
+                                }
                             </style>
 
 </head>
@@ -83,7 +227,7 @@
                         <form
                             class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                             <div class="input-group">
-                                <input type="text" class="form-control bg-light border-0 small"
+                                <input type="text" id="overall-search" class="form-control bg-light border-0 small"
                                     placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="button">
@@ -101,7 +245,56 @@
 
                     <!-- Begin Page Content -->
                     <div class="container-fluid">
-
+                        <div id="results" class="row" style="display: none;">
+                            <div class="col-md-12 mb-4">
+                                <div class="card border-left-primary shadow h-100 py-2">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="m-0 font-weight-bold text-primary">Search Results</h6>
+                                        <button type="button" class="btn btn-sm btn-light" id="close-search-results">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="border-right pr-3">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <i class="fas fa-ticket-alt text-primary mr-2"></i>
+                                                        <h6 class="m-0 font-weight-bold text-dark">Issues</h6>
+                                                        <span class="badge badge-primary ml-2"
+                                                            id="issues-count">0</span>
+                                                    </div>
+                                                    <div id="issues-results-from-search"
+                                                        class="search-results-container">
+                                                        <div class="text-muted text-center py-3">
+                                                            <i class="fas fa-search fa-2x mb-2"></i>
+                                                            <p>No issues found</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="pl-3">
+                                                    <div class="d-flex align-items-center mb-3">
+                                                        <i class="fas fa-file-invoice text-success mr-2"></i>
+                                                        <h6 class="m-0 font-weight-bold text-dark">Invoices</h6>
+                                                        <span class="badge badge-success ml-2"
+                                                            id="invoices-count">0</span>
+                                                    </div>
+                                                    <div id="invoices-results-from-search"
+                                                        class="search-results-container">
+                                                        <div class="text-muted text-center py-3">
+                                                            <i class="fas fa-search fa-2x mb-2"></i>
+                                                            <p>No invoices found</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- Page Heading -->
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
                             <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
@@ -202,260 +395,153 @@
                             <% } %>
 
                                 <!-- Content Row -->
+                                <% if( default_user.role==="technician" ){ %>
+                                    <div class="row">
+                                        <div class="col-xl-4 col-lg-5">
+                                            <div class="card shadow mb-4">
+                                                <!-- Card Header - Dropdown -->
+                                                <div
+                                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Recent Invoices</h6>
+                                                </div>
+                                                <!-- Card Body -->
+                                                <div class="card-body" id="recent-invoice-card-body">
 
-                                <div class="row">
 
-                                    <% if (default_user.role === "admin"){ %>
-                                    <div class="col-xl-8 col-lg-7">
-                                        <div class="card shadow mb-4">
-                                            <!-- Card Header - Dropdown -->
-                                            <div
-                                                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                <h6 class="m-0 font-weight-bold text-warning">Pending Reports</h6>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a href="/invoice-list" class="btn btn-primary btn-sm">View All</a>
+                                                </div>
                                             </div>
-                                            <!-- Card Body -->
-                                            <div class="card-body" id="pending-report-card-body">
-                                                <table class="table table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Issue ID</th>
-                                                            <th>Report Status</th>
-                                                            <th>Quotation</th>
-                                                            <th>Quotation Type</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="pending-report-table-body">
+                                        </div>
 
-                                                    </tbody>
-                                                </table>
-                                                
-                                            </div>
-                                            <div class="card-footer">
-                                                <a href="/issue-reports" class="btn btn-primary btn-sm">View All</a>
+                                        <div class="col-xl-4 col-lg-5">
+                                            <div class="card shadow mb-4">
+                                                <!-- Card Header - Dropdown -->
+                                                <div
+                                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                                                </div>
+                                                <!-- Card Body -->
+                                                <div class="card-body">
+                                                    <div class="d-flex">
+
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <% }%>
 
-                                <% if (default_user.role === "technician"){ %>
-                                    <div class="col-xl-8 col-lg-7">
-                                        <div class="card shadow mb-4">
-                                            <!-- Card Header - Dropdown -->
-                                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                <h6 class="m-0 font-weight-bold text-warning">Recently Assigned Issues</h6>
-                                            </div>
-                                            <!-- Card Body -->
-                                            <div class="card-body overflow-auto" id="pending-report-card-body">
-                                                <table class="table table-bordered" id="technician-assigned-issue-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Issue ID</th>
-                                                            <th>Contact</th>
-                                                            <th>Device</th>
-                                                            <th>Problem</th>
-                                                            <th>Status</th>
-                                                            <th>Repost Generation</th>
-                                                            <th>Priority</th>
-                                                            <th>Scheduled At</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="technician-assigned-issue-table-body">
-                                    
-                                                    </tbody>
-                                                </table>
-                                    
-                                            </div>
-                                            <div class="card-footer">
-                                                <a href="/technician/assigend-issue" class="btn btn-primary btn-sm">View All</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% }%>
-
-                                    <!-- Pie Chart -->
-                                    <div class="col-xl-4 col-lg-5">
-                                        <div class="card shadow mb-4">
-                                            <!-- Card Header - Dropdown -->
-                                            <div
-                                                class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                                <h6 class="m-0 font-weight-bold text-primary">Recent Invoices</h6>
-                                            </div>
-                                            <!-- Card Body -->
-                                            <div class="card-body" id="recent-invoice-card-body">
-
-
-                                            </div>
-                                            <div class="card-footer">
-                                                <a href="/invoice-list" class="btn btn-primary btn-sm">View All</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Content Row -->
-                                <div class="row">
-
-                                    <!-- Content Column -->
-                                    <div class="col-lg-6 mb-4">
-
-                                        <!-- Project Card Example -->
-                                        <div class="card shadow mb-4">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <h4 class="small font-weight-bold">Server Migration <span
-                                                        class="float-right">20%</span></h4>
-                                                <div class="progress mb-4">
-                                                    <div class="progress-bar bg-danger" role="progressbar"
-                                                        style="width: 20%" aria-valuenow="20" aria-valuemin="0"
-                                                        aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 class="small font-weight-bold">Sales Tracking <span
-                                                        class="float-right">40%</span></h4>
-                                                <div class="progress mb-4">
-                                                    <div class="progress-bar bg-warning" role="progressbar"
-                                                        style="width: 40%" aria-valuenow="40" aria-valuemin="0"
-                                                        aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 class="small font-weight-bold">Customer Database <span
-                                                        class="float-right">60%</span></h4>
-                                                <div class="progress mb-4">
-                                                    <div class="progress-bar" role="progressbar" style="width: 60%"
-                                                        aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 class="small font-weight-bold">Payout Details <span
-                                                        class="float-right">80%</span></h4>
-                                                <div class="progress mb-4">
-                                                    <div class="progress-bar bg-info" role="progressbar"
-                                                        style="width: 80%" aria-valuenow="80" aria-valuemin="0"
-                                                        aria-valuemax="100"></div>
-                                                </div>
-                                                <h4 class="small font-weight-bold">Account Setup <span
-                                                        class="float-right">Complete!</span></h4>
-                                                <div class="progress">
-                                                    <div class="progress-bar bg-success" role="progressbar"
-                                                        style="width: 100%" aria-valuenow="100" aria-valuemin="0"
-                                                        aria-valuemax="100"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Color System -->
                                         <div class="row">
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-primary text-white shadow">
-                                                    <div class="card-body">
-                                                        Primary
-                                                        <div class="text-white-50 small">#4e73df</div>
+
+                                            <% if (default_user.role==="admin" ){ %>
+                                                <div class="col-xl-8 col-lg-7">
+                                                    <div class="card shadow mb-4">
+                                                        <!-- Card Header - Dropdown -->
+                                                        <div
+                                                            class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                            <h6 class="m-0 font-weight-bold text-warning">Pending
+                                                                Reports</h6>
+                                                        </div>
+                                                        <!-- Card Body -->
+                                                        <div class="card-body" id="pending-report-card-body">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Issue ID</th>
+                                                                        <th>Report Status</th>
+                                                                        <th>Quotation</th>
+                                                                        <th>Quotation Type</th>
+                                                                        <th>Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="pending-report-table-body">
+
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                        <div class="card-footer">
+                                                            <a href="/issue-reports" class="btn btn-primary btn-sm">View
+                                                                All</a>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-success text-white shadow">
-                                                    <div class="card-body">
-                                                        Success
-                                                        <div class="text-white-50 small">#1cc88a</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-info text-white shadow">
-                                                    <div class="card-body">
-                                                        Info
-                                                        <div class="text-white-50 small">#36b9cc</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-warning text-white shadow">
-                                                    <div class="card-body">
-                                                        Warning
-                                                        <div class="text-white-50 small">#f6c23e</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-danger text-white shadow">
-                                                    <div class="card-body">
-                                                        Danger
-                                                        <div class="text-white-50 small">#e74a3b</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-secondary text-white shadow">
-                                                    <div class="card-body">
-                                                        Secondary
-                                                        <div class="text-white-50 small">#858796</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-light text-black shadow">
-                                                    <div class="card-body">
-                                                        Light
-                                                        <div class="text-black-50 small">#f8f9fc</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 mb-4">
-                                                <div class="card bg-dark text-white shadow">
-                                                    <div class="card-body">
-                                                        Dark
-                                                        <div class="text-white-50 small">#5a5c69</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                <% }%>
+
+                                                    <% if (default_user.role==="technician" ){ %>
+                                                        <div class="col-12">
+                                                            <div class="card shadow mb-4">
+                                                                <!-- Card Header - Dropdown -->
+                                                                <div
+                                                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                                    <h6 class="m-0 font-weight-bold text-warning">
+                                                                        Recently Assigned Issues</h6>
+                                                                </div>
+                                                                <!-- Card Body -->
+                                                                <div class="card-body overflow-auto"
+                                                                    id="pending-report-card-body">
+                                                                    <table class="table table-bordered"
+                                                                        id="technician-assigned-issue-table">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Issue ID</th>
+                                                                                <th>Contact</th>
+                                                                                <th>Device</th>
+                                                                                <th>Problem</th>
+                                                                                <th>Status</th>
+                                                                                <th>Repost Generation</th>
+                                                                                <th>Priority</th>
+                                                                                <th>Scheduled At</th>
+                                                                                <th>Actions</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody
+                                                                            id="technician-assigned-issue-table-body">
+
+                                                                        </tbody>
+                                                                    </table>
+
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    <a href="/technician/assigend-issue"
+                                                                        class="btn btn-primary btn-sm">View All</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <% }%>
+
+                                                            <!-- Pie Chart -->
+                                                            <% if (default_user.role==="admin" ){ %>
+
+                                                                <div class="col-xl-4 col-lg-5">
+                                                                    <div class="card shadow mb-4">
+                                                                        <!-- Card Header - Dropdown -->
+                                                                        <div
+                                                                            class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                                                            <h6
+                                                                                class="m-0 font-weight-bold text-primary">
+                                                                                Recent Invoices</h6>
+                                                                        </div>
+                                                                        <!-- Card Body -->
+                                                                        <div class="card-body"
+                                                                            id="recent-invoice-card-body">
+
+
+                                                                        </div>
+                                                                        <div class="card-footer">
+                                                                            <a href="/invoice-list"
+                                                                                class="btn btn-primary btn-sm">View
+                                                                                All</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <% }%>
                                         </div>
 
-                                    </div>
+                                        <!-- Content Row -->
 
-                                    <div class="col-lg-6 mb-4">
-
-                                        <!-- Illustrations -->
-                                        <div class="card shadow mb-4">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Illustrations</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="text-center">
-                                                    <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 25rem;"
-                                                        src="img/undraw_posting_photo.svg" alt="...">
-                                                </div>
-                                                <p>Add some quality, svg illustrations to your project courtesy of <a
-                                                        target="_blank" rel="nofollow"
-                                                        href="https://undraw.co/">unDraw</a>, a
-                                                    constantly updated collection of beautiful svg images that you can
-                                                    use
-                                                    completely free and without attribution!</p>
-                                                <a target="_blank" rel="nofollow" href="https://undraw.co/">Browse
-                                                    Illustrations on
-                                                    unDraw &rarr;</a>
-                                            </div>
-                                        </div>
-
-                                        <!-- Approach -->
-                                        <div class="card shadow mb-4">
-                                            <div class="card-header py-3">
-                                                <h6 class="m-0 font-weight-bold text-primary">Development Approach</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in
-                                                    order to reduce
-                                                    CSS bloat and poor page performance. Custom CSS classes are used to
-                                                    create
-                                                    custom components and custom utility classes.</p>
-                                                <p class="mb-0">Before working with this theme, you should become
-                                                    familiar with the
-                                                    Bootstrap framework, especially the utility classes.</p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
 
                     </div>
                     <!-- /.container-fluid -->
@@ -619,14 +705,14 @@
     <script src="/vendor/datatables/jquery.dataTables.js"></script>
     <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
 
-    <script>  
+    <script>
 
         let technicianAssignTable = ''
 
         function showNotification(message, type = 'info') {
-                // Create a simple notification
-                const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
-                const notification = $(`
+            // Create a simple notification
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+            const notification = $(`
                 <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
                      style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
                     ${message}
@@ -636,13 +722,13 @@
                 </div>
             `);
 
-                $('body').append(notification);
+            $('body').append(notification);
 
-                // Auto-remove after 5 seconds
-                setTimeout(function () {
-                    notification.alert('close');
-                }, 5000);
-            }
+            // Auto-remove after 5 seconds
+            setTimeout(function () {
+                notification.alert('close');
+            }, 5000);
+        }
 
         function getUnassignedIssues() {
             $.ajax({
@@ -1104,7 +1190,7 @@
             };
             return priorityColors[priority] || 'info';
         }
-        
+
         function getTechnicianAssignedIssues() {
             $.ajax({
                 url: `/technician/get-recently-assigned-issue`,
@@ -1119,32 +1205,32 @@
             })
         }
         function loadIssueInTable(issueData) {
-                technicianAssignTable.clear(); // clear old rows
+            technicianAssignTable.clear(); // clear old rows
 
-                $.each(issueData, function (_, issue) {
-                    let scheduleDate = issue.schedule?.preferredDate ? new Date(issue.schedule.preferredDate) : null;
-                    let dateText = "-";
-                    if (scheduleDate) dateText = scheduleDate.toLocaleDateString();
-                    
-                    technicianAssignTable.row.add([
-                        issue.human_readable_id || "-",
-                        `<div><strong>${issue.contact?.name || "-"}</strong><br><small>${issue.contact?.phone}</small></div>`,
-                        issue.device?.type || "-",
-                        issue.problemDescription || "-",
-                        issue.status || "-",
-                        `<span class="btn btn-sm ${issue.hasIssueReport ? "btn-success" : "btn-warning"}">${issue.hasIssueReport ? "Done" : "Pending"}</span>`,
-                        issue.priority || "-",
-                        `<div><strong>${dateText}</strong></div><small>${issue.schedule?.window || ""}</small>`,
-                        `<div class="action-buttons d-flex justify-content-around">
+            $.each(issueData, function (_, issue) {
+                let scheduleDate = issue.schedule?.preferredDate ? new Date(issue.schedule.preferredDate) : null;
+                let dateText = "-";
+                if (scheduleDate) dateText = scheduleDate.toLocaleDateString();
+
+                technicianAssignTable.row.add([
+                    issue.human_readable_id || "-",
+                    `<div><strong>${issue.contact?.name || "-"}</strong><br><small>${issue.contact?.phone}</small></div>`,
+                    issue.device?.type || "-",
+                    issue.problemDescription || "-",
+                    issue.status || "-",
+                    `<span class="btn btn-sm ${issue.hasIssueReport ? "btn-success" : "btn-warning"}">${issue.hasIssueReport ? "Done" : "Pending"}</span>`,
+                    issue.priority || "-",
+                    `<div><strong>${dateText}</strong></div><small>${issue.schedule?.window || ""}</small>`,
+                    `<div class="action-buttons d-flex justify-content-around">
           <a href="/full-issue-details/${issue.human_readable_id}" class="btn btn-sm mx-1 btn-primary view-issue-btn" data-issue-id="${issue.human_readable_id}"><i class="fas fa-eye"></i></a>
           <button class="btn btn-sm ${issue.hasIssueReport ? "btn-success" : "btn-warning"} report-issue-btn" data-issue-id="${issue._id}" data-service-id="${issue.serviceCategoryId}" data-human-redable-id="${issue.human_readable_id}"><i class="fas fa-file-alt"></i></button>
         </div>`
-                    ]);
-                });
+                ]);
+            });
 
-                technicianAssignTable.draw();
-            }
-        
+            technicianAssignTable.draw();
+        }
+
 
 
         $(document).ready(function () {
@@ -1193,9 +1279,9 @@
                     type: 'PATCH',
                     data: $(this).serialize(),
                     success: function (response) {
-                      setTimeout(() => {
-                        location.reload()
-                      }, 1000);
+                        setTimeout(() => {
+                            location.reload()
+                        }, 1000);
                     },
                     error: function (xhr) {
 
@@ -1204,7 +1290,180 @@
             })
         });
     </script>
+    <script>
+        let typingTimer;
+        let debounceTime = 500;
+        $(document).ready(function () {
 
+            $('#overall-search').on('input', function () {
+                clearTimeout(typingTimer); // reset timer
+                let query = $(this).val().trim();
+
+                typingTimer = setTimeout(function () {
+                    if (query.length > 0) {
+                        // Show loading state
+                        showLoadingState();
+                        $('#results').show();
+
+                        // Make AJAX request
+                        $.ajax({
+                            url: '/search', // your backend route
+                            method: 'GET',
+                            data: { q: query },
+                            success: function (response) {
+                                const data = response.data;
+                                renderSearchResults(data);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Search error:', error);
+                                showErrorState();
+                            }
+                        });
+                    } else {
+                        $('#results').hide();
+                        clearSearchResults();
+                    }
+                }, debounceTime);
+            })
+
+            // Close search results
+            $(document).on('click', '#close-search-results', function () {
+                $('#results').hide();
+                $('#overall-search').val('');
+                clearSearchResults();
+            });
+
+            function showLoadingState() {
+                $('#issues-results-from-search').html(`
+                    <div class="search-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p>Searching...</p>
+                    </div>
+                `);
+                $('#invoices-results-from-search').html(`
+                    <div class="search-loading">
+                        <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                        <p>Searching...</p>
+                    </div>
+                `);
+                $('#issues-count').text('...');
+                $('#invoices-count').text('...');
+            }
+
+            function showErrorState() {
+                $('#issues-results-from-search').html(`
+                    <div class="search-empty-state">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                        <p>Error occurred while searching</p>
+                    </div>
+                `);
+                $('#invoices-results-from-search').html(`
+                    <div class="search-empty-state">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                        <p>Error occurred while searching</p>
+                    </div>
+                `);
+            }
+
+            function clearSearchResults() {
+                $('#issues-results-from-search').html(`
+                    <div class="search-empty-state">
+                        <i class="fas fa-search fa-2x mb-2"></i>
+                        <p>No issues found</p>
+                    </div>
+                `);
+                $('#invoices-results-from-search').html(`
+                    <div class="search-empty-state">
+                        <i class="fas fa-search fa-2x mb-2"></i>
+                        <p>No invoices found</p>
+                    </div>
+                `);
+                $('#issues-count').text('0');
+                $('#invoices-count').text('0');
+            }
+
+            function renderSearchResults(data) {
+                // Render Issues
+                if (data?.issues?.length > 0) {
+                    let issuesHtml = '';
+                    data.issues.forEach(issue => {
+                        const statusClass = `status-${issue.status.replace(/_/g, '-')}`;
+                        const createdDate = new Date(issue.createdAt).toLocaleDateString();
+
+                        issuesHtml += `
+                            <a href="/issue/${issue.human_readable_id}" class="search-result-item">
+                                <div class="search-result-title">
+                                    <i class="fas fa-ticket-alt mr-2"></i>
+                                    ${issue.human_readable_id}
+                                </div>
+                                <div class="search-result-meta">
+                                    <strong>Customer:</strong> ${issue.contact?.name || 'N/A'}
+                                </div>
+                                <div class="search-result-meta">
+                                    <strong>Problem:</strong> ${issue.problemDescription?.substring(0, 60)}${issue.problemDescription?.length > 60 ? '...' : ''}
+                                </div>
+                                <div class="search-result-meta">
+                                    <strong>Created:</strong> ${createdDate}
+                                    <span class="search-result-status ${statusClass} ml-2">${issue.status}</span>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    $('#issues-results-from-search').html(issuesHtml);
+                    $('#issues-count').text(data.issues.length);
+                } else {
+                    $('#issues-results-from-search').html(`
+                        <div class="search-empty-state">
+                            <i class="fas fa-search fa-2x mb-2"></i>
+                            <p>No issues found</p>
+                        </div>
+                    `);
+                    $('#issues-count').text('0');
+                }
+
+                // Render Invoices
+                if (data?.invoices?.length > 0) {
+                    let invoicesHtml = '';
+                    data.invoices.forEach(invoice => {
+                        const statusClass = `invoice-status-${invoice.status}`;
+                        const invoiceDate = new Date(invoice.invoiceDate).toLocaleDateString();
+                        const amount = invoice.finalAmount || 0;
+
+                        invoicesHtml += `
+                            <a href="/invoice/${invoice.human_readable_invoice_id}" class="search-result-item">
+                                <div class="search-result-title">
+                                    <i class="fas fa-file-invoice mr-2"></i>
+                                    ${invoice.human_readable_invoice_id || invoice.human_readable_issue_id}
+                                </div>
+                                <div class="search-result-meta">
+                                    <strong>Customer:</strong> ${invoice.customerName || 'N/A'}
+                                </div>
+                                <div class="search-result-meta">
+                                    <strong>Amount:</strong> ₹${amount.toLocaleString()}
+                                </div>
+                                <div class="search-result-meta">
+                                    <strong>Date:</strong> ${invoiceDate}
+                                    <span class="search-result-status ${statusClass} ml-2">${invoice.status}</span>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    $('#invoices-results-from-search').html(invoicesHtml);
+                    $('#invoices-count').text(data.invoices.length);
+                } else {
+                    $('#invoices-results-from-search').html(`
+                        <div class="search-empty-state">
+                            <i class="fas fa-search fa-2x mb-2"></i>
+                            <p>No invoices found</p>
+                        </div>
+                    `);
+                    $('#invoices-count').text('0');
+                }
+            }
+
+
+        })
+    </script>
 </body>
 
 </html>

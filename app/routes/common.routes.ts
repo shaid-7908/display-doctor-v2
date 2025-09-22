@@ -7,6 +7,7 @@ import { upload, uploadMulitplePhotoToS3 } from "../middelware/multer.middleware
 
 const commonRouter = express.Router();
 
+commonRouter.get("/search", authChecker, roleChecker(["caller", "admin", "technician"]), commonController.overAllSearch);
 
 commonRouter.get("/create-issue", authChecker, roleChecker(["caller", "admin"]), commonController.renderCreateIssue);
 commonRouter.post("/create-issue", authChecker, roleChecker(["caller", "admin"]), upload.fields([{ name: 'photos', maxCount: 10 }]), uploadMulitplePhotoToS3, commonController.createIssue);

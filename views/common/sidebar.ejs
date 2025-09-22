@@ -15,7 +15,48 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
-
+     <% if(default_user.role === "caller"){ %>
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTechnicianManagement"
+                aria-expanded="false" aria-controls="collapseTechnicianManagement">
+                <i class="fas fa-fw fa-tools"></i>
+                <span>Technician Management</span>
+            </a>
+            <div id="collapseTechnicianManagement" class="collapse" aria-labelledby="headingTechnicianManagement"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded shadow-sm">
+                    <hr class="sidebar-divider my-1">
+                    <a class="collapse-item d-flex align-items-center py-2 px-3" href="/technician-list">
+                        <i class="fas fa-fw fa-list text-info mr-2"></i>
+                        <span class="text-gray-700">Technician List</span>
+                    </a>
+                </div>
+            </div>
+        </li>
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseIssueManagement"
+                aria-expanded="false" aria-controls="collapseIssueManagement">
+                <i class="fas fa-fw fa-ticket-alt"></i>
+                <span>Issue Management</span>
+            </a>
+            <div id="collapseIssueManagement" class="collapse" aria-labelledby="headingIssueManagement"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded shadow-sm">
+                    <a class="collapse-item d-flex align-items-center py-2 px-3" href="/create-issue">
+                        <i class="fas fa-fw fa-plus-circle text-primary mr-2"></i>
+                        <span class="text-gray-700">Create Issue</span>
+                    </a>
+                    <hr class="sidebar-divider my-1">
+                    <a class="collapse-item d-flex align-items-center py-2 px-3" href="/issue-list">
+                        <i class="fas fa-fw fa-list text-info mr-2"></i>
+                        <span class="text-gray-700">Issue List</span>
+                    </a>
+                </div>
+            </div>
+        </li>
+    <% } %>
     <! ---- Caller management --->
         <% if(default_user.role==="admin" ) { %>
             <hr class="sidebar-divider">
