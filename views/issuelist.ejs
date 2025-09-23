@@ -423,6 +423,9 @@
                         <div class="content-box">
                             <p id="modal-problem-description"></p>
                         </div>
+                        <div id="modal-generic-problem-type" class="my-2">
+
+                        </div>
                     </div>
 
                     <!-- Additional Notes Section -->
@@ -857,7 +860,41 @@
 
             // Problem description
             $('#modal-problem-description').text(issueData.problemDescription || 'No description available');
+            let generictypehtml = ''
+            console.log(issueData);
+            issueData.generic_problem_type.forEach(type => {
 
+                if(type === 'display_issue'){
+                    generictypehtml += `
+                    <div class="problem-type-option btn btn-outline-primary">
+                        <i class="problem-icon fas fa-desktop"></i>
+                    <span >Display Issue</span>
+                    </div>
+                    `;
+                }else if(type === 'sound_issue'){
+                    generictypehtml += `
+                    <div class="problem-type-option btn btn-outline-primary">
+                        <i class="problem-icon fas fa-volume-mute"></i>
+                    <span >Sound Issue</span>
+                    </div>
+                    `;
+                }else if(type === 'power_issue'){
+                    generictypehtml += `
+                    <div class="problem-type-option btn btn-outline-primary">
+                        <i class="problem-icon fas fa-power-off"></i>
+                    <span >Power Issue</span>
+                    </div>
+                    `;
+                }else if(type === 'unknown_issue'){
+                    generictypehtml += `
+                    <div class="problem-type-option btn btn-outline-primary">
+                        <i class="problem-icon fas fa-question-circle"></i>
+                    <span >Unknown Issue</span>
+                    </div>
+                    `;
+                }
+            });
+            $('#modal-generic-problem-type').html(generictypehtml);
             // Additional notes (if available)
             if (issueData.notes) {
                 $('#modal-notes').text(issueData.notes);

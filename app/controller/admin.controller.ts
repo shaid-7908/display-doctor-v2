@@ -395,6 +395,27 @@ class AdminController {
         return sendSuccess(res, "Callers fetched successfully", callers, STATUS_CODES.OK);
     })
 
+    deactivateTechnician = asyncHandler(async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const technician = await UserModel.findById(id);
+        if (!technician) {
+            return sendError(res, "Technician not found", null, STATUS_CODES.NOT_FOUND);
+        }
+        technician.status = "inactive";
+        await technician.save();
+        return sendSuccess(res, "Technician status changed successfully", null, STATUS_CODES.OK);
+    })
+    reactivateTechnician = asyncHandler(async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const technician = await UserModel.findById(id);
+        if (!technician) {
+            return sendError(res, "Technician not found", null, STATUS_CODES.NOT_FOUND);
+        }
+        technician.status = "active";
+        await technician.save();
+        return sendSuccess(res, "Technician status changed successfully", null, STATUS_CODES.OK);
+    })
+
 }
 
 const adminController = new AdminController();

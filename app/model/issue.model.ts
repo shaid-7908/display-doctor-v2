@@ -57,7 +57,7 @@ export type CreateIssueInput = z.infer<typeof issueCreateSchema>;
 export interface IssueDocument extends mongoose.Document {
     human_readable_id: string;
     customerId?: mongoose.Types.ObjectId;
-
+    generic_problem_type:string[];
     contact: {
         name: string;
         phone: string;
@@ -204,7 +204,9 @@ const issueSchema = new Schema<IssueDocument, IssueModel>(
         human_readable_id: { type: String, required: true, unique: true }, // e.g., ISS25xxxxx
 
         customerId: { type: Schema.Types.ObjectId, ref: "users" },
-
+        generic_problem_type:[
+            {type:String ,enum:["display_issue","sound_issue","power_issue","unknown_issue"],}
+        ],
         contact: {
             name: { type: String, required: true },
             phone: { type: String, required: true },

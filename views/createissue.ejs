@@ -115,6 +115,78 @@
             min-height: 100px;
         }
     </style>
+
+    <!-- Multi-select problem type styles -->
+    <style>
+        .problem-type-multiselect {
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            min-height: 120px;
+            padding: 10px;
+            background-color: white;
+        }
+
+        .problem-type-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .problem-type-option:hover {
+            background-color: #f8f9fc;
+            border-color: #d1d3e2;
+        }
+
+        .problem-type-option.selected {
+            background-color: #4e73df;
+            color: white;
+            border-color: #4e73df;
+        }
+
+        .problem-type-option.selected:hover {
+            background-color: #3a5bd8;
+        }
+
+        .problem-icon {
+            font-size: 1.2em;
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .problem-label {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .problem-check {
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .problem-type-option.selected .problem-check {
+            opacity: 1;
+        }
+
+        .multiselect-label {
+            font-weight: 600;
+            color: #5a5c69;
+            margin-bottom: 8px;
+        }
+
+        .selected-count {
+            font-size: 0.875rem;
+            color: #858796;
+            margin-top: 5px;
+        }
+    </style>
+
     <link href="/css/search-result.css" rel="stylesheet">
 </head>
 
@@ -135,309 +207,357 @@
                     <!-- Topbar -->
                     <!-- Topbar -->
                     <%- include("common/topnavbar") %>
-                    <!-- End of Topbar -->
+                        <!-- End of Topbar -->
 
-                    <!-- Begin Page Content -->
-                    <div class="container-fluid">
-                        <%- include("common/search-result-section") %>
-                        <!-- Page Heading -->
-                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">Create New Issue</h1>
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+                            <%- include("common/search-result-section") %>
+                                <!-- Page Heading -->
+                                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                                    <h1 class="h3 mb-0 text-gray-800">Create New Issue</h1>
+                                </div>
+
+                                <!-- Flash Message -->
+                                <%- include('common/flash-message') %>
+
+                                    <!-- Create Issue Form -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Issue Details</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="createIssueForm" enctype="multipart/form-data">
+
+                                                <!-- Contact Information Section -->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-user mr-2"></i>Contact Information</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="contactName">Contact Name *</label>
+                                                                <input type="text" class="form-control" id="contactName"
+                                                                    name="contact.name" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="contactPhone">Phone Number *</label>
+                                                                <input type="tel" class="form-control" id="contactPhone"
+                                                                    name="contact.phone" required pattern="[0-9]{10}"
+                                                                    placeholder="10 digit number">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="contactEmail">Email (Optional)</label>
+                                                                <input type="email" class="form-control"
+                                                                    id="contactEmail" name="contact.email">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Address Section -->
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label for="addressLine1">Address Line 1 *</label>
+                                                                <input type="text" class="form-control"
+                                                                    id="addressLine1" name="contact.address.line1"
+                                                                    required minlength="3">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="landmark">Landmark (Optional)</label>
+                                                                <input type="text" class="form-control" id="landmark"
+                                                                    name="contact.address.landmark">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="city">City *</label>
+                                                                <input type="text" class="form-control" id="city"
+                                                                    name="contact.address.city" required minlength="2">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="state">State *</label>
+                                                                <input type="text" class="form-control" id="state"
+                                                                    name="contact.address.state" required minlength="2">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="pinCode">PIN Code *</label>
+                                                                <input type="text" class="form-control" id="pinCode"
+                                                                    name="contact.address.pinCode" required
+                                                                    pattern="[0-9]{6}" placeholder="6 digit PIN">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Service Information Section -->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-concierge-bell mr-2"></i>Service Information
+                                                    </h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="serviceCategory">Service Category
+                                                                </label>
+                                                                <select class="form-control" id="serviceCategory"
+                                                                    name="serviceCategoryId">
+                                                                    <option value="">Select Category</option>
+                                                                    <% serviceCategories.forEach(category=> { %>
+                                                                        <option value="<%= category._id %>">
+                                                                            <%= category.name %>
+                                                                        </option>
+                                                                        <% }) %>
+
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+                                                    <div class="">
+                                                        <div class="form-group">
+                                                            <label for="serviceSubCategory">Service Sub-Category</label>
+                                                            <div id="sub-category-container"
+                                                                class="d-flex flex-wrap gap-2">
+
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <!-- Device Information Section -->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-tv mr-2"></i>Device Information</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="deviceType">Device Type</label>
+                                                                <select class="form-control" id="deviceType"
+                                                                    name="device.type">
+                                                                    <option value="tv" selected>TV</option>
+                                                                    <!-- Future device types can be added here -->
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="deviceBrand">Brand (Optional)</label>
+                                                                <input type="text" class="form-control" id="deviceBrand"
+                                                                    name="device.brand">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="deviceModel">Model (Optional)</label>
+                                                                <input type="text" class="form-control" id="deviceModel"
+                                                                    name="device.model">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="serialNumber">Serial Number
+                                                                    (Optional)</label>
+                                                                <input type="text" class="form-control"
+                                                                    id="serialNumber" name="device.serialNumber">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="warrantyStatus">Warranty Status</label>
+                                                                <select class="form-control" id="warrantyStatus"
+                                                                    name="device.warrantyStatus">
+                                                                    <option value="">Select Status</option>
+                                                                    <option value="in_warranty">In Warranty</option>
+                                                                    <option value="out_of_warranty">Out of Warranty
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Problem Description Section -->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-exclamation-triangle mr-2"></i>Problem
+                                                        Description
+                                                    </h5>
+                                                    <div class="form-group">
+                                                        <label class="multiselect-label"
+                                                            for="genericProblemType">Generic Problem Type</label>
+                                                        <div class="problem-type-multiselect"
+                                                            id="problemTypeMultiselect">
+                                                            <div class="problem-type-option" data-value="display_issue">
+                                                                <i class="problem-icon fas fa-desktop"></i>
+                                                                <span class="problem-label">Display Issue</span>
+                                                                <i class="problem-check fas fa-check"></i>
+                                                            </div>
+                                                            <div class="problem-type-option" data-value="sound_issue">
+                                                                <i class="problem-icon fas fa-volume-mute"></i>
+                                                                <span class="problem-label">Sound Issue</span>
+                                                                <i class="problem-check fas fa-check"></i>
+                                                            </div>
+                                                            <div class="problem-type-option" data-value="power_issue">
+                                                                <i class="problem-icon fas fa-power-off"></i>
+                                                                <span class="problem-label">Power Issue</span>
+                                                                <i class="problem-check fas fa-check"></i>
+                                                            </div>
+                                                            <div class="problem-type-option" data-value="unknown_issue">
+                                                                <i class="problem-icon fas fa-question-circle"></i>
+                                                                <span class="problem-label">Unknown Issue</span>
+                                                                <i class="problem-check fas fa-check"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="selected-count" id="selectedCount">0 problems
+                                                            selected</div>
+                                                        <!-- Hidden input to store selected values -->
+                                                        <input type="hidden" id="genericProblemType"
+                                                            name="generic_problem_type" value="">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="problemDescription">Problem Description *</label>
+                                                        <textarea class="form-control" id="problemDescription"
+                                                            name="problemDescription" rows="4" required minlength="5"
+                                                            placeholder="Please describe the problem in detail..."></textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="photos">Photos (Optional)</label>
+                                                        <input type="file" class="form-control-file" id="photos"
+                                                            name="photos" multiple accept="image/*">
+                                                        <small class="form-text text-muted">You can select multiple
+                                                            images</small>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Source & Priority Section -->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-info-circle mr-2"></i>Source & Priority</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="source">Source Channel</label>
+                                                                <select class="form-control" id="source" name="source">
+                                                                    <option value="call_center" selected>Call Center
+                                                                    </option>
+                                                                    <option value="customer_portal">Customer Portal
+                                                                    </option>
+                                                                    <option value="social_ad">Social Ad</option>
+                                                                    <option value="website">Website</option>
+                                                                    <option value="whatsapp">WhatsApp</option>
+                                                                    <option value="referral">Referral</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="campaignId">Campaign ID (Optional)</label>
+                                                                <input type="text" class="form-control" id="campaignId"
+                                                                    name="campaignId">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="priority">Priority Level</label>
+                                                                <select class="form-control" id="priority"
+                                                                    name="priority">
+                                                                    <option value="normal" selected>Normal</option>
+                                                                    <option value="low">Low</option>
+                                                                    <option value="high">High</option>
+                                                                    <option value="urgent">Urgent</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Scheduling Section -->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-calendar-alt mr-2"></i>Scheduling Preferences
+                                                    </h5>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="preferredDate">Preferred Date
+                                                                    (Optional)</label>
+                                                                <input type="date" class="form-control"
+                                                                    id="preferredDate" name="schedule.preferredDate">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="timeWindow">Preferred Time Window</label>
+                                                                <select class="form-control" id="timeWindow"
+                                                                    name="schedule.window">
+                                                                    <option value="any" selected>Any Time</option>
+                                                                    <option value="morning">Morning (9 AM - 12 PM)
+                                                                    </option>
+                                                                    <option value="afternoon">Afternoon (12 PM - 3 PM)
+                                                                    </option>
+                                                                    <option value="evening">Evening (3 PM - 6 PM)
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--- Additional notes-->
+                                                <div class="form-section">
+                                                    <h5><i class="fas fa-exclamation-triangle mr-2"></i>Aditional Note
+                                                    </h5>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label>Note (Optional)</label>
+                                                                <textarea type="text" class="form-control"
+                                                                    id="additionalnotes" rows="4" name="additionalnotes"
+                                                                    placeholder="Additional note for the issue"></textarea>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- Submit Buttons -->
+                                                <div class="row mt-4">
+                                                    <div class="col-md-12 text-center">
+                                                        <button type="submit" class="btn btn-primary btn-lg mr-3">
+                                                            <i class="fas fa-save mr-2"></i>Create Issue
+                                                        </button>
+                                                        <a href="/" class="btn btn-secondary btn-lg">
+                                                            <i class="fas fa-times mr-2"></i>Cancel
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
                         </div>
-
-                        <!-- Flash Message -->
-                        <%- include('common/flash-message') %>
-
-                            <!-- Create Issue Form -->
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Issue Details</h6>
-                                </div>
-                                <div class="card-body">
-                                    <form id="createIssueForm" enctype="multipart/form-data">
-
-                                        <!-- Contact Information Section -->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-user mr-2"></i>Contact Information</h5>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="contactName">Contact Name *</label>
-                                                        <input type="text" class="form-control" id="contactName"
-                                                            name="contact.name" required >
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="contactPhone">Phone Number *</label>
-                                                        <input type="tel" class="form-control" id="contactPhone"
-                                                            name="contact.phone" required pattern="[0-9]{10}"
-                                                            placeholder="10 digit number">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="contactEmail">Email (Optional)</label>
-                                                        <input type="email" class="form-control" id="contactEmail"
-                                                            name="contact.email">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Address Section -->
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="addressLine1">Address Line 1 *</label>
-                                                        <input type="text" class="form-control" id="addressLine1"
-                                                            name="contact.address.line1" required minlength="3">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="landmark">Landmark (Optional)</label>
-                                                        <input type="text" class="form-control" id="landmark"
-                                                            name="contact.address.landmark">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="city">City *</label>
-                                                        <input type="text" class="form-control" id="city"
-                                                            name="contact.address.city" required minlength="2">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="state">State *</label>
-                                                        <input type="text" class="form-control" id="state"
-                                                            name="contact.address.state" required minlength="2">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="pinCode">PIN Code *</label>
-                                                        <input type="text" class="form-control" id="pinCode"
-                                                            name="contact.address.pinCode" required pattern="[0-9]{6}"
-                                                            placeholder="6 digit PIN">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Service Information Section -->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-concierge-bell mr-2"></i>Service Information</h5>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="serviceCategory">Service Category
-                                                        </label>
-                                                        <select class="form-control" id="serviceCategory"
-                                                            name="serviceCategoryId">
-                                                            <option value="">Select Category</option>
-                                                            <% serviceCategories.forEach(category=> { %>
-                                                                <option value="<%= category._id %>">
-                                                                    <%= category.name %>
-                                                                </option>
-                                                                <% }) %>
-
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-
-                                            </div>
-                                            <div class="">
-                                                <div class="form-group">
-                                                    <label for="serviceSubCategory">Service Sub-Category</label>
-                                                    <div id="sub-category-container" class="d-flex flex-wrap gap-2">
-
-
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Device Information Section -->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-tv mr-2"></i>Device Information</h5>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="deviceType">Device Type</label>
-                                                        <select class="form-control" id="deviceType" name="device.type">
-                                                            <option value="tv" selected>TV</option>
-                                                            <!-- Future device types can be added here -->
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="deviceBrand">Brand (Optional)</label>
-                                                        <input type="text" class="form-control" id="deviceBrand"
-                                                            name="device.brand">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="deviceModel">Model (Optional)</label>
-                                                        <input type="text" class="form-control" id="deviceModel"
-                                                            name="device.model">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="serialNumber">Serial Number (Optional)</label>
-                                                        <input type="text" class="form-control" id="serialNumber"
-                                                            name="device.serialNumber">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="warrantyStatus">Warranty Status</label>
-                                                        <select class="form-control" id="warrantyStatus"
-                                                            name="device.warrantyStatus">
-                                                            <option value="">Select Status</option>
-                                                            <option value="in_warranty">In Warranty</option>
-                                                            <option value="out_of_warranty">Out of Warranty</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Problem Description Section -->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-exclamation-triangle mr-2"></i>Problem Description
-                                            </h5>
-                                            <div class="form-group">
-                                                <label for="problemDescription">Problem Description *</label>
-                                                <textarea class="form-control" id="problemDescription"
-                                                    name="problemDescription" rows="4" required minlength="5"
-                                                    placeholder="Please describe the problem in detail..."></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="photos">Photos (Optional)</label>
-                                                <input type="file" class="form-control-file" id="photos" name="photos"
-                                                    multiple accept="image/*">
-                                                <small class="form-text text-muted">You can select multiple
-                                                    images</small>
-                                            </div>
-                                        </div>
-
-                                        <!-- Source & Priority Section -->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-info-circle mr-2"></i>Source & Priority</h5>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="source">Source Channel</label>
-                                                        <select class="form-control" id="source" name="source">
-                                                            <option value="call_center" selected>Call Center
-                                                            </option>
-                                                            <option value="customer_portal">Customer Portal</option>
-                                                            <option value="social_ad">Social Ad</option>
-                                                            <option value="website">Website</option>
-                                                            <option value="whatsapp">WhatsApp</option>
-                                                            <option value="referral">Referral</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="campaignId">Campaign ID (Optional)</label>
-                                                        <input type="text" class="form-control" id="campaignId"
-                                                            name="campaignId">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="priority">Priority Level</label>
-                                                        <select class="form-control" id="priority" name="priority">
-                                                            <option value="normal" selected>Normal</option>
-                                                            <option value="low">Low</option>
-                                                            <option value="high">High</option>
-                                                            <option value="urgent">Urgent</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Scheduling Section -->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-calendar-alt mr-2"></i>Scheduling Preferences</h5>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="preferredDate">Preferred Date (Optional)</label>
-                                                        <input type="date" class="form-control" id="preferredDate"
-                                                            name="schedule.preferredDate">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="timeWindow">Preferred Time Window</label>
-                                                        <select class="form-control" id="timeWindow"
-                                                            name="schedule.window">
-                                                            <option value="any" selected>Any Time</option>
-                                                            <option value="morning">Morning (9 AM - 12 PM)</option>
-                                                            <option value="afternoon">Afternoon (12 PM - 3 PM)
-                                                            </option>
-                                                            <option value="evening">Evening (3 PM - 6 PM)</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--- Additional notes-->
-                                        <div class="form-section">
-                                            <h5><i class="fas fa-exclamation-triangle mr-2"></i>Aditional Note</h5>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                     <div class="form-group">
-                                                    <label>Note (Optional)</label>
-                                                    <textarea type="text" class="form-control" id="additionalnotes" rows="4" name="additionalnotes" placeholder="Additional note for the issue" ></textarea>
-
-                                                </div>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-
-                                        <!-- Submit Buttons -->
-                                        <div class="row mt-4">
-                                            <div class="col-md-12 text-center">
-                                                <button type="submit" class="btn btn-primary btn-lg mr-3">
-                                                    <i class="fas fa-save mr-2"></i>Create Issue
-                                                </button>
-                                                <a href="/" class="btn btn-secondary btn-lg">
-                                                    <i class="fas fa-times mr-2"></i>Cancel
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                    </div>
-                    <!-- /.container-fluid -->
+                        <!-- /.container-fluid -->
 
                 </div>
                 <!-- End of Main Content -->
@@ -511,6 +631,8 @@
         // Form validation
         document.querySelector('form').addEventListener('submit', function (e) {
             const requiredFields = this.querySelectorAll('[required]');
+            const problemTypeInput = document.getElementById('genericProblemType');
+            const problemTypeContainer = document.getElementById('problemTypeMultiselect');
             let isValid = true;
 
             requiredFields.forEach(field => {
@@ -522,9 +644,19 @@
                 }
             });
 
+            // Validate problem type selection (at least one must be selected)
+            if (!problemTypeInput.value.trim()) {
+                isValid = false;
+                problemTypeContainer.style.borderColor = '#e74a3b';
+                problemTypeContainer.style.backgroundColor = '#fff5f5';
+            } else {
+                problemTypeContainer.style.borderColor = '#d1d3e2';
+                problemTypeContainer.style.backgroundColor = 'white';
+            }
+
             if (!isValid) {
                 e.preventDefault();
-                alert('Please fill in all required fields.');
+                alert('Please fill in all required fields and select at least one problem type.');
             }
         });
 
@@ -637,21 +769,21 @@
                     contentType: false,
                     success: function (response) {
                         console.log(response);
-                            showAlert(response.message, 'success');
-                            // Optionally redirect or clear form
-                          $("#createIssueForm")[0].reset()
+                        showAlert(response.message, 'success');
+                        // Optionally redirect or clear form
+                        $("#createIssueForm")[0].reset()
                     },
                     error: function (xhr, status, error) {
                         let errorMessage = 'An error occurred while creating the account.';
                         console.log(xhr.responseJSON);
                         if (xhr.responseJSON && xhr.responseJSON.message) {
-                            if(xhr.responseJSON.message === "Zod Error"){
+                            if (xhr.responseJSON.message === "Zod Error") {
                                 let combiedMessage = ''
-                                xhr.responseJSON.error.forEach((e)=>{
+                                xhr.responseJSON.error.forEach((e) => {
                                     combiedMessage += JSON.stringify(e)
                                 })
                                 errorMessage = combiedMessage
-                            }else{
+                            } else {
 
                                 errorMessage = xhr.responseJSON.message;
                             }
@@ -668,6 +800,68 @@
                     }
                 });
             });
+
+            // Multi-select problem type functionality
+            function initializeProblemTypeMultiselect() {
+                const multiselect = document.getElementById('problemTypeMultiselect');
+                const hiddenInput = document.getElementById('genericProblemType');
+                const selectedCount = document.getElementById('selectedCount');
+                const options = multiselect.querySelectorAll('.problem-type-option');
+                let selectedValues = [];
+
+                function updateDisplay() {
+                    const count = selectedValues.length;
+                    if (count === 0) {
+                        selectedCount.textContent = 'No problems selected';
+                        selectedCount.style.color = '#858796';
+                    } else if (count === 1) {
+                        selectedCount.textContent = '1 problem selected';
+                        selectedCount.style.color = '#4e73df';
+                    } else {
+                        selectedCount.textContent = `${count} problems selected`;
+                        selectedCount.style.color = '#4e73df';
+                    }
+
+                    // Update hidden input with comma-separated values
+                    hiddenInput.value = selectedValues.join(',');
+                }
+
+                options.forEach(option => {
+                    option.addEventListener('click', function () {
+                        const value = this.getAttribute('data-value');
+
+                        if (this.classList.contains('selected')) {
+                            // Deselect
+                            this.classList.remove('selected');
+                            selectedValues = selectedValues.filter(v => v !== value);
+                        } else {
+                            // Select
+                            this.classList.add('selected');
+                            selectedValues.push(value);
+                        }
+
+                        updateDisplay();
+                    });
+
+                    // Add keyboard support
+                    option.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.click();
+                        }
+                    });
+
+                    // Make focusable for accessibility
+                    option.setAttribute('tabindex', '0');
+                });
+
+                // Initialize display
+                updateDisplay();
+            }
+
+            // Initialize the multiselect when the page loads
+            initializeProblemTypeMultiselect();
+
         });
     </script>
 

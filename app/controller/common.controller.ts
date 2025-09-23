@@ -22,8 +22,8 @@ class CommonController {
   createIssue = asyncHandler(async (req: Request, res: Response) => {
     // Validate request body using the schema from issue model
     const issueData = req.body;
-
-
+    console.log(issueData);
+    
     // Parse nested form data (contact.name, contact.address.line1, etc.)
     const parsedData = {
       contact: {
@@ -47,6 +47,7 @@ class CommonController {
         serialNumber: issueData["device.serialNumber"] || undefined,
         warrantyStatus: issueData["device.warrantyStatus"] || undefined,
       },
+      generic_problem_type: issueData.generic_problem_type.trim() === "" ? [] : issueData.generic_problem_type.split(","),
       problemDescription: issueData.problemDescription,
       photos: req.body.photosUrls,
       source: issueData.source || "call_center",
@@ -84,6 +85,7 @@ class CommonController {
               .regex(/^\d{6}$/, "PIN code must be exactly 6 digits"),
           }),
         }),
+        generic_problem_type: z.array(z.string()).optional(),
         serviceCategoryId: z.string().min(1, "Service Category not selected"),
         serviceSubCategoryId: z.array(z.string()).optional(),
         device: z.object({
@@ -311,6 +313,14 @@ class CommonController {
             "Issue not found",
             null,
             STATUS_CODES.NOT_FOUND
+          );
+        }
+        if(!issue?.schedule?.preferredDate){
+          return sendError(
+            res,
+            "Issue is not scheduled",
+            null,
+            STATUS_CODES.BAD_REQUEST
           );
         }
 
