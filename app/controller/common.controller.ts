@@ -23,7 +23,7 @@ class CommonController {
     // Validate request body using the schema from issue model
     const issueData = req.body;
     console.log(issueData);
-    
+
     // Parse nested form data (contact.name, contact.address.line1, etc.)
     const parsedData = {
       contact: {
@@ -289,6 +289,74 @@ class CommonController {
     });
   })
 
+
+  renderIssue = asyncHandler(async (req: Request, res: Response) => {
+    const issueId = req.params.id;
+    let pipeline: any[] = []
+    if (req.user.role === "technician") {
+      pipeline = [
+        {
+          $match: {
+            "human_readable_id": issueId,
+            "assignment.technicianId": new mongoose.Types.ObjectId(req.user.id)
+          }
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "assignment.technicianId",
+            foreignField: "_id",
+            as: "technician"
+          }
+        },
+        {
+          $lookup: {
+            from: "issue_reports",
+            localField: "_id",
+            foreignField: "issue_id",
+            as: "reports"
+          }
+        },
+        {
+          $project: {
+            "technician.password": 0,
+          }
+        }
+      ]
+    } else {
+      pipeline = [
+        { $match: { "human_readable_id": issueId } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "assignment.technicianId",
+            foreignField: "_id",
+            as: "technician"
+          }
+        },
+        {
+          $lookup: {
+            from: "issue_reports",
+            localField: "_id",
+            foreignField: "issue_id",
+            as: "reports"
+          }
+        },
+        {
+          $project: {
+            "technician.password": 0,
+          }
+        }
+      ]
+    }
+
+    const issue = await IssueModel.aggregate(pipeline);
+    res.render("issue", {
+      default_user: req.user,
+      issue: issue[0]
+    });
+  })
+
   assignIssueToTechnician = asyncHandler(
     async (req: Request, res: Response) => {
       const issueId = req.params.id;
@@ -315,7 +383,7 @@ class CommonController {
             STATUS_CODES.NOT_FOUND
           );
         }
-        if(!issue?.schedule?.preferredDate){
+        if (!issue?.schedule?.preferredDate) {
           return sendError(
             res,
             "Issue is not scheduled",
@@ -1267,23 +1335,23 @@ class CommonController {
       issuePipeline[0].$match["assignment.technicianId"] = new mongoose.Types.ObjectId(req.user.id);
     }
 
-    let invoicePipeline:any[] = [
+    let invoicePipeline: any[] = [
       {
         $match: {
           $or: [
             { "customerName": { $regex: searchRegex } },
             { "customerPhone": { $regex: searchRegex } },
             { "human_readable_invoice_id": { $regex: searchRegex } },
-            {"human_readable_issue_id": { $regex: searchRegex }}
+            { "human_readable_issue_id": { $regex: searchRegex } }
           ]
         }
       },
       {
-        $lookup:{
-          from:'issues',
-          localField:'issueId',
-          foreignField:'_id',
-          as:'issue_details'
+        $lookup: {
+          from: 'issues',
+          localField: 'issueId',
+          foreignField: '_id',
+          as: 'issue_details'
         }
       },
       {
@@ -1294,7 +1362,7 @@ class CommonController {
       }
     ]
 
-    if(currentUserRole === "technician"){
+    if (currentUserRole === "technician") {
       invoicePipeline.push({
         $match: {
           "issue_details.assignment.technicianId": new mongoose.Types.ObjectId(req.user.id)

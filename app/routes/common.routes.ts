@@ -48,5 +48,6 @@ commonRouter.get('/view-invoice/:id', authChecker, roleChecker(["technician", "a
 commonRouter.get("/get-all-unassigned-issues", authChecker, roleChecker(["admin", "caller"]), commonController.getAllUnassignedIssues);
 commonRouter.get("/get-recent-pending-reports", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getRecentPendingReports);
 commonRouter.get("/get-issue-report-details-modal/:id", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getIssueReportDetailsForModal);
+commonRouter.get("/issue/:id", authChecker, roleChecker(["caller", "admin", "technician"]), commonController.renderIssue);
 
 export default commonRouter;

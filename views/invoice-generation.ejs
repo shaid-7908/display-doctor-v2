@@ -534,6 +534,27 @@
     <script src="/js/serach-functionality.js"></script>
     <!-- Invoice Generation Custom Scripts -->
     <script>
+        function showNotification(message, type = 'info') {
+                // Create a simple notification
+                const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+                const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+
+                $('body').append(notification);
+
+                // Auto-remove after 5 seconds
+                setTimeout(function () {
+                    notification.alert('close');
+                }, 5000);
+            }
+
         const issueReport = `<%= issueReport ? issueReport.requiredParts : ''    %>`;
         console.log(issueReport);
         $(document).ready(function () {
@@ -568,10 +589,17 @@
                     data: formData,
                     dataType: 'json',
                     success: function(response){
-                        console.log(response);
+                        showNotification('Invoice generated successfully','success');
+                        setTimeout(function(){
+                            window.location.href = '/invoice-list';
+                        }, 1500);
                     },
                     error: function(xhr){
                         console.log(xhr.responseJSON);
+                        showNotification(xhr.responseJSON.message,'error');
+                        setTimeout(function(){
+                            window.location.href = '/invoice-generation';
+                        }, 1500);
                     }
                     
                 })
