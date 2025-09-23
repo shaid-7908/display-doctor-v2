@@ -603,57 +603,11 @@ class CommonController {
 
   // Render invoice page with hardcoded data
   renderInvoicePage = asyncHandler(async (req: Request, res: Response) => {
-    const issueId = req.params.issueId;
-    console.log(req.body)
-    // Hardcoded invoice data for now
-    const invoiceData = {
-      // Company Info
-      companyName: "TechFix Solutions",
-      companyAddress: "123 Service Street, Tech City, TC 12345",
-      companyPhone: "(555) 123-4567",
-      companyEmail: "info@techfix.com",
-      companyGST: "12ABCDE3456F7G8",
-
-      // Customer Info
-      customerName: "John Doe",
-      customerPhone: "+91 9876543210",
-      customerAddress: "123 Main Street, Mumbai, Maharashtra - 400001",
-
-      // Invoice Details
-      invoiceNo: `INV-2024-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-      issueId: "TF-001",
-      date: new Date().toLocaleDateString('en-IN'),
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN'),
-
-      // Service Details
-      serviceDescription: "Laptop Screen Replacement & Software Installation",
-      deviceInfo: "HP Pavilion 15 - Model: DV6-3000",
-      partsUsed: "15.6\" LED Display, Thermal Paste",
-      serviceAmount: 8500,
-
-      // Payment Info
-      bankName: "Tech Bank Ltd.",
-      accountNo: "1234567890",
-
-      // Technician Info
-      technicianName: "Rajesh Kumar",
-      technicianTitle: "Certified Technician"
-    };
-
-    // Calculate totals
-    const subtotal = invoiceData.serviceAmount;
-    const gst = Math.round(subtotal * 0.18);
-    const total = subtotal + gst;
-
-    const finalInvoiceData = {
-      ...invoiceData,
-      subtotal,
-      gst,
-      total
-    };
-
+    const invoice_id = req.params.id;
+    const invoiceData = await InvoiceModel.findOne({ human_readable_invoice_id: invoice_id })
+    console.log(invoiceData)
     res.render("invoice", {
-      invoice: finalInvoiceData,
+      invoice: invoiceData,
       default_user: req.user
     });
   });
@@ -679,12 +633,12 @@ class CommonController {
     let numPartsCost = parseFloat(partsCost) || 0
     let numVisitCharge = parseFloat(visitCharge) || 0
     let numDiscount = parseFloat(discount) || 0
-    let subtotal = numLabourCharge + numPartsCost + numVisitCharge
+    let subtotal = numLabourCharge + numPartsCost + numVisitCharge - numDiscount
     if (subtotal < existingReport.finalQuotation.valueOf()) {
       return sendError(res, "Subtotal is less than final quotation", null, STATUS_CODES.BAD_REQUEST);
     }
     let gst = subtotal * 0.18
-    let finalAmount = subtotal + gst - numDiscount
+    let finalAmount = subtotal + gst 
     const newInvoice = await InvoiceModel.create({
       issueId,
       issue_report_id,

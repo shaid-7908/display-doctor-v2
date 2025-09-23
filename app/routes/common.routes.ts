@@ -27,12 +27,13 @@ commonRouter.get('/get-issue-history/:id', authChecker, roleChecker(['caller', '
 //Issue report route
 
 // Bill generation routes
-commonRouter.get("/generate-invoice/:issueId", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoicePage);
+
 commonRouter.post("/generate-invoice/:issueId", authChecker, roleChecker(["technician", "admin"]), commonController.generateInvoice);
 commonRouter.get("/download-invoice-pdf/:issueId", authChecker, roleChecker(["technician", "admin"]), commonController.downloadInvoicePdf);
 commonRouter.get("/invoice-generation", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceGenerationPage);
 commonRouter.get("/invoice-generation/:id", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceGenerationPageWithIssue);
 commonRouter.post("/search-issue-for-invoice", authChecker, roleChecker(["technician", "admin"]), commonController.searchIssueForInvoice);
+commonRouter.get("/invoice/:id",authChecker,roleChecker(["admin","caller","technician"]),commonController.renderInvoicePage);
 
 commonRouter.get("/invoice-list", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceList);
 commonRouter.get("/get-all-invoices", authChecker, roleChecker(["technician", "admin"]), commonController.getInvoiceList);

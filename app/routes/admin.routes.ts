@@ -37,7 +37,7 @@ adminRouter.delete("/delete-service-category/:id", authChecker, roleChecker(["ad
 //service sub category routes
 adminRouter.get("/create-service-subcategory", authChecker, roleChecker(["admin"]), adminController.renderCreateServiceSubCategory);
 adminRouter.post("/create-service-subcategory", authChecker, roleChecker(["admin"]), adminController.createServiceSubCategory);
-adminRouter.get("/get-sub-categories-by-service/:service_id", authChecker, roleChecker(["admin"]), adminController.getSubCategoriesByServiceCategory);
+adminRouter.get("/get-sub-categories-by-service/:service_id", authChecker, roleChecker(["admin","caller"]), adminController.getSubCategoriesByServiceCategory);
 
 
 //Issue Report Routes
