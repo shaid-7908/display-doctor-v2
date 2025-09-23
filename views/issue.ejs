@@ -625,6 +625,17 @@
                                                                 <div class="empty-state">
                                                                     <i class="fas fa-user-slash"></i>
                                                                     <p>No technicians assigned yet</p>
+                                                                    <% if(issue.schedule && issue.schedule.preferredDate) { %>
+
+                                                                        <div class="btn btn-primary" id="assign-technician-btn" data-issue-id="<%= issue.human_readable_id %>" data-toggle="modal" data-target="#assignTechnicianModal">Assign Technician</div>
+
+                                                                    <% }else{ %>
+                                                                        <div id="schedule-visit-btn" data-issue-id="<%= issue.human_readable_id %>" class="btn btn-warning text-white text-sm" data-toggle="modal" data-target="#scheduleModal">
+                                                                            <i class="fas fa-calendar" style="font-size: 0.8em;"></i>
+                                                                            <span class="text-white">Schedule Visit</span>
+                                                                        </div>
+                                                                    <% } %>
+                                                                    
                                                                 </div>
                                                                 <% } %>
                                             </div>
@@ -819,6 +830,159 @@
                 </div>
             </div>
     </div>
+     
+    <!-- Issue Schedule Modal -->
+    <div class="modal fade" id="issue_schedule_modal" tabindex="-1" role="dialog"
+        aria-labelledby="issue_schedule_modal_label" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="issue_schedule_modal_label">Issue Schedule</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="issue_schedule_modal_body">
+                        <div class="section-card mb-3">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                <h6>Issue Information</h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Issue ID:</strong>
+                                    <span id="issue-schedule-modal-issue-id"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Priority:</strong>
+                                    <span id="issue-schedule-modal-priority"></span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <strong>Problem:</strong>
+                                    <span id="issue-schedule-modal-problem"></span>
+                                </div>
+                            </div>
+                            <div class="row mt-2" id="issue-schedule-modal-schedule-information">
+                                <div class="col-12">
+                                    <strong>Schedule Information:</strong>
+                                    <span id="issue-schedule-modal-notes"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+    
+                    <form id="issue-schedule-form">
+                        <input type="hidden" id="to-be-scheduled-issue-id" name="issue_id" />
+                        <div class="form-group">
+                            <label for="timeWindow">Preferred Time Window</label>
+                            <select class="form-control" id="timeWindow-issue-schedule-select" name="schedule.window">
+                                <option value="any" selected>Any Time</option>
+                                <option value="morning">Morning (9 AM - 12 PM)</option>
+                                <option value="afternoon">Afternoon (12 PM - 3 PM)
+                                </option>
+                                <option value="evening">Evening (3 PM - 6 PM)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferredDate">Preferred Date (Optional)</label>
+                            <input type="date" class="form-control" id="preferredDate-issue-schedule-input"
+                                name="schedule.preferredDate">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            Change Schedule
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+     <!-- Assign Technician Modal -->
+    <div class="modal fade" id="assignTechnicianModal" tabindex="-1" role="dialog"
+        aria-labelledby="assignTechnicianModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignTechnicianModalLabel">Assign Technician</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignTechnicianForm">
+                        <input type="hidden" id="assign-issue-id" name="issueId">
+    
+                        <!-- Issue Information -->
+                        <div class="section-card mb-3">
+                            <div class="section-header">
+                                <div class="icon">
+                                    <i class="fas fa-ticket-alt"></i>
+                                </div>
+                                <h6>Issue Information</h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Issue ID:</strong>
+                                    <span id="assign-modal-issue-id"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Priority:</strong>
+                                    <span id="assign-modal-priority"></span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <strong>Problem:</strong>
+                                    <span id="assign-modal-problem"></span>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Technician Selection -->
+                        <div class="form-group">
+                            <label for="technicianSelect"><strong>Select Technician</strong></label>
+                            <select class="form-control" id="technicianSelect" name="technicianId" required>
+                                <option value="">Loading technicians...</option>
+                            </select>
+                            <small class="form-text text-muted">Choose a qualified technician for this service
+                                type.</small>
+                        </div>
+    
+                        <!-- Assignment Notes -->
+                        <div class="form-group">
+                            <label for="assignmentNotes"><strong>Assignment Notes</strong></label>
+                            <textarea class="form-control" id="assignmentNotes" name="notes" rows="3"
+                                placeholder="Enter any specific instructions or notes for the technician..."></textarea>
+                        </div>
+    
+                        <!-- Priority Override -->
+                        <div class="form-group">
+                            <label for="priorityOverride"><strong>Priority (Optional Override)</strong></label>
+                            <select class="form-control" id="priorityOverride" name="priority">
+                                <option value="">Keep current priority</option>
+                                <option value="low">Low</option>
+                                <option value="normal">Normal</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssignBtn">
+                        <i class="fas fa-user-plus"></i> Assign Technician
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!---- Scripts Section ---->
     <script src="/vendor/jquery/jquery.min.js"></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -836,12 +1000,133 @@
 
     <!-- Custom JavaScript for issue details -->
     <script>
+        function showNotification(message, type = 'info') {
+                // Create a simple notification
+                const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+                const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+
+                $('body').append(notification);
+
+                // Auto-remove after 5 seconds
+                setTimeout(function () {
+                    notification.alert('close');
+                }, 5000);
+            }
+
         // Photo modal functionality
         function openPhotoModal(photoUrl) {
             document.getElementById('modalPhoto').src = photoUrl;
             $('#photoModal').modal('show');
         }
 
+        function openIssueScheduleModal(issueData) {
+                $('#issue-schedule-modal-issue-id').text(issueData.human_readable_id);
+                $('#issue-schedule-modal-priority').text(issueData.priority);
+                $('#issue-schedule-modal-problem').text(issueData.problemDescription);
+                $('#to-be-scheduled-issue-id').val(issueData._id)
+                loadIssueSchedule(issueData._id);
+                $('#issue_schedule_modal').modal('show');
+            }
+
+        function loadIssueSchedule(issueID) {
+                $.ajax({
+                    url: `/get-current-schedule/${issueID}`,
+                    method: 'GET',
+                    success: function (response) {
+                        console.log('Issue schedule response:', response);
+
+                        if (response && response.data && response.data.preferredDate && response.data.window) {
+                            const preferredDate = response.data.preferredDate;
+                            const timeWindow = response.data.window;
+                            const formattedDate = preferredDate.split('T')[0]
+                            $('#preferredDate-issue-schedule-input').val(formattedDate);
+                            $('#timeWindow-issue-schedule-select').val(timeWindow)
+
+                            $('#issue-schedule-modal-schedule-information').html(`<div class="col-12">
+                                <strong>Schedule Information:<span class="text-success">Scheduled (<span id="issue-schedule-modal-notes">${formattedDate} - ${timeWindow}</span>)</span></strong>
+                                
+                            </div>`);
+
+                        } else {
+                            $('#issue-schedule-modal-schedule-information').html(`<div class="col-12">
+                                <strong>Schedule Information:<span class="text-danger text-sm"> Not Scheduled</span></strong>
+                                <span id="issue-schedule-modal-notes"></span>
+                            </div>`);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log('Issue schedule error:', xhr);
+                    }
+                });
+            }
+
+        function openAssignTechnicianModal(issueData) {
+                // Populate modal with issue data
+                $('#assign-issue-id').val(issueData.human_readable_id);
+                $('#assign-modal-issue-id').text(issueData.human_readable_id);
+                $('#assign-modal-priority').html(`<span class="badge status-badge status-${issueData.priority}">${issueData.priority}</span>`);
+                $('#assign-modal-problem').text(issueData.problemDescription || 'No description available');
+
+                // Reset form
+                $('#assignTechnicianForm')[0].reset();
+                $('#assign-issue-id').val(issueData.human_readable_id);
+                console.log('issueData', issueData);
+                // Load technicians for this service category
+                loadTechniciansForIssue(issueData.serviceCategoryId);
+
+                // Show the modal
+                $('#assignTechnicianModal').modal('show');
+            }
+
+        function loadTechniciansForIssue(serviceCategoryId) {
+                $('#technicianSelect').html('<option value="">Loading technicians...</option>');
+
+                console.log('Loading technicians for service category:', serviceCategoryId._id);
+
+                // Check if serviceCategoryId is valid
+                if (!serviceCategoryId) {
+                    $('#technicianSelect').html('<option value="">No service category specified</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: `/get-technicians-to-assign/${serviceCategoryId}`,
+                    method: 'GET',
+                    success: function (response) {
+                        console.log('Technicians response:', response);
+
+                        if (response.success && response.data && response.data.length > 0) {
+                            let options = '<option value="">Select a technician...</option>';
+
+                            response.data.forEach(function (item) {
+                                if (item.technician) {
+                                    const tech = item.technician;
+                                    options += `<option value="${tech._id}">${tech.firstName} ${tech.lastName} - ${tech.phone}</option>`;
+                                }
+                            });
+
+                            $('#technicianSelect').html(options);
+                            console.log('Loaded', response.data.length, 'technicians');
+                        } else {
+                            console.log('No technicians found or invalid response');
+                            $('#technicianSelect').html('<option value="">No technicians available for this service</option>');
+                        }
+                    },
+                    error: function () {
+                        $('#technicianSelect').html('<option value="">Error loading technicians</option>');
+                        showNotification('Error loading technicians', 'error');
+                    }
+                });
+            }
+        
         // Initialize tooltips and other Bootstrap components
         $(document).ready(function () {
             // Initialize tooltips
@@ -857,7 +1142,105 @@
                     }, 1000);
                 }
             });
+            
 
+            $(document).on('click', '#schedule-visit-btn', function (e) {
+                e.preventDefault();
+                const issueData = $(this).data('issue-id');
+                $.ajax({
+                    url: `/get-issue-details/${issueData}`,
+                    type: 'GET',
+                    success: function (response) {
+                        console.log('response', response);
+                        openIssueScheduleModal(response.data);
+                    }
+                })
+            });
+
+            $(document).on('click', '#confirmAssignBtn', function () {
+                const form = $('#assignTechnicianForm');
+                const issueId = $('#assign-issue-id').val();
+                const technicianId = $('#technicianSelect').val();
+                const notes = $('#assignmentNotes').val();
+                const priority = $('#priorityOverride').val();
+
+                if (!technicianId) {
+                    showNotification('Please select a technician', 'error');
+                    return;
+                }
+
+                // Disable button and show loading
+                $('#confirmAssignBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Assigning...');
+
+                $.ajax({
+                    url: `/assign-issue-to-technician/${issueId}`,
+                    method: 'POST',
+                    data: {
+                        technicianId: technicianId,
+                        notes: notes,
+                        priority: priority || undefined
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification('Technician assigned successfully!', 'success');
+                            $('#assignTechnicianModal').modal('hide');
+
+                            // Update the UI to show assignment
+
+                            // Optionally reload the page to reflect changes
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showNotification(response.message || 'Assignment failed', 'error');
+                        }
+                    },
+                    error: function (xhr) {
+                        const response = xhr.responseJSON;
+                        showNotification(response?.message || 'Assignment failed', 'error');
+                        $('#assignTechnicianModal').modal('hide');
+                    },
+                    complete: function () {
+                        $('#confirmAssignBtn').prop('disabled', false).html('<i class="fas fa-user-plus"></i> Assign Technician');
+                    }
+                });
+            });
+
+            $(document).on('click', '#assign-technician-btn', function (e) {
+                    e.preventDefault();
+                    const issueData = $(this).data('issue-id');
+                    $.ajax({
+                        url: `/get-issue-details/${issueData}`,
+                        type: 'GET',
+                        success: function (response) {
+                            console.log('response', response);
+                            openAssignTechnicianModal(response.data);
+                        }
+                    })
+            })
+
+            $('#issue-schedule-form').on('submit', function (e) {
+                e.preventDefault()
+                $.ajax({
+                    url: '/change-schedule',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification('Issue scheduled successfully','success')
+                            $('#issue_schedule_modal').modal('hide')
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        }
+                    },
+                    error: function (xhr, status, err) {
+                        const response = xhr.responseJSON;
+                        showNotification(response?.message || 'Schedule failed', 'error');
+                    }
+                })
+            })
+            // Handle assignment confirmation
             // Auto-refresh functionality (optional)
             // Uncomment if you want auto-refresh every 30 seconds
             // setInterval(function() {

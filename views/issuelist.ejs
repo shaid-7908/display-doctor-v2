@@ -1108,6 +1108,7 @@
                 error: function (xhr) {
                     const response = xhr.responseJSON;
                     showNotification(response?.message || 'Assignment failed', 'error');
+                    $('#assignTechnicianModal').modal('hide');
                 },
                 complete: function () {
                     $('#confirmAssignBtn').prop('disabled', false).html('<i class="fas fa-user-plus"></i> Assign Technician');
@@ -1115,6 +1116,7 @@
             });
         });
 
+        
         function updateAssignmentInTable(issueId, assignmentData) {
             // Find the row and update the "Assigned To" column
             $('table tbody tr').each(function () {
