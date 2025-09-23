@@ -1,0 +1,143 @@
+/* Search Results Styling */
+.search-results-container {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+    background-color: #f8f9fc;
+}
+
+.search-result-item {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: white;
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.search-result-item:hover {
+    background: #f8f9fc;
+    border-color: #4e73df;
+    transform: translateY(-1px);
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    text-decoration: none;
+    color: inherit;
+}
+
+.search-result-title {
+    font-weight: 600;
+    color: #5a5c69;
+    margin-bottom: 0.25rem;
+}
+
+.search-result-meta {
+    font-size: 0.875rem;
+    color: #858796;
+    margin-bottom: 0.25rem;
+}
+
+.search-result-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.35rem;
+    text-transform: uppercase;
+}
+
+.status-new {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-assigned {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-in-progress {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.status-resolved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-scheduled {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.invoice-status-paid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.invoice-status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.invoice-status-overdue {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.search-empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #858796;
+}
+
+.search-empty-state i {
+    opacity: 0.5;
+    margin-bottom: 0.5rem;
+}
+
+.search-loading {
+    text-align: center;
+    padding: 1rem;
+    color: #858796;
+}
+
+.border-right {
+    border-right: 1px solid #e3e6f0 !important;
+}
+
+@media (max-width: 768px) {
+    .border-right {
+        border-right: none !important;
+        border-bottom: 1px solid #e3e6f0;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animation for showing/hiding results */
+#results {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

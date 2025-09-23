@@ -369,6 +369,7 @@
                                     }
                                 }
     </style>
+    <link href="/css/search-result.css" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -385,78 +386,9 @@
                 <div id="content">
 
                     <!-- Topbar -->
-                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-                        <!-- Sidebar Toggle (Topbar) -->
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
-
-                        <!-- Topbar Search -->
-                        <form
-                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                            <div class="input-group">
-                                <input type="text" id="overall-search" class="form-control bg-light border-0 small"
-                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button">
-                                        <i class="fas fa-search fa-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <!-- Topbar Navbar -->
-                        <%- include("common/topnavbar") %>
-
-                    </nav>
+                    <%- include("common/topnavbar") %>
                     <div class="container-fluid">
-                        <div id="results" class="row" style="display: none;">
-                            <div class="col-md-12 mb-4">
-                                <div class="card border-left-primary shadow h-100 py-2">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h6 class="m-0 font-weight-bold text-primary">Search Results</h6>
-                                        <button type="button" class="btn btn-sm btn-light" id="close-search-results">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="border-right pr-3">
-                                                    <div class="d-flex align-items-center mb-3">
-                                                        <i class="fas fa-ticket-alt text-primary mr-2"></i>
-                                                        <h6 class="m-0 font-weight-bold text-dark">Issues</h6>
-                                                        <span class="badge badge-primary ml-2" id="issues-count">0</span>
-                                                    </div>
-                                                    <div id="issues-results-from-search" class="search-results-container">
-                                                        <div class="text-muted text-center py-3">
-                                                            <i class="fas fa-search fa-2x mb-2"></i>
-                                                            <p>No issues found</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="pl-3">
-                                                    <div class="d-flex align-items-center mb-3">
-                                                        <i class="fas fa-file-invoice text-success mr-2"></i>
-                                                        <h6 class="m-0 font-weight-bold text-dark">Invoices</h6>
-                                                        <span class="badge badge-success ml-2" id="invoices-count">0</span>
-                                                    </div>
-                                                    <div id="invoices-results-from-search" class="search-results-container">
-                                                        <div class="text-muted text-center py-3">
-                                                            <i class="fas fa-search fa-2x mb-2"></i>
-                                                            <p>No invoices found</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%- include("common/search-result-section") %>
                         <div class="row">
                             <div class="card shadow mb-4 col-md-12">
                                 <div class="card-header py-3">
@@ -636,6 +568,7 @@
     <!-- DataTables JavaScript -->
     <script src="/vendor/datatables/jquery.dataTables.js"></script>
     <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
+    <script src="/js/serach-functionality.js"></script>
     <script>
         let table
         const userRole = "<%= default_user.role %>";
@@ -1205,180 +1138,7 @@
             };
         }
     </script>
-    <script>
-        let typingTimer;
-        let debounceTime = 500;
-        $(document).ready(function () {
-
-            $('#overall-search').on('input', function () {
-                clearTimeout(typingTimer); // reset timer
-                let query = $(this).val().trim();
-
-                typingTimer = setTimeout(function () {
-                    if (query.length > 0) {
-                        // Show loading state
-                        showLoadingState();
-                        $('#results').show();
-
-                        // Make AJAX request
-                        $.ajax({
-                            url: '/search', // your backend route
-                            method: 'GET',
-                            data: { q: query },
-                            success: function (response) {
-                                const data = response.data;
-                                renderSearchResults(data);
-                            },
-                            error: function (xhr, status, error) {
-                                console.error('Search error:', error);
-                                showErrorState();
-                            }
-                        });
-                    } else {
-                        $('#results').hide();
-                        clearSearchResults();
-                    }
-                }, debounceTime);
-            })
-
-            // Close search results
-            $(document).on('click', '#close-search-results', function () {
-                $('#results').hide();
-                $('#overall-search').val('');
-                clearSearchResults();
-            });
-
-            function showLoadingState() {
-                $('#issues-results-from-search').html(`
-                        <div class="search-loading">
-                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
-                            <p>Searching...</p>
-                        </div>
-                    `);
-                $('#invoices-results-from-search').html(`
-                        <div class="search-loading">
-                            <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
-                            <p>Searching...</p>
-                        </div>
-                    `);
-                $('#issues-count').text('...');
-                $('#invoices-count').text('...');
-            }
-
-            function showErrorState() {
-                $('#issues-results-from-search').html(`
-                        <div class="search-empty-state">
-                            <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
-                            <p>Error occurred while searching</p>
-                        </div>
-                    `);
-                $('#invoices-results-from-search').html(`
-                        <div class="search-empty-state">
-                            <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
-                            <p>Error occurred while searching</p>
-                        </div>
-                    `);
-            }
-
-            function clearSearchResults() {
-                $('#issues-results-from-search').html(`
-                        <div class="search-empty-state">
-                            <i class="fas fa-search fa-2x mb-2"></i>
-                            <p>No issues found</p>
-                        </div>
-                    `);
-                $('#invoices-results-from-search').html(`
-                        <div class="search-empty-state">
-                            <i class="fas fa-search fa-2x mb-2"></i>
-                            <p>No invoices found</p>
-                        </div>
-                    `);
-                $('#issues-count').text('0');
-                $('#invoices-count').text('0');
-            }
-
-            function renderSearchResults(data) {
-                // Render Issues
-                if (data?.issues?.length > 0) {
-                    let issuesHtml = '';
-                    data.issues.forEach(issue => {
-                        const statusClass = `status-${issue.status.replace(/_/g, '-')}`;
-                        const createdDate = new Date(issue.createdAt).toLocaleDateString();
-
-                        issuesHtml += `
-                                <a href="/issue/${issue.human_readable_id}" class="search-result-item">
-                                    <div class="search-result-title">
-                                        <i class="fas fa-ticket-alt mr-2"></i>
-                                        ${issue.human_readable_id}
-                                    </div>
-                                    <div class="search-result-meta">
-                                        <strong>Customer:</strong> ${issue.contact?.name || 'N/A'}
-                                    </div>
-                                    <div class="search-result-meta">
-                                        <strong>Problem:</strong> ${issue.problemDescription?.substring(0, 60)}${issue.problemDescription?.length > 60 ? '...' : ''}
-                                    </div>
-                                    <div class="search-result-meta">
-                                        <strong>Created:</strong> ${createdDate}
-                                        <span class="search-result-status ${statusClass} ml-2">${issue.status}</span>
-                                    </div>
-                                </a>
-                            `;
-                    });
-                    $('#issues-results-from-search').html(issuesHtml);
-                    $('#issues-count').text(data.issues.length);
-                } else {
-                    $('#issues-results-from-search').html(`
-                            <div class="search-empty-state">
-                                <i class="fas fa-search fa-2x mb-2"></i>
-                                <p>No issues found</p>
-                            </div>
-                        `);
-                    $('#issues-count').text('0');
-                }
-
-                // Render Invoices
-                if (data?.invoices?.length > 0) {
-                    let invoicesHtml = '';
-                    data.invoices.forEach(invoice => {
-                        const statusClass = `invoice-status-${invoice.status}`;
-                        const invoiceDate = new Date(invoice.invoiceDate).toLocaleDateString();
-                        const amount = invoice.finalAmount || 0;
-
-                        invoicesHtml += `
-                                <a href="/invoice/${invoice.human_readable_invoice_id}" class="search-result-item">
-                                    <div class="search-result-title">
-                                        <i class="fas fa-file-invoice mr-2"></i>
-                                        ${invoice.human_readable_invoice_id || invoice.human_readable_issue_id}
-                                    </div>
-                                    <div class="search-result-meta">
-                                        <strong>Customer:</strong> ${invoice.customerName || 'N/A'}
-                                    </div>
-                                    <div class="search-result-meta">
-                                        <strong>Amount:</strong> ₹${amount.toLocaleString()}
-                                    </div>
-                                    <div class="search-result-meta">
-                                        <strong>Date:</strong> ${invoiceDate}
-                                        <span class="search-result-status ${statusClass} ml-2">${invoice.status}</span>
-                                    </div>
-                                </a>
-                            `;
-                    });
-                    $('#invoices-results-from-search').html(invoicesHtml);
-                    $('#invoices-count').text(data.invoices.length);
-                } else {
-                    $('#invoices-results-from-search').html(`
-                            <div class="search-empty-state">
-                                <i class="fas fa-search fa-2x mb-2"></i>
-                                <p>No invoices found</p>
-                            </div>
-                        `);
-                    $('#invoices-count').text('0');
-                }
-            }
-
-
-        })
-    </script>
+    
 </body>
 
 </html>
