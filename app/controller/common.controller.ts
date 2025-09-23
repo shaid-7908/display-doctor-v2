@@ -803,7 +803,7 @@ class CommonController {
 
         // Render the invoice HTML
         const html = await new Promise((resolve, reject) => {
-          res.render("invoice", {
+          res.render("invoice-downloader-page", {
             invoice: formattedInvoiceData,
             default_user: req.user
           }, (err, html) => {
