@@ -608,6 +608,88 @@
             </div>
         </div>
     </div>
+    <!--Issue Report Modal for technician-->
+    
+    <div class="modal fade" id="issueReportModalForTechnician" tabindex="-1" aria-labelledby="issueReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered">
+            <div class="modal-content">
+    
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="issueReportModalLabel">Issue Report</h5>
+                    <button type="button" id="issueReportModal-close-btn" class="close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+    
+                <!-- Body -->
+                <div class="modal-body">
+                    <form id="issueReportForm">
+    
+                        <!-- Issue ID -->
+                        <div class="mb-3">
+                            <label class="form-label">Issue ID :<strong id="report-issue-human-redable-id"></strong></label>
+                            <input type="hidden" class="form-control" name="issue_id" id="report-issue-id"
+                                placeholder="Enter Issue ID" required>
+                            <input type="hidden" id="repost-service-issue-id" name="serviceCategoryId">
+                            <input type="hidden" name="issue_human_redable_id" id="issue_human_redable_id">
+                        </div>
+    
+    
+                        <!-- Device Type -->
+                        <div class="mb-3">
+                            <label class="form-label">Device Type</label>
+                            <input type="text" class="form-control" name="deviceType" value="tv">
+                        </div>
+    
+                        <!-- Device Model Number -->
+                        <div class="mb-3">
+                            <label class="form-label">Device Model Number</label>
+                            <input type="text" class="form-control" name="deviceModelNumber"
+                                placeholder="Enter Model Number">
+                        </div>
+    
+                        <!-- Device Name -->
+                        <div class="mb-3">
+                            <label class="form-label">Device Name</label>
+                            <input type="text" class="form-control" name="deviceName" placeholder="Enter Device Name">
+                        </div>
+    
+                        <!-- Technician Notes -->
+                        <div class="mb-3">
+                            <label class="form-label">Technician Note</label>
+                            <textarea class="form-control" name="techNote" rows="3"
+                                placeholder="Enter technician notes"></textarea>
+                        </div>
+    
+                        <!-- Required Parts -->
+                        <div class="mb-3">
+                            <label class="form-label">Required Parts</label>
+                            <textarea type="text" class="form-control" name="requiredParts" rows="3"
+                                placeholder="Enter required parts"></textarea>
+                        </div>
+    
+                        <!-- Budget Estimation -->
+                        <div class="mb-3">
+                            <label class="form-label">Budget Estimation</label>
+                            <input type="number" class="form-control" name="budgetEstimation"
+                                placeholder="Enter budget estimation">
+                        </div>
+    
+                    </form>
+                </div>
+    
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="close-issue-report-modal-btn"
+                        data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="issueReportForm" class="btn btn-primary">Save Report</button>
+                </div>
+    
+            </div>
+        </div>
+    </div>
 
 
 
@@ -1215,6 +1297,51 @@
                     }
                 })
             })
+
+            $(document).on('click', '.report-issue-btn', function (e) {
+                e.preventDefault()
+                const issueId = $(this).data('issue-id')
+                const serviceId = $(this).data('service-id')
+                const human_readable_id = $(this).data('human-redable-id')
+                $('#issueReportModalForTechnician').modal('show')
+                $('#report-issue-id').val(issueId)
+                $('#report-issue-human-redable-id').text(human_readable_id)
+                $('#issue_human_redable_id').val(human_readable_id)
+                $('#repost-service-issue-id').val(serviceId)
+            }) 
+
+            $('#issueReportModal-close-btn').on('click', function (e) {
+                e.preventDefault()
+                $('#issueReportModal').modal('hide')
+            })
+
+            $('#close-issue-report-modal-btn').on('click', function (e) {
+                e.preventDefault()
+                $('#issueReportModal').modal('hide')
+            })
+          
+
+            $('#issueReportForm').on('submit', function (e) {
+                e.preventDefault()
+                $.ajax({
+                    url: '/technician/generate-issue-report',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification('Issue report submitted successfully', 'success')
+                            $('#issueReportModalForTechnician').modal('hide')
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.log(xhr)
+                    }
+                })
+            })
+            
         });
     </script>
     <script>
