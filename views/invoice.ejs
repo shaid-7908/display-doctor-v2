@@ -319,15 +319,15 @@
                                 <!-- Company Header -->
                                 <div class="invoice-header">
                                     <div class="company-name">
-                                        <%= invoice.companyName %>
+                                        Display Doctor
                                     </div>
                                     <div class="company-details">
                                         <div>
-                                            <%= invoice.companyAddress %>
+                                            123, Main Street, Anytown, USA
                                         </div>
-                                        <div>Phone: <%= invoice.companyPhone %> | Email: <%= invoice.companyEmail %>
+                                        <div>Phone: +1-800-EMERGENCY | Email: support@emergencyresponse.com
                                         </div>
-                                        <div>GST No: <%= invoice.companyGST %>
+                                        <div>GST No: 9900022344
                                         </div>
                                     </div>
                                 </div>
@@ -538,10 +538,10 @@
                                                                 Technician
                                                             </h6>
                                                             <div class="customer-name">
-                                                                <%= invoice.technicianName %>
+                                                                <%= invoice.technician.firstName %> <%= invoice.technician.lastName %>
                                                             </div>
                                                             <div class="text-muted">
-                                                                <%= invoice.technicianTitle %>
+                                                                <%= invoice.technician.phone %>(<%= invoice.technician.email %>)
                                                             </div>
                                                         </div>
                                                     </div>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Warranty Checker - Display Doctor</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for warranty checker -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .warranty-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .warranty-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .warranty-header {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .warranty-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .warranty-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .warranty-body {
+            padding: 40px 30px;
+        }
+
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-form {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #e3e6f0;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #858796;
+            font-size: 1.2rem;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            margin-top: 20px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 115, 223, 0.3);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-right: 8px;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .warranty-result-card {
+            background: #f8f9fc;
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 5px solid #4e73df;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .result-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 20px;
+        }
+
+        .result-title {
+            flex: 1;
+        }
+
+        .result-title h3 {
+            margin: 0;
+            color: #2e2e2e;
+            font-weight: 700;
+        }
+
+        .result-title span {
+            color: #858796;
+            font-size: 0.9rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section h5 {
+            color: #4e73df;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-section h5 i {
+            margin-right: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 12px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #5a5c69;
+            min-width: 120px;
+            margin-right: 10px;
+        }
+
+        .info-value {
+            flex: 1;
+            color: #2e2e2e;
+        }
+
+        .warranty-status {
+            text-align: center;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .warranty-valid {
+            background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+            color: white;
+        }
+
+        .warranty-expired {
+            background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .warranty-status h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .warranty-status p {
+            margin: 8px 0 0 0;
+            opacity: 0.9;
+        }
+
+        .badge-custom {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #1cc88a;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #f6c23e;
+            color: #2e2e2e;
+        }
+
+        .badge-danger {
+            background: #e74a3b;
+            color: white;
+        }
+
+        .badge-info {
+            background: #36b9cc;
+            color: white;
+        }
+
+        .error-section {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: #e74a3b;
+            margin-bottom: 20px;
+        }
+
+        .error-section h4 {
+            color: #e74a3b;
+            margin-bottom: 15px;
+        }
+
+        .error-section p {
+            color: #858796;
+            margin-bottom: 25px;
+        }
+
+        .retry-btn {
+            background: #e74a3b;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .warranty-header {
+                padding: 30px 20px;
+            }
+
+            .warranty-header h1 {
+                font-size: 2rem;
+            }
+
+            .warranty-body {
+                padding: 30px 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .info-item {
+                flex-direction: column;
+            }
+
+            .info-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="warranty-container">
+        <div class="warranty-card">
+            <!-- Header Section -->
+            <div class="warranty-header">
+                <h1><i class="fas fa-shield-alt mr-3"></i>Warranty Checker</h1>
+                <p>Check your device warranty status using Issue ID or Invoice ID</p>
+            </div>
+
+            <!-- Body Section -->
+            <div class="warranty-body">
+                <!-- Search Section -->
+                <div class="search-section">
+                    <form id="warrantySearchForm" class="search-form">
+                        <div class="position-relative">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchInput" class="search-input"
+                                placeholder="Enter Issue ID (e.g., ISS2500001) or Invoice ID (e.g., INV2500001)"
+                                required>
+                        </div>
+                        <button type="submit" id="searchBtn" class="search-btn">
+                            <i class="loading-spinner fas fa-spinner fa-spin"></i>
+                            <span class="btn-text">Check Warranty Status</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section" id="resultsSection">
+                    <div class="warranty-result-card">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <div class="result-title">
+                                <h3 id="resultTitle">Warranty Information</h3>
+                                <span id="resultSubtitle">Details for your device</span>
+                            </div>
+                        </div>
+
+                        <div class="info-grid">
+                            <!-- Invoice Information -->
+                            <div class="info-section">
+                                <h5><i class="fas fa-receipt"></i>Invoice Details</h5>
+                                <div class="info-item">
+                                    <div class="info-label">Invoice ID:</div>
+                                    <div class="info-value" id="invoiceId">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Issue ID:</div>
+                                    <div class="info-value" id="issueId">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Invoice Date:</div>
+                                    <div class="info-value" id="invoiceDate">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Total Amount:</div>
+                                    <div class="info-value" id="totalAmount">-</div>
+                                </div>
+                            </div>
+
+                            <!-- Device Information -->
+                            <div class="info-section">
+                                <h5><i class="fas fa-laptop"></i>Device Details</h5>
+                                <div class="info-item">
+                                    <div class="info-label">Device Type:</div>
+                                    <div class="info-value" id="deviceType">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Device Name:</div>
+                                    <div class="info-value" id="deviceName">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Model Number:</div>
+                                    <div class="info-value" id="modelNumber">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Service Date:</div>
+                                    <div class="info-value" id="serviceDate">-</div>
+                                </div>
+                            </div>
+
+                            <!-- Customer Information -->
+                            <div class="info-section">
+                                <h5><i class="fas fa-user"></i>Customer Details</h5>
+                                <div class="info-item">
+                                    <div class="info-label">Name:</div>
+                                    <div class="info-value" id="customerName">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Phone:</div>
+                                    <div class="info-value" id="customerPhone">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Email:</div>
+                                    <div class="info-value" id="customerEmail">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Address:</div>
+                                    <div class="info-value" id="customerAddress">-</div>
+                                </div>
+                            </div>
+
+                            <!-- Technician Information -->
+                            <div class="info-section">
+                                <h5><i class="fas fa-tools"></i>Service Details</h5>
+                                <div class="info-item">
+                                    <div class="info-label">Technician:</div>
+                                    <div class="info-value" id="technicianName">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Contact:</div>
+                                    <div class="info-value" id="technicianPhone">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Parts Used:</div>
+                                    <div class="info-value" id="partsUsed">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Service Status:</div>
+                                    <div class="info-value" id="serviceStatus">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Warranty Status -->
+                        <div class="warranty-status" id="warrantyStatus">
+                            <h4 id="warrantyTitle">Checking Warranty Status...</h4>
+                            <p id="warrantyMessage">Please wait while we verify your warranty information.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Section -->
+                <div class="error-section" id="errorSection">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4>No Records Found</h4>
+                    <p id="errorMessage">We couldn't find any warranty information for the provided ID. Please check
+                        your ID and try again.</p>
+                    <button type="button" class="retry-btn" onclick="resetSearch()">
+                        <i class="fas fa-redo mr-2"></i>Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#warrantySearchForm').on('submit', function (e) {
+                e.preventDefault();
+                searchWarranty();
+            });
+
+            // Auto-format input for better UX
+            $('#searchInput').on('input', function () {
+                let value = $(this).val().toUpperCase();
+                $(this).val(value);
+            });
+        });
+
+        function searchWarranty() {
+            const searchId = $('#searchInput').val().trim();
+
+            if (!searchId) {
+                alert('Please enter an Issue ID or Invoice ID');
+                return;
+            }
+
+            // Show loading state
+            setLoadingState(true);
+            hideAllSections();
+
+            // Make API call
+            $.ajax({
+                url: `/get-warrenty-info/${searchId}`,
+                method: 'GET',
+                success: function (response) {
+                    if (response.success && response.data) {
+                        displayWarrantyInfo(response.data);
+                    } else {
+                        showError('No warranty information found for this ID.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    let errorMsg = 'Unable to fetch warranty information. Please try again.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+
+                    showError(errorMsg);
+                },
+                complete: function () {
+                    setLoadingState(false);
+                }
+            });
+        }
+
+        function displayWarrantyInfo(data) {
+            // Populate invoice information
+            $('#invoiceId').text(data.human_readable_invoice_id || '-');
+            $('#issueId').text(data.human_readable_issue_id || '-');
+            $('#invoiceDate').text(data.createdAt ? formatDate(data.createdAt) : '-');
+            $('#totalAmount').text(data.totalAmount ? `₹${data.totalAmount.toLocaleString()}` : '-');
+
+            // Populate device information
+            $('#deviceType').text(data.issue?.device?.type || '-');
+            $('#deviceName').text(data.deviceName || '-');
+            $('#modelNumber').text(data.deviceModelNumber || '-');
+            $('#serviceDate').text(data.issue?.createdAt ? formatDate(data.issue.createdAt) : '-');
+
+            // Populate customer information
+            $('#customerName').text(data.issue?.contact?.name || '-');
+            $('#customerPhone').text(data.issue?.contact?.phone || '-');
+            $('#customerEmail').text(data.issue?.contact?.email || '-');
+
+            const address = data.issue?.contact?.address;
+            if (address) {
+                const fullAddress = `${address.line1 || ''}, ${address.city || ''}, ${address.state || ''} - ${address.pinCode || ''}`;
+                $('#customerAddress').text(fullAddress);
+            } else {
+                $('#customerAddress').text('-');
+            }
+
+            // Populate technician information
+            $('#technicianName').text(data.technician ? `${data.technician.firstName} ${data.technician.lastName}` : '-');
+            $('#technicianPhone').text(data.technician?.phone || '-');
+            $('#partsUsed').text(data.partsUsed?.length > 0 ? data.partsUsed : 'No parts replaced');
+
+            // Service status with badge
+            const status = data.issue?.status || 'unknown';
+            $('#serviceStatus').html(`<span class="badge-custom badge-${getStatusColor(status)}">${status.toUpperCase()}</span>`);
+
+            // Calculate and display warranty status
+            displayWarrantyStatus(data);
+
+            // Update result title
+            $('#resultTitle').text(`Warranty Information - ${data.human_readable_invoice_id}`);
+            $('#resultSubtitle').text(`Device: ${data.deviceName || 'Unknown Device'}`);
+
+            // Show results
+            $('#resultsSection').fadeIn();
+        }
+
+        function displayWarrantyStatus(data) {
+            const serviceDate = new Date(data.issue?.createdAt);
+            const currentDate = new Date();
+            const warrantyPeriod = 365; // 1 year warranty in days
+            const warrantyEndDate = new Date(serviceDate);
+            warrantyEndDate.setDate(warrantyEndDate.getDate() + warrantyPeriod);
+
+            const daysRemaining = Math.ceil((warrantyEndDate - currentDate) / (1000 * 60 * 60 * 24));
+
+            let statusClass, title, message;
+
+            if (daysRemaining > 0) {
+                statusClass = 'warranty-valid';
+                title = '✓ Warranty Active';
+                message = `Your warranty is valid for ${daysRemaining} more days (until ${warrantyEndDate.toLocaleDateString()})`;
+            } else {
+                statusClass = 'warranty-expired';
+                title = '✗ Warranty Expired';
+                message = `Your warranty expired ${Math.abs(daysRemaining)} days ago (${warrantyEndDate.toLocaleDateString()})`;
+            }
+
+            $('#warrantyStatus').removeClass('warranty-valid warranty-expired').addClass(statusClass);
+            $('#warrantyTitle').text(title);
+            $('#warrantyMessage').text(message);
+        }
+
+        function showError(message) {
+            $('#errorMessage').text(message);
+            $('#errorSection').fadeIn();
+        }
+
+        function setLoadingState(loading) {
+            if (loading) {
+                $('#searchBtn').prop('disabled', true);
+                $('.loading-spinner').show();
+                $('.btn-text').text('Searching...');
+            } else {
+                $('#searchBtn').prop('disabled', false);
+                $('.loading-spinner').hide();
+                $('.btn-text').text('Check Warranty Status');
+            }
+        }
+
+        function hideAllSections() {
+            $('#resultsSection').hide();
+            $('#errorSection').hide();
+        }
+
+        function resetSearch() {
+            $('#searchInput').val('').focus();
+            hideAllSections();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'completed': return 'success';
+                case 'in-progress': return 'warning';
+                case 'new': return 'info';
+                case 'cancelled': return 'danger';
+                default: return 'warning';
+            }
+        }
+
+        // Enter key support for better UX
+        $('#searchInput').on('keypress', function (e) {
+            if (e.which === 13) {
+                searchWarranty();
+            }
+        });
+    </script>
+</body>
+
+</html>

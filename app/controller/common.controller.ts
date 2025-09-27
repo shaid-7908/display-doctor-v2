@@ -604,10 +604,41 @@ class CommonController {
   // Render invoice page with hardcoded data
   renderInvoicePage = asyncHandler(async (req: Request, res: Response) => {
     const invoice_id = req.params.id;
-    const invoiceData = await InvoiceModel.findOne({ human_readable_invoice_id: invoice_id })
+    const invoiceData = await InvoiceModel.aggregate([
+      {$match:{'human_readable_invoice_id':invoice_id}},
+      {
+        $lookup: {
+          from: "issues",
+          localField: "human_readable_issue_id",
+          foreignField: "human_readable_id",
+          as: "issue"
+        }
+      },
+      { $unwind: "$issue" },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'issue.assignment.technicianId',
+          foreignField: '_id',
+          as: 'technician'
+        }
+      },
+      { $unwind: "$technician" },
+      {
+        $project: {
+          "technician.password": 0,
+          "technician.isVerified": 0,
+          "technician.status": 0,
+          "technician.createdAt": 0,
+          "technician.updatedAt": 0,
+          "technician.role": 0,
+          "technician.dateOfBirth": 0,
+        }
+      }
+    ])
     console.log(invoiceData)
     res.render("invoice", {
-      invoice: invoiceData,
+      invoice: invoiceData[0],
       default_user: req.user
     });
   });
@@ -1328,6 +1359,47 @@ class CommonController {
     return sendSuccess(res, "Search results", { issues, invoices }, STATUS_CODES.OK);
 
   })
+
+  getWarrentyInfo = asyncHandler(async (req: Request, res: Response)=>{
+    const id  = req.params.id
+    const fullData = await InvoiceModel.aggregate([
+      {$match:{$or:[{'human_readable_invoice_id':id},{'human_readable_issue_id':id}]}},
+      {
+        $lookup: {
+          from: "issues",
+          localField: "issueId",
+          foreignField: "_id",
+          as: "issue"
+        }
+      },
+      { $unwind: "$issue" },
+      {$lookup:{
+        from:'users',
+        localField: 'issue.assignment.technicianId',
+        foreignField: '_id',
+        as: 'technician'
+      }
+      },
+      { $unwind: "$technician" },
+      {
+        $project: {
+          "technician.password": 0,
+          "technician.isVerified": 0,
+          "technician.status": 0,
+          "technician.createdAt": 0,
+          "technician.updatedAt": 0,
+          "technician.role": 0,
+          "technician.dateOfBirth": 0,
+        }
+      }
+    ])
+    return sendSuccess(res, "Warrenty info", fullData[0], STATUS_CODES.OK);
+  })
+  renderWarrentyCheckerPage = asyncHandler(async (req: Request, res: Response)=>{
+
+    res.render("warrenty-checker");
+  })
+
 }
 
 const commonController = new CommonController();

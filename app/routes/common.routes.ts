@@ -51,4 +51,8 @@ commonRouter.get("/get-recent-pending-reports", authChecker, roleChecker(["techn
 commonRouter.get("/get-issue-report-details-modal/:id", authChecker, roleChecker(["technician", "admin", "caller"]), commonController.getIssueReportDetailsForModal);
 commonRouter.get("/issue/:id", authChecker, roleChecker(["caller", "admin", "technician"]), commonController.renderIssue);
 
+
+//Public Routes
+commonRouter.get("/get-warrenty-info/:id", commonController.getWarrentyInfo);
+commonRouter.get("/warrenty-checker", commonController.renderWarrentyCheckerPage);
 export default commonRouter;

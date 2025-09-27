@@ -4,10 +4,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "build:clean": "rm -rf dist && tsc",
+    "build:prod": "npm run build:clean && npm run copy-assets",
+    "copy-assets": "mkdir -p dist/views dist/public dist/uploads && cp -r views/* dist/views && cp -r public/* dist/public && [ -d uploads ] && cp -r uploads/* dist/uploads || true",
+    "start": "node dist/server.js",
+    "start:prod": "NODE_ENV=production node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -49,6 +52,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "puppeteer": "^24.20.0",
+    "rimraf": "^6.0.1",
     "zod": "^3.25.7"
   }
 }
