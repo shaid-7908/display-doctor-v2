@@ -70,7 +70,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDB(); // Connect to MongoDB
-    app.listen(envConfig.PORT, () => {
+    app.listen(Number(envConfig.PORT),"0.0.0.0", () => {
       console.log(`✅ Server running on http://localhost:${envConfig.PORT}`);
     });
   } catch (err) {
