@@ -19,6 +19,9 @@ adminRouter.get("/create-specialization", authChecker, roleChecker(["admin"]), s
 adminRouter.get("/technician-list", authChecker, roleChecker(["admin","caller"]), adminController.renderTechnicianList);
 adminRouter.patch("/deactivate-technician/:id", authChecker, roleChecker(["admin"]), adminController.deactivateTechnician);
 adminRouter.patch("/reactivate-technician/:id", authChecker, roleChecker(["admin"]), adminController.reactivateTechnician);
+adminRouter.get("/edit-technician/:id", authChecker, roleChecker(["admin"]), adminController.renderEditTechnicianPage);
+adminRouter.put("/edit-technician/:id", authChecker, roleChecker(["admin"]), adminController.updateTechnician);
+adminRouter.get("/get-technician-service-info/:id", authChecker, roleChecker(["admin"]), adminController.getTechnicianServiceInfo);
 //skill routes
 adminRouter.get("/create-skill", authChecker, roleChecker(["admin"]), adminController.renderCreateSkill);
 adminRouter.post("/create-skill", authChecker, roleChecker(["admin"]), adminController.createSkill);

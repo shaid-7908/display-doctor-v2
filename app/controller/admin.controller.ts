@@ -416,6 +416,140 @@ class AdminController {
         return sendSuccess(res, "Technician status changed successfully", null, STATUS_CODES.OK);
     })
 
+    renderEditTechnicianPage = asyncHandler(async (req: Request, res: Response)=>{
+
+        const technician_id = req.params.id
+
+        const technician_details = await TechnicianToServiceModel.aggregate([
+            {$match:{human_redable_id:technician_id}},
+            {$lookup:{
+                from:'users',
+                localField:'technicianId',
+                foreignField:'_id',
+                as:'technicianDetails'
+            }},
+            {$unwind:'$technicianDetails'},
+            {$lookup:{
+                from:'address_proofs',
+                localField:'technicianId',
+                foreignField:'userId',
+                as:'address_proof'
+            }},
+            {$unwind:'$address_proof'},
+            {$project:{
+                'technicianDetails.password':0
+            }}
+        ])
+        res.render("edit-technician-page", { default_user: req.user ,technician:technician_details[0] })
+
+    })
+
+    updateTechnician = asyncHandler(async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const { 
+            firstName, 
+            lastName, 
+            email, 
+            phone, 
+            dateOfBirth, 
+            aadhaarNumber, 
+            city, 
+            state, 
+            pinCode, 
+            fatherName, 
+            addressLine1, 
+            status 
+        } = req.body;
+
+        try {
+            // Find the technician by human_readable_id
+            const technicianToService = await TechnicianToServiceModel.findOne({ human_redable_id: id });
+            if (!technicianToService) {
+                return sendError(res, "Technician not found", null, STATUS_CODES.NOT_FOUND);
+            }
+
+            // Update user details
+            const updatedUser = await UserModel.findByIdAndUpdate(
+                technicianToService.technicianId,
+                {
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    dateOfBirth: dateOfBirth || null,
+                    status
+                },
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                return sendError(res, "User not found", null, STATUS_CODES.NOT_FOUND);
+            }
+
+            // Update address proof details
+            await AddressProofModel.findOneAndUpdate(
+                { userId: technicianToService.technicianId },
+                {
+                    adhar_number: aadhaarNumber,
+                    city,
+                    state,
+                    pin_code: pinCode,
+                    son_or_daughter_of: fatherName,
+                    address_line_1: addressLine1
+                },
+                { new: true }
+            );
+
+            return sendSuccess(res, "Technician updated successfully", null, STATUS_CODES.OK);
+
+        } catch (error) {
+            console.error("Error updating technician:", error);
+            return sendError(res, "Failed to update technician", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+        }
+    })
+
+    getTechnicianServiceInfo = asyncHandler(async (req: Request, res: Response) => {
+        const { id } = req.params;
+
+        try {
+            const technicianServiceInfo = await TechnicianToServiceModel.aggregate([
+                { $match: { human_redable_id: id } },
+                {
+                    $lookup: {
+                        from: 'servicecategories',
+                        localField: 'parent_serviceId',
+                        foreignField: '_id',
+                        as: 'serviceCategory'
+                    }
+                },
+                { $unwind: '$serviceCategory' },
+                {
+                    $lookup: {
+                        from: 'servicesubcategories',
+                        localField: 'sub_serviceId',
+                        foreignField: '_id',
+                        as: 'subCategories'
+                    }
+                }
+            ]);
+
+            if (!technicianServiceInfo || technicianServiceInfo.length === 0) {
+                return sendError(res, "Technician service information not found", null, STATUS_CODES.NOT_FOUND);
+            }
+
+            const data = {
+                serviceCategory: technicianServiceInfo[0].serviceCategory,
+                subCategories: technicianServiceInfo[0].subCategories
+            };
+
+            return sendSuccess(res, "Service information retrieved successfully", data, STATUS_CODES.OK);
+
+        } catch (error) {
+            console.error("Error fetching technician service info:", error);
+            return sendError(res, "Failed to fetch service information", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
+        }
+    })
+
 }
 
 const adminController = new AdminController();

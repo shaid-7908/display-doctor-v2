@@ -216,7 +216,7 @@
                 let dataText = "-"
                 if (submittedOn) dataText = submittedOn.toLocaleDateString()
                 table.row.add([
-                    `<a href='/issue-details/${issueReport.issue_id}'>${issueReport.issue_human_redable_id || "-"}</a>`,
+                    `<a href='/full-issue-details/${issueReport.issue_human_redable_id}'>${issueReport.issue_human_redable_id || "-"}</a>`,
                     `<div>${issueReport.is_approved ? "<span class='btn btn-outline-success'>Approved</span>" : "<span class='btn btn-outline-warning btn-sm'>Pending</span>"}</div>`,
                     `${issueReport.finalQuotation === 0 ? issueReport.initialQuotation : issueReport.finalQuotation}`,
                     `${quotationTypeIndicator}`,

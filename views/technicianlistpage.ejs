@@ -290,10 +290,10 @@
                                                                         <i class="fas fa-eye"></i>
                                                                     </button>
                                                                     <% if(default_user.role==="admin" ){ %>
-                                                                        <button type="button"
+                                                                        <a href="/edit-technician/<%= technician.technicianToServiceRelation.human_redable_id %>"
                                                                             class="btn btn-sm btn-primary" title="Edit">
                                                                             <i class="fas fa-edit"></i>
-                                                                        </button>
+                                                                    </a>
                                                                         <% if(technician.status==='active' ) { %>
                                                                             <button type="button"
                                                                                 class="btn btn-sm btn-danger"
@@ -524,7 +524,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" id="technicianDetailsModalFooter">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <% if(default_user.role==="admin" ){ %>
                         <button type="button" class="btn btn-primary" id="editTechnicianBtn">
@@ -680,6 +680,11 @@
                 $('#modalPhone').text(data.phone);
                 $('#modalServiceCategory').text(data.serviceCategory);
 
+                $('#technicianDetailsModalFooter').html(`
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a class="btn btn-primary" href="/edit-technician/${data.technicianId}">Edit Technician</a>
+                `);
+
                 // Update status badge colors
                 var statusBadge = $('#modalStatus');
                 statusBadge.removeClass().addClass('badge status-badge');
@@ -719,22 +724,22 @@
             }
 
             // Edit technician button handler
-            $(document).on('click', '#editTechnicianBtn', function () {
-                var technicianName = $('#modalTechnicianName').text();
-                var technicianId = $('#modalTechnicianId').text();
+            // $(document).on('click', '#editTechnicianBtn', function () {
+            //     var technicianName = $('#modalTechnicianName').text();
+            //     var technicianId = $('#modalTechnicianId').text();
 
-                // Close the modal first
-                $('#technicianDetailsModal').modal('hide');
+            //     // Close the modal first
+            //     $('#technicianDetailsModal').modal('hide');
 
-                // Show edit confirmation (you can replace this with actual edit functionality)
-                alert('Edit functionality for technician: ' + technicianName + ' (' + technicianId + ') will be implemented here.');
-            });
+            //     // Show edit confirmation (you can replace this with actual edit functionality)
+            //     alert('Edit functionality for technician: ' + technicianName + ' (' + technicianId + ') will be implemented here.');
+            // });
 
-            $(document).on('click', '.btn-primary', function () {
-                var row = $(this).closest('tr');
-                var name = row.find('td:eq(1)').text();
-                alert('Edit technician: ' + name);
-            });
+            // $(document).on('click', '.btn-primary', function () {
+            //     var row = $(this).closest('tr');
+            //     var name = row.find('td:eq(1)').text();
+            //     alert('Edit technician: ' + name);
+            // });
 
             $(document).on('click', '#deleteTechnicianBtn', function () {
                 let technicianId = $(this).data('id');

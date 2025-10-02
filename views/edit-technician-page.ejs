@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Edit Technician - Display Doctor</title>
+
+    <!-- Custom fonts for this template -->
+    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <style>
+        .technician-card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .technician-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .filter-section {
+            background: #f8f9fc;
+            border-radius: 0.35rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            border-radius: 20px;
+            border: 1px solid #d1d3e2;
+            padding: 0.5rem 1rem;
+        }
+
+        .search-box:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .technician-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .skill-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 0.1rem;
+            display: inline-block;
+        }
+
+        .service-category {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 0.1rem;
+            display: inline-block;
+        }
+
+        /* Modal Styles */
+        .technician-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #4e73df;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-lg {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .info-group {
+            background: #f8f9fc;
+            border-radius: 0.35rem;
+            padding: 1rem;
+        }
+
+        .info-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .info-item label {
+            color: #5a5c69;
+            margin-right: 0.5rem;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .info-item span {
+            color: #2e2e2e;
+        }
+
+        .profile-section {
+            background: #f8f9fc;
+            border-radius: 0.35rem;
+            padding: 1.5rem;
+        }
+
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .modal-header.bg-primary {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%) !important;
+        }
+
+        .details-section {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+    <link href="/css/search-result.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <%- include('common/sidebar') %>
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <!-- Topbar -->
+                    <%- include("common/topnavbar") %>
+                        <!-- End of Topbar -->
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+                            <%- include("common/search-result-section") %>
+                            
+                            <!-- Flash Messages -->
+                            <%- include('./common/flash-message') %>
+
+                            <!-- Page Heading -->
+                            <h1 class="h3 mb-4 text-gray-800">Edit Technician</h1>
+
+                            <!-- Edit Technician Form -->
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <!-- Basic Card Example -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Edit Technician Details - <%= technician.human_redable_id %></h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="editTechnicianForm">
+                                                <input type="hidden" name="technicianId" value="<%= technician.human_redable_id %>">
+                                                
+                                                <!-- Name Fields -->
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <label for="firstName" class="form-label">First Name</label>
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="firstName" name="firstName" placeholder="First Name"
+                                                            value="<%= technician.technicianDetails.firstName %>" required>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <label for="lastName" class="form-label">Last Name</label>
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="lastName" name="lastName" placeholder="Last Name"
+                                                            value="<%= technician.technicianDetails.lastName %>" required>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <label for="fatherName" class="form-label">Father's Name</label>
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="fatherName" name="fatherName"
+                                                            placeholder="Father's Name" 
+                                                            value="<%= technician.address_proof.son_or_daughter_of || '' %>" required>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <label for="email" class="form-label">Email Address</label>
+                                                        <input type="email" class="form-control form-control-user" 
+                                                            id="email" name="email" placeholder="Email Address" 
+                                                            value="<%= technician.technicianDetails.email %>" required>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Phone Number -->
+                                                <div class="form-group">
+                                                    <label for="phone" class="form-label">Phone Number</label>
+                                                    <input class="form-control form-control-user" id="phone"
+                                                        name="phone" placeholder="Phone Number" 
+                                                        value="<%= technician.technicianDetails.phone %>" required>
+                                                </div>
+
+                                                <!-- Date of Birth -->
+                                                <div class="form-group">
+                                                    <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                                    <input type="date" class="form-control form-control-user"
+                                                        id="dateOfBirth" name="dateOfBirth"
+                                                        value="<%= technician.technicianDetails.dateOfBirth ? new Date(technician.technicianDetails.dateOfBirth).toISOString().split('T')[0] : '' %>">
+                                                </div>
+
+                                                <!-- Aadhaar Number -->
+                                                <div class="form-group">
+                                                    <label for="aadhaarNumber" class="form-label">Aadhaar Number</label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="aadhaarNumber" name="aadhaarNumber"
+                                                        placeholder="Aadhaar Number (12 digits)" maxlength="12"
+                                                        pattern="[0-9]{12}" 
+                                                        value="<%= technician.address_proof.adhar_number || '' %>" required>
+                                                </div>
+
+                                                <!-- Address Fields -->
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                        <label for="city" class="form-label">City</label>
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="city" name="city" placeholder="City" 
+                                                            value="<%= technician.address_proof.city || '' %>" required>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <label for="state" class="form-label">State</label>
+                                                        <input type="text" class="form-control form-control-user"
+                                                            id="state" name="state" placeholder="State" 
+                                                            value="<%= technician.address_proof.state || '' %>" required>
+                                                    </div>
+                                                </div>
+
+                                                <!-- PIN Code -->
+                                                <div class="form-group">
+                                                    <label for="pinCode" class="form-label">PIN Code</label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="pinCode" name="pinCode" placeholder="PIN Code (6 digits)"
+                                                        maxlength="6" pattern="[0-9]{6}" 
+                                                        value="<%= technician.address_proof.pin_code || '' %>" required>
+                                                </div>
+
+                                                <!-- Address Line 1 -->
+                                                <div class="form-group">
+                                                    <label for="addressLine1" class="form-label">Address Line 1</label>
+                                                    <input type="text" class="form-control form-control-user"
+                                                        id="addressLine1" name="addressLine1" placeholder="Address Line 1" 
+                                                        value="<%= technician.address_proof.address_line_1 || '' %>" required>
+                                                </div>
+
+                                                <!-- Service Category (Read-only) -->
+                                                <div class="form-group">
+                                                    <label class="form-label">Service Category (Cannot be changed)</label>
+                                                    <div class="alert alert-info">
+                                                        <i class="fas fa-info-circle mr-2"></i>
+                                                        <span id="currentServiceCategory">Loading...</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Sub Categories (Read-only) -->
+                                                <div class="form-group">
+                                                    <label class="form-label">Sub Categories (Cannot be changed)</label>
+                                                    <div class="alert alert-info">
+                                                        <i class="fas fa-info-circle mr-2"></i>
+                                                        <div id="currentSubCategories">Loading...</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Status -->
+                                                <div class="form-group">
+                                                    <label for="status" class="form-label">Status</label>
+                                                    <select class="form-control form-control-user" name="status" id="status">
+                                                        <option value="active" <%= technician.technicianDetails.status === 'active' ? 'selected' : '' %>>Active</option>
+                                                        <option value="inactive" <%= technician.technicianDetails.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <div class="col-sm-6">
+                                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                                            <i class="fas fa-save mr-2"></i>Update Technician
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <a href="/technician-list" class="btn btn-secondary btn-user btn-block">
+                                                            <i class="fas fa-arrow-left mr-2"></i>Back to List
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <!-- Technician Info -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Technician Information</h6>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <% if (technician.technicianDetails.profileImage) { %>
+                                                <img src="<%= technician.technicianDetails.profileImage %>" 
+                                                     alt="Profile" class="img-fluid rounded-circle mb-3" 
+                                                     style="width: 100px; height: 100px; object-fit: cover;">
+                                            <% } else { %>
+                                                <div class="bg-gradient-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                                     style="width: 100px; height: 100px;">
+                                                    <i class="fas fa-user fa-2x text-white"></i>
+                                                </div>
+                                            <% } %>
+                                            <h5 class="mb-1"><%= technician.technicianDetails.firstName %> <%= technician.technicianDetails.lastName %></h5>
+                                            <p class="text-muted mb-2">ID: <%= technician.human_redable_id %></p>
+                                            <span class="badge badge-<%= technician.technicianDetails.status === 'active' ? 'success' : 'secondary' %>">
+                                                <%= technician.technicianDetails.status.toUpperCase() %>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Address Proof Info -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Address Proof</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <% if (technician.address_proof.adhar_front_image) { %>
+                                                <div class="text-center mb-3">
+                                                    <img src="<%= technician.address_proof.adhar_front_image %>" 
+                                                         alt="Aadhaar" class="img-fluid rounded" 
+                                                         style="max-height: 200px;">
+                                                </div>
+                                            <% } %>
+                                            <p class="mb-1"><strong>Aadhaar:</strong> <%= technician.address_proof.adhar_number || 'Not provided' %></p>
+                                            <p class="mb-0"><strong>Father's Name:</strong> <%= technician.address_proof.son_or_daughter_of || 'Not provided' %></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Edit Guidelines -->
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary">Edit Guidelines</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center">
+                                                <i class="fas fa-edit fa-2x text-gray-300 mb-3"></i>
+                                            </div>
+                                            <p class="mb-2">• Personal details can be updated</p>
+                                            <p class="mb-2">• Service categories cannot be changed</p>
+                                            <p class="mb-2">• Status can be activated/deactivated</p>
+                                            <p class="mb-0">• Changes are logged for audit</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+    </div>
+<!-- Bootstrap core JavaScript-->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="/js/sb-admin-2.min.js"></script>
+
+<!-- DataTables JavaScript -->
+<script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="/js/serach-functionality.js"></script>
+
+<!-- Form submission and validation JavaScript -->
+<script>
+    $(document).ready(function () {
+        // Load service category and subcategories on page load
+        loadServiceCategoryInfo();
+
+        // Phone number formatting
+        $('#phone').on('input', function () {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            this.value = value;
+        });
+
+        // Aadhaar number formatting (only allow numbers, max 12 digits)
+        $('#aadhaarNumber').on('input', function () {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 12) {
+                value = value.substring(0, 12);
+            }
+            this.value = value;
+        });
+
+        // PIN code formatting (only allow numbers, max 6 digits)
+        $('#pinCode').on('input', function () {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            this.value = value;
+        });
+
+        // Form submission with AJAX
+        $('#editTechnicianForm').on('submit', function (e) {
+            e.preventDefault();
+
+            // Get form data
+            const formData = {
+                technicianId: $('input[name="technicianId"]').val(),
+                firstName: $('#firstName').val().trim(),
+                lastName: $('#lastName').val().trim(),
+                email: $('#email').val().trim(),
+                phone: $('#phone').val().replace(/\D/g, ''),
+                dateOfBirth: $('#dateOfBirth').val(),
+                aadhaarNumber: $('#aadhaarNumber').val().trim(),
+                city: $('#city').val().trim(),
+                state: $('#state').val().trim(),
+                pinCode: $('#pinCode').val().trim(),
+                fatherName: $('#fatherName').val().trim(),
+                addressLine1: $('#addressLine1').val().trim(),
+                status: $('#status').val()
+            };
+
+            // Basic validation
+            if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.aadhaarNumber || !formData.city || !formData.state || !formData.pinCode) {
+                showAlert('Please fill in all required fields.', 'danger');
+                return;
+            }
+
+            // Aadhaar validation (12 digits)
+            if (!/^[0-9]{12}$/.test(formData.aadhaarNumber)) {
+                showAlert('Please enter a valid 12-digit Aadhaar number.', 'danger');
+                return;
+            }
+
+            // PIN code validation (6 digits)
+            if (!/^[0-9]{6}$/.test(formData.pinCode)) {
+                showAlert('Please enter a valid 6-digit PIN code.', 'danger');
+                return;
+            }
+
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(formData.email)) {
+                showAlert('Please enter a valid email address.', 'danger');
+                return;
+            }
+
+            // Phone validation (10 digits)
+            if (formData.phone.length !== 10) {
+                showAlert('Please enter a valid 10-digit phone number.', 'danger');
+                return;
+            }
+
+            // Disable submit button and show loading
+            const $submitBtn = $('#editTechnicianForm button[type="submit"]');
+            const originalText = $submitBtn.html();
+            $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Updating...');
+
+            // Submit via AJAX
+            $.ajax({
+                url: `/edit-technician/${formData.technicianId}`,
+                method: 'PUT',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
+                dataType: 'json'
+            })
+            .done(function (response) {
+                showAlert('Technician updated successfully!', 'success');
+                // Optionally reload the page after a delay
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+            })
+            .fail(function (xhr) {
+                let errorMessage = 'An error occurred while updating the technician.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                } else if (xhr.responseText) {
+                    try {
+                        const errorData = JSON.parse(xhr.responseText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        // If not JSON, use default message
+                    }
+                }
+                showAlert(errorMessage, 'danger');
+            })
+            .always(function () {
+                $submitBtn.prop('disabled', false).html(originalText);
+            });
+        });
+
+        // Load service category and subcategories info
+        function loadServiceCategoryInfo() {
+            const technicianId = '<%= technician.human_redable_id %>';
+            
+            $.ajax({
+                url: `/get-technician-service-info/${technicianId}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        $('#currentServiceCategory').text(response.data.serviceCategory.name);
+                        
+                        let subCategoriesHtml = '';
+                        if (response.data.subCategories && response.data.subCategories.length > 0) {
+                            response.data.subCategories.forEach(function(subCat) {
+                                subCategoriesHtml += `<span class="badge badge-primary mr-1 mb-1">${subCat.name}</span>`;
+                            });
+                        } else {
+                            subCategoriesHtml = 'No subcategories assigned';
+                        }
+                        $('#currentSubCategories').html(subCategoriesHtml);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    $('#currentServiceCategory').text('Error loading category');
+                    $('#currentSubCategories').html('Error loading subcategories');
+                }
+            });
+        }
+
+        // Custom alert function using SB Admin 2 styling
+        function showAlert(message, type) {
+            $('.custom-alert').remove();
+
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show custom-alert" role="alert">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} mr-2"></i>
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+
+            $('.card-body').first().prepend(alertHtml);
+
+            if (type === 'success') {
+                setTimeout(function () {
+                    $('.custom-alert').fadeOut(function () {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+
+            $('html, body').animate({
+                scrollTop: $('.card').offset().top - 100
+            }, 500);
+        }
+
+        // Field validation on blur
+        $('#email').on('blur', function () {
+            const email = $(this).val().trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#phone').on('blur', function () {
+            const phone = $(this).val().replace(/\D/g, '');
+            if (phone && phone.length !== 10) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#aadhaarNumber').on('blur', function () {
+            const aadhaar = $(this).val().trim();
+            if (aadhaar && !/^[0-9]{12}$/.test(aadhaar)) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('#pinCode').on('blur', function () {
+            const pin = $(this).val().trim();
+            if (pin && !/^[0-9]{6}$/.test(pin)) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        $('.form-control').on('focus', function () {
+            $(this).removeClass('is-invalid');
+        });
+    });
+</script>
+
+</body>
+</html>
