@@ -30,8 +30,8 @@ commonRouter.get('/get-issue-history/:id', authChecker, roleChecker(['caller', '
 
 commonRouter.post("/generate-invoice/:issueId", authChecker, roleChecker(["technician", "admin"]), commonController.generateInvoice);
 commonRouter.get("/download-invoice-pdf/:issueId", authChecker, roleChecker(["technician", "admin"]), commonController.downloadInvoicePdf);
-commonRouter.get("/invoice-generation", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceGenerationPage);
-commonRouter.get("/invoice-generation/:id", authChecker, roleChecker(["technician", "admin"]), commonController.renderInvoiceGenerationPageWithIssue);
+commonRouter.get("/invoice-generation", authChecker, roleChecker([ "admin"]), commonController.renderInvoiceGenerationPage);
+commonRouter.get("/invoice-generation/:id", authChecker, roleChecker([ "admin"]), commonController.renderInvoiceGenerationPageWithIssue);
 commonRouter.post("/search-issue-for-invoice", authChecker, roleChecker(["technician", "admin"]), commonController.searchIssueForInvoice);
 commonRouter.get("/invoice/:id",authChecker,roleChecker(["admin","caller","technician"]),commonController.renderInvoicePage);
 

@@ -494,7 +494,7 @@
                 dataType: 'json'
             })
             .done(function (response) {
-                showAlert('Technician updated successfully!', 'success');
+                showNotification('Technician updated successfully!', 'success');
                 // Optionally reload the page after a delay
                 setTimeout(function() {
                     window.location.reload();
@@ -576,6 +576,27 @@
             $('html, body').animate({
                 scrollTop: $('.card').offset().top - 100
             }, 500);
+        }
+         
+        function showNotification(message, type = 'info') {
+            // Create a simple notification
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+            const notification = $(`
+                <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            `);
+
+            $('body').append(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(function () {
+                notification.alert('close');
+            }, 5000);
         }
 
         // Field validation on blur

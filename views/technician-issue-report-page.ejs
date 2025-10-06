@@ -140,7 +140,7 @@
                 let dataText = "-"
                 if (submittedOn) dataText = submittedOn.toLocaleDateString()
                 let billgenerationButton = ""
-                if (issueReport.status === "open" && issueReport.quotation_type === "final" && issueReport.is_approved) billgenerationButton = `<a href="/invoice-generation/${issueReport.issue_human_redable_id}" class="btn btn-sm btn-warning bill-generation-btn" data-issue-id="${issueReport._id}" title="Generate Invoice"><i class="fas fa-cogs"></i></a>`
+                if (issueReport.status === "open" && issueReport.quotation_type === "final" && issueReport.is_approved) billgenerationButton = `<a href="#" class="btn btn-sm btn-warning bill-generation-btn" data-issue-id="${issueReport._id}" title="Generate Invoice"><i class="fas fa-file-alt"></i></a>`
                 else if (issueReport.status !== "open") billgenerationButton = `<a href="/view-invoice/${issueReport.issue_human_redable_id}" class="btn btn-sm btn-success bill-generation-btn" data-issue-id="${issueReport._id}" title="View Invoice"><i class="fas fa-file-alt"></i></a>`
 
                 table.row.add([

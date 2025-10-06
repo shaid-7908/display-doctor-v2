@@ -676,7 +676,7 @@ class CommonController {
       human_readable_issue_id,
       customerName,
       customerPhone,
-      customerEmail,
+      customerEmail: customerEmail || "NA",
       customerAddress,
       deviceType,
       deviceBrand: deviceBrand || "NA",
@@ -699,8 +699,10 @@ class CommonController {
     if (!newInvoice) {
       return sendError(res, "Failed to generate invoice", null, STATUS_CODES.INTERNAL_SERVER_ERROR);
     } else {
-      const updateIssueReport = await IssueReportModel.updateOne({ issue_human_redable_id: newInvoice.issueId }, { $set: { status: "bill-generated" } })
-      const issue = await IssueModel.findOne({ human_readable_id: newInvoice.issueId })
+      const updateIssueReport = await IssueReportModel.updateOne({ _id: newInvoice.issue_report_id }, { $set: { status: "bill-generated" } })
+      console.log({data:newInvoice})
+      const issue = await IssueModel.findOne({ _id: newInvoice.issueId })
+      console.log({issue:issue})  
       if (issue) {
         const previousStatus = issue.status
         issue.status = "awaiting_payment"
@@ -773,10 +775,10 @@ class CommonController {
       const formattedInvoiceData = {
         // Company Info
         companyName: "Display Doctor",
-        companyAddress: "123, Main Street, Anytown, USA",
-        companyPhone: "+1-800-EMERGENCY",
-        companyEmail: "support@emergencyresponse.com",
-        companyGST: "1234567890",
+        companyAddress: "2/3A Christopher lane Kolkata 14",
+        companyPhone: "+91 76058 84658",
+        companyEmail: "displaydoctorkolkata@gmail.com",
+        companyGST: "19CSDPA5294B1ZY",
 
         // Customer Info
         customerName: invoiceData.customerName,
@@ -816,8 +818,8 @@ class CommonController {
         technicianTitle: "Certified Technician",
 
         // Payment Info
-        bankName: "State Bank of India",
-        accountNo: "1234567890"
+        bankName: "N/A",
+        accountNo: "N/A"
       };
 
       const puppeteer = require('puppeteer');
@@ -919,7 +921,6 @@ class CommonController {
           error: `Report for issue ID ${issueId} not found ornot approved or final quotation is not set`
         });
       }
-      console.log(issue[0]);
       res.render("invoice-generation", {
         default_user: req.user,
         issue: issue[0].issue,
@@ -1135,7 +1136,7 @@ class CommonController {
   deleteInvoice = asyncHandler(async (req: Request, res: Response) => {
     const invoiceId = req.params.id;
     const { reason } = req.body;
-
+    console.log(invoiceId)
     try {
       // Validation
       if (!reason || reason.trim().length < 10) {
@@ -1143,28 +1144,18 @@ class CommonController {
       }
 
       // Check if user is admin (additional security check)
-      if (req.user?.role !== "admin") {
+      if (req.user?.role !== "admin" && req.user?.role !== "technician") {
         return sendError(res, "Unauthorized. Only admins can delete invoices", null, STATUS_CODES.FORBIDDEN);
       }
 
-      // Mock - Find the invoice (in real implementation, use InvoiceModel)
-      console.log(`Mock: Deleting invoice ${invoiceId}`);
-      console.log(`Mock: Reason: ${reason}`);
-      console.log(`Mock: Deleted by admin: ${req.user?.id}`);
+      const invoice = await InvoiceModel.findOne({ _id: invoiceId });
+      if (!invoice) {
+        return sendError(res, "Invoice not found", null, STATUS_CODES.NOT_FOUND);
+      }
+      await InvoiceModel.findByIdAndDelete(invoiceId);
+      await IssueReportModel.findByIdAndUpdate(invoice.issue_report_id, { $set: { status: 'open' } })
 
-      // Simulate database deletion delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // Mock response data
-      const mockResponse = {
-        invoiceId: invoiceId,
-        deletedBy: req.user?.id,
-        deletedAt: new Date(),
-        reason: reason.trim(),
-        status: "deleted"
-      };
-
-      return sendSuccess(res, "Invoice deleted successfully", mockResponse, STATUS_CODES.OK);
+      return sendSuccess(res, "Invoice deleted successfully", null, STATUS_CODES.OK);
 
     } catch (error) {
       console.error('Error deleting invoice:', error);
@@ -1283,11 +1274,42 @@ class CommonController {
   })
 
   renderViewInvoicePage = asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const invoice = await InvoiceModel.findOne({ human_readable_issue_id: id });
+    const human_readable_issue_id = req.params.id;
+    const invoiceData = await InvoiceModel.aggregate([
+      {$match:{'human_readable_issue_id':human_readable_issue_id}},
+      {
+        $lookup: {
+          from: "issues",
+          localField: "human_readable_issue_id",
+          foreignField: "human_readable_id",
+          as: "issue"
+        }
+      },
+      { $unwind: "$issue" },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'issue.assignment.technicianId',
+          foreignField: '_id',
+          as: 'technician'
+        }
+      },
+      { $unwind: "$technician" },
+      {
+        $project: {
+          "technician.password": 0,
+          "technician.isVerified": 0,
+          "technician.status": 0,
+          "technician.createdAt": 0,
+          "technician.updatedAt": 0,
+          "technician.role": 0,
+          "technician.dateOfBirth": 0,
+        }
+      }
+    ])
     res.render("view-invoice-page", {
       default_user: req.user,
-      invoice: invoice
+      invoice: invoiceData[0]
     });
   })
 

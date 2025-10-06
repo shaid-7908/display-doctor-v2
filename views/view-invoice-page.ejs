@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Invoice Details - Admin Dashboard</title>
+    <title>Issue Details - Admin Dashboard</title>
 
     <!-- Custom fonts for this template-->
     <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -16,55 +16,77 @@
     <!-- Custom styles for this template-->
     <link href="/css/sb-admin-2.css" rel="stylesheet">
 
-
-
     <!-- DataTables CSS -->
     <link href="/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
     <link href="/css/issuelist.css" rel="stylesheet">
-
-    <!-- Modal Invoice Styles -->
+    <link href="/css/search-result.css" rel="stylesheet">
     <style>
-        .modal-xl {
-            max-width: 95%;
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+    
+            body {
+                font-size: 12px;
+            }
+    
+            .container {
+                max-width: none;
+            }
+    
+            body {
+                background: white !important;
+            }
         }
-
-        .invoice-modal-container {
-            background: white;
+    
+        body {
+            background-color: #f5f6fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        .invoice-modal-header {
+    
+        .invoice-container {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 850px;
+            border: 1px solid #e1e5e9;
+        }
+    
+        .invoice-header {
             background: #2c3e50;
             color: white;
             padding: 30px 40px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
         }
-
-        .invoice-modal-company-name {
+    
+        .company-name {
             font-size: 1.8rem;
             font-weight: 600;
             margin-bottom: 8px;
         }
-
-        .invoice-modal-company-details {
+    
+        .company-details {
             font-size: 0.9rem;
             opacity: 0.9;
         }
-
-        .invoice-modal-body {
+    
+        .invoice-body {
             padding: 30px;
         }
-
-        .invoice-modal-details {
+    
+        .invoice-details {
             background: #f8f9fa;
             border-radius: 6px;
             padding: 20px;
             margin-bottom: 25px;
             border-left: 4px solid #3498db;
         }
-
-        .invoice-modal-section-title {
+    
+        .section-title {
             color: #2c3e50;
             font-weight: 600;
             font-size: 1rem;
@@ -72,24 +94,20 @@
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 6px;
         }
-
-        .invoice-modal-customer-info,
-        .invoice-modal-invoice-info {
+    
+        .customer-info,
+        .invoice-info {
             background: white;
             padding: 15px;
             border-radius: 6px;
             border: 1px solid #e9ecef;
         }
-
-        .invoice-modal-service-section {
+    
+        .warranty-section {
             margin-bottom: 25px;
         }
-
-        .invoice-modal-warranty-section {
-            margin-bottom: 25px;
-        }
-
-        .invoice-modal-service-title {
+    
+        .warranty-title {
             color: #2c3e50;
             font-weight: 600;
             font-size: 1.1rem;
@@ -97,127 +115,137 @@
             display: flex;
             align-items: center;
         }
-
-        .invoice-modal-warranty-title {
+    
+        .warranty-title i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+    
+        .warranty-table {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+    
+        .warranty-table thead {
+            background: #34495e;
+            color: white;
+        }
+    
+        .warranty-table thead th {
+            font-weight: 500;
+            padding: 10px 12px;
+            border: none;
+            font-size: 0.85rem;
+        }
+    
+        .service-section {
+            margin-bottom: 25px;
+        }
+    
+        .service-title {
             color: #2c3e50;
             font-weight: 600;
             font-size: 1.1rem;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
         }
-
-        .invoice-modal-warranty-title i {
+    
+        .service-title i {
             margin-right: 8px;
             color: #3498db;
         }
-
-        .invoice-modal-service-title i {
-            margin-right: 8px;
-            color: #3498db;
-        }
-
-        .invoice-modal-warranty-table {
+    
+        .service-table {
             border: 1px solid #dee2e6;
             border-radius: 6px;
             overflow: hidden;
         }
-
-        .invoice-modal-warranty-table thead {
+    
+        .service-table thead {
             background: #34495e;
             color: white;
         }
-
-        .invoice-modal-warranty-table thead th {
+    
+        .service-table thead th {
             font-weight: 500;
             padding: 10px 12px;
             border: none;
             font-size: 0.85rem;
         }
-
-        .invoice-modal-service-table {
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .invoice-modal-service-table thead {
-            background: #34495e;
-            color: white;
-        }
-
-        .invoice-modal-service-table thead th {
-            font-weight: 500;
-            padding: 10px 12px;
-            border: none;
-            font-size: 0.85rem;
-        }
-
-        .invoice-modal-service-table tbody td {
+    
+        .service-table tbody td {
             padding: 12px;
             border-bottom: 1px solid #eee;
             vertical-align: middle;
         }
-
-        .invoice-modal-amount-cell {
+    
+        .service-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+    
+        .amount-cell {
             font-weight: 600;
             color: #27ae60;
             font-size: 1rem;
         }
-
-        .invoice-modal-totals-section {
+    
+        .totals-section {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 6px;
             padding: 15px;
         }
-
-        .invoice-modal-totals-table td {
+    
+        .totals-table td {
             padding: 6px 12px;
             border: none;
         }
-
-        .invoice-modal-total-amount-row {
+    
+        .total-amount-row {
             background: #27ae60;
             color: white;
             font-weight: 600;
         }
-
-        .invoice-modal-total-amount-row td {
+    
+        .total-amount-row td {
             padding: 10px 12px;
             font-size: 1rem;
         }
-
-        .invoice-modal-footer-section {
+    
+        .footer-section {
             margin-top: 25px;
             padding-top: 20px;
             border-top: 2px solid #3498db;
         }
-
-        .invoice-modal-payment-info,
-        .invoice-modal-technician-info {
+    
+        .payment-info,
+        .technician-info {
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 6px;
             padding: 15px;
         }
-
-        .invoice-modal-info-title {
+    
+        .info-title {
             color: #2c3e50;
             font-weight: 600;
             margin-bottom: 10px;
             font-size: 0.95rem;
         }
-
-        .invoice-modal-info-title i {
+    
+        .info-title i {
             margin-right: 6px;
             color: #3498db;
         }
-
-        .invoice-modal-customer-name {
+    
+        .customer-name {
             font-weight: 600;
             color: #2c3e50;
         }
-
-        .invoice-modal-thank-you {
+    
+        .thank-you {
             background: #ecf0f1;
             border-radius: 6px;
             padding: 15px;
@@ -225,9 +253,47 @@
             text-align: center;
             border: 1px solid #bdc3c7;
         }
+    
+        .btn-download {
+            background: #27ae60;
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+    
+        .btn-download:hover {
+            background: #229954;
+            color: white;
+        }
+    
+        .btn-print {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+    
+        .btn-print:hover {
+            background: #2980b9;
+            color: white;
+        }
+    
+        .text-muted {
+            color: #7f8c8d !important;
+        }
+    
+        hr {
+            border-top: 1px solid #dee2e6;
+            margin: 25px 0;
+        }
     </style>
 </head>
-
 <body id="page-top">
 
     <!-- Page Wrapper -->
@@ -236,233 +302,261 @@
         <!-- Sidebar -->
         <%- include('common/sidebar') %>
 
+            <!-- Content Wrapper -->
             <div id="content-wrapper" class="d-flex flex-column">
 
                 <!-- Main Content -->
                 <div id="content">
 
                     <!-- Topbar -->
-                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <%- include('common/topnavbar') %>
+                        <!-- End of Topbar -->
 
-                        <!-- Sidebar Toggle (Topbar) -->
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
-
-                        <!-- Topbar Search -->
-                        <form
-                            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                            <div class="input-group">
-                                <input type="text" class="form-control bg-light border-0 small"
-                                    placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button">
-                                        <i class="fas fa-search fa-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
-                        <!-- Topbar Navbar -->
-                        <%- include("common/topnavbar") %>
-
-                    </nav>
-                    <div class="container-fluid">
-                        <!-- Page Header -->
-                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">Invoice Details</h1>
-                            <div>
-                                <button type="button" class="btn btn-success mr-2" id="downloadInvoiceBtn">
-                                    <i class="fas fa-download mr-2"></i>Download PDF
-                                </button>
-                                <button type="button" class="btn btn-info mr-2" id="printInvoiceBtn">
-                                    <i class="fas fa-print mr-2"></i>Print
-                                </button>
-                                <a href="/invoice-list" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left mr-2"></i>Back to List
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Invoice Content -->
-                        <div class="card shadow-lg border-0">
-                            <div class="invoice-modal-container" id="invoiceContent">
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid issue-details-container px-3">
+                            <%- include('common/search-result-section') %>
+                            <div class="invoice-container">
                                 <!-- Company Header -->
-                                <div class="invoice-modal-header text-center">
-                                    <div class="invoice-modal-company-name">
+                                <div class="invoice-header">
+                                    <div class="company-name">
                                         Display Doctor
                                     </div>
-                                    <div class="invoice-modal-company-details">
-                                        <div>Address: 123, Main Street, Anytown, USA</div>
-                                        <div>Phone: +1-800-EMERGENCY | Email: support@emergencyresponse.com</div>
-                                        <div>GST No: 1234567890</div>
+                                    <div class="company-details">
+                                        <div>
+                                            2/3A Christopher lane Kolkata 14
+                                        </div>
+                                        <div>Phone: +91 76058 84658 | Email: displaydoctorkolkata@gmail.com
+                                        </div>
+                                        <div>GST No: 19CSDPA5294B1ZY
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="invoice-modal-body">
+                            
+                                <div class="invoice-body">
                                     <!-- Invoice Details Section -->
-                                    <div class="invoice-modal-details">
+                                    <div class="invoice-details">
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <div class="invoice-modal-customer-info">
-                                                    <h6 class="invoice-modal-section-title">
+                                                <div class="customer-info">
+                                                    <h6 class="section-title">
                                                         <i class="fas fa-user mr-2"></i>Bill To
                                                     </h6>
-                                                    <div class="invoice-modal-customer-name" id="customerName"></div>
-                                                    <div class="text-muted" id="customerPhone"></div>
-                                                    <div class="text-muted" id="customerEmail"></div>
-                                                    <div class="text-muted" id="customerAddress"></div>
+                                                    <div class="customer-name">
+                                                        <%= invoice.customerName %>
+                                                    </div>
+                                                    <div class="text-muted">Phone: <%= invoice.customerPhone %>
+                                                    </div>
+                                                    <div class="text-muted">
+                                                        <%= invoice.customerAddress %>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <div class="invoice-modal-invoice-info">
-                                                    <h6 class="invoice-modal-section-title">
+                                                <div class="invoice-info">
+                                                    <h6 class="section-title">
                                                         <i class="fas fa-file-invoice mr-2"></i>Invoice Details
                                                     </h6>
-                                                    <div><strong>Invoice No:</strong> <span id="invoiceNo"></span></div>
-                                                    <div><strong>Issue ID:</strong> <span id="issueId"></span></div>
-                                                    <div><strong>Date:</strong> <span id="invoiceDate"></span></div>
-                                                    <div><strong>Status:</strong> <span id="invoiceStatus"
-                                                            class="badge"></span></div>
+                                                    <div><strong>Invoice No:</strong>
+                                                        <%= invoice.human_readable_invoice_id %>
+                                                    </div>
+                                                    <div><strong>Issue ID:</strong>
+                                                        <%= invoice.human_readable_issue_id %>
+                                                    </div>
+                                                    <div><strong>Date:</strong>
+                                                        <%= invoice.createdAt %>
+                                                    </div>
+                                                    <!-- <% if (invoice.dueDate) { %>
+                                                        <div><strong>Due Date:</strong>
+                                                            <%= invoice.dueDate %>
+                                                        </div>
+                                                        <% } %> -->
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Device Information Section -->
-                                    <div class="invoice-modal-details">
-                                        <h6 class="invoice-modal-section-title">
-                                            <i class="fas fa-tv mr-2"></i>Device Information
-                                        </h6>
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <strong>Type:</strong> <span id="deviceType"></span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <strong>Brand:</strong> <span id="deviceBrand"></span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <strong>Model:</strong> <span id="deviceModel"></span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <strong>Serial:</strong> <span id="deviceSerial"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                            
                                     <!-- Warranty Section -->
-                                    <div class="invoice-modal-warranty-section">
-                                        <h5 class="invoice-modal-warranty-title">
-                                            <i class="fas fa-shield-alt"></i>
-                                            Warranty Details
-                                        </h5>
-                                        <div class="table-responsive">
-                                            <table class="table invoice-modal-warranty-table table-striped mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 30%;">Warranty Months</th>
-                                                        <th style="width: 30%;">Warranty Start</th>
-                                                        <th style="width: 30%;">Warranty End</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td id="warrantyMonths"></td>
-                                                        <td id="warrantyStart"></td>
-                                                        <td id="warrantyEnd"></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- Service Details -->
-                                    <div class="invoice-modal-service-section">
-                                        <h5 class="invoice-modal-service-title">
-                                            <i class="fas fa-cogs"></i>
-                                            Service Details
-                                        </h5>
-                                        <div class="table-responsive">
-                                            <table class="table invoice-modal-service-table table-striped mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="width: 30%;">Description</th>
-                                                        <th style="width: 25%;">Parts Used</th>
-                                                        <th style="width: 15%;">Service Charge</th>
-                                                        <th style="width: 15%;">Parts Cost</th>
-                                                        <th style="width: 15%;">Visit Charge</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td id="serviceDescription"></td>
-                                                        <td id="partsUsed"></td>
-                                                        <td class="text-right invoice-modal-amount-cell">
-                                                            ₹<span id="labourCharge"></span>
-                                                        </td>
-                                                        <td class="text-right invoice-modal-amount-cell">
-                                                            ₹<span id="partsCost"></span>
-                                                        </td>
-                                                        <td class="text-right invoice-modal-amount-cell">
-                                                            ₹<span id="visitCharge"></span>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- Totals Section -->
-                                    <div class="row justify-content-end">
-                                        <div class="col-md-5">
-                                            <div class="invoice-modal-totals-section">
-                                                <table class="table mb-0 invoice-modal-totals-table">
-                                                    <tr>
-                                                        <td><strong>Subtotal:</strong></td>
-                                                        <td class="text-right">
-                                                            <strong>₹<span id="subtotal"></span></strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Visit Charge:</strong></td>
-                                                        <td class="text-right">
-                                                            <strong>₹<span id="visitChargeTotal"></span></strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>Discount:</strong></td>
-                                                        <td class="text-right">
-                                                            <strong>- ₹<span id="discount"></span></strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>GST (18%):</strong></td>
-                                                        <td class="text-right">
-                                                            <strong>₹<span id="gstAmount"></span></strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="invoice-modal-total-amount-row">
-                                                        <td><strong>Total Amount:</strong></td>
-                                                        <td class="text-right">
-                                                            <strong>₹<span id="finalAmount"></span></strong>
-                                                        </td>
-                                                    </tr>
+                                    <% if (invoice.warrantyMonths && invoice.warrantyMonths !=="0" ) { %>
+                                        <div class="warranty-section">
+                                            <h5 class="warranty-title">
+                                                <i class="fas fa-shield-alt"></i>
+                                                Warranty Details
+                                            </h5>
+                                            <div class="table-responsive">
+                                                <table class="table warranty-table table-striped mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width: 30%;">Warranty Months</th>
+                                                            <th style="width: 30%;">Warranty Start</th>
+                                                            <th style="width: 30%;">Warranty End</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <%= invoice.warrantyMonths %>
+                                                            </td>
+                                                            <td>
+                                                                <%= invoice.warrantyStart ? new Date(invoice.warrantyStart).toLocaleDateString()
+                                                                    : "N/A" %>
+                                                            </td>
+                                                            <td>
+                                                                <%= invoice.warrantyEnd ? new Date(invoice.warrantyEnd).toLocaleDateString() : "N/A"
+                                                                    %>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Thank You Section -->
-                                    <div class="invoice-modal-thank-you">
-                                        <strong class="text-primary">Thank you for choosing Display Doctor!</strong>
-                                        <p class="mb-0 mt-2 text-muted small">
-                                            For any queries regarding this invoice, please contact our customer support.
-                                        </p>
-                                    </div>
+                                        <% } %>
+                            
+                                            <!-- Service Details -->
+                                            <div class="service-section">
+                                                <h5 class="service-title">
+                                                    <i class="fas fa-cogs"></i>
+                                                    Service Details
+                                                </h5>
+                                                <div class="table-responsive">
+                                                    <table class="table service-table table-striped mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 25%;">Description</th>
+                                                                <th style="width: 20%;">Device Info</th>
+                                                                <th style="width: 20%;">Parts Used</th>
+                                                                <th style="width: 12%;">Service Charge</th>
+                                                                <th style="width: 12%;">Parts Cost</th>
+                                                                <th style="width: 12%;">Visit Charge</th>
+                                                                <th style="width: 12%;">Discount</th>
+                                                                <th style="width: 15%;" class="text-right">Subtotal (₹)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= invoice.serviceDescription %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= invoice.deviceInfo %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= invoice.partsUsed %>
+                                                                </td>
+                                                                <td class="text-right amount-cell">
+                                                                    ₹<%= (invoice.labourCharge || 0).toLocaleString('en-IN') %>
+                                                                </td>
+                                                                <td class="text-right amount-cell">
+                                                                    ₹<%= (invoice.partsCost || 0).toLocaleString('en-IN') %>
+                                                                </td>
+                                                                <td class="text-right amount-cell">
+                                                                    ₹<%= (invoice.visitCharge || 0).toLocaleString('en-IN') %>
+                                                                </td>
+                                                                <td class="text-right amount-cell">
+                                                                    ₹<%= (invoice.discount || 0).toLocaleString('en-IN') %>
+                                                                </td>
+                                                                <% const total=(invoice.labourCharge || 0) + (invoice.partsCost || 0) + (invoice.visitCharge || 0) - (invoice.discount
+                                                                    || 0) %>
+                                                                <td class="text-right amount-cell">
+                                                                    ₹<%= total.toLocaleString('en-IN') || 0 %>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                            
+                                            <!-- Totals Section -->
+                                            <div class="row justify-content-end">
+                                                <div class="col-md-5">
+                                                    <div class="totals-section">
+                                                        <table class="table mb-0">
+                                                            <tr>
+                                                                <td><strong>Subtotal:</strong></td>
+                                                                
+                                                                <td class="text-right"><strong>₹<%= total.toLocaleString('en-IN') || 0 %>
+                                                                    </strong></td>
+                                                            </tr>
+                                                            <% if (invoice.visitCharge && invoice.visitCharge> 0) { %>
+                                                                <tr>
+                                                                    <td><strong>Visit Charge:</strong></td>
+                                                                    <td class="text-right"><strong>₹<%= invoice.visitCharge.toLocaleString('en-IN')
+                                                                                %>
+                                                                        </strong></td>
+                                                                </tr>
+                                                                <% } %>
+                                                                    <% if (invoice.discount && invoice.discount> 0) { %>
+                                                                        <tr>
+                                                                            <td><strong>Discount:</strong></td>
+                                                                            <td class="text-right"><strong>- ₹<%=
+                                                                                        invoice.discount.toLocaleString('en-IN') %>
+                                                                                </strong></td>
+                                                                        </tr>
+                                                                        <% } %>
+                                                                            <tr>
+                                                                                <% const gst = (total * 18) / 100 %>
+                                                                                <td><strong>GST (18%):</strong></td>
+                                                                                <td class="text-right"><strong>₹<%=
+                                                                                            gst.toLocaleString('en-IN') || 0 %></strong>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr class="total-amount-row">
+                                                                                <% const totalAmount = total + gst %>
+                                                                                <td><strong>Total Amount:</strong></td>
+                                                                                <td class="text-right"><strong>₹<%=
+                                                                                            totalAmount.toLocaleString('en-IN') || 0 %>
+                                                                                    </strong></td>
+                                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                            
+                                            <!-- Footer Section -->
+                                            <div class="footer-section">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="payment-info">
+                                                            <h6 class="info-title">
+                                                                <i class="fas fa-university"></i>
+                                                                Payment Information
+                                                            </h6>
+                                                            <div><strong>Account:</strong>
+                                                                <%= invoice.companyName %>
+                                                            </div>
+                                                            <div><strong>Bank:</strong>
+                                                                <%= invoice.bankName %>
+                                                            </div>
+                                                            <div><strong>Account No:</strong>
+                                                                <%= invoice.accountNo %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="technician-info">
+                                                            <h6 class="info-title">
+                                                                <i class="fas fa-user-cog"></i>
+                                                                Technician
+                                                            </h6>
+                                                            <div class="customer-name">
+                                                                <%= invoice.technician.firstName %> <%= invoice.technician.lastName %>
+                                                            </div>
+                                                            <div class="text-muted">
+                                                                <%= invoice.technician.phone %>(<%= invoice.technician.email %>)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                            
+                                            <!-- Thank You Section -->
+                                            <div class="thank-you">
+                                                <strong class="text-primary">Thank you for choosing <%= invoice.companyName %>!</strong>
+                                                <div class="text-muted mt-1">For any queries, contact us at <%= invoice.companyEmail %>
+                                                </div>
+                                            </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
     </div>
@@ -470,130 +564,16 @@
     <!---- Scripts Section ---->
     <script src="/vendor/jquery/jquery.min.js"></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+    
     <!-- Core plugin JavaScript-->
     <script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
-
+    
     <!-- Custom scripts for all pages-->
     <script src="/js/sb-admin-2.min.js"></script>
-
+    
     <!-- DataTables JavaScript -->
     <script src="/vendor/datatables/jquery.dataTables.js"></script>
     <script src="/vendor/datatables/dataTables.bootstrap4.js"></script>
-    <script>
-        const inv = '<%- JSON.stringify(invoice) %>';
-        const parsedInv = JSON.parse(inv);
-        console.log(parsedInv);
-
-        function populateInvoiceData(invoiceData) {
-            // Customer Information
-            $('#customerName').text(invoiceData.customerName || 'N/A');
-            $('#customerPhone').text('Phone: ' + (invoiceData.customerPhone || 'N/A'));
-            $('#customerEmail').text('Email: ' + (invoiceData.customerEmail || 'N/A'));
-            $('#customerAddress').text(invoiceData.customerAddress || 'N/A');
-
-            // Invoice Information
-            $('#invoiceNo').text(invoiceData.human_readable_invoice_id || 'N/A');
-            $('#issueId').text(invoiceData.human_readable_issue_id || 'N/A');
-
-            const invoiceDate = invoiceData.invoiceDate ? new Date(invoiceData.invoiceDate).toLocaleDateString() : 'N/A';
-            $('#invoiceDate').text(invoiceDate);
-
-            // Status badge
-            const status = invoiceData.status || 'unknown';
-            const statusClass = status === 'paid' ? 'badge-success' : status === 'pending' ? 'badge-warning' : 'badge-secondary';
-            $('#invoiceStatus').text(status.toUpperCase()).addClass(statusClass);
-
-            // Device Information
-            $('#deviceType').text(invoiceData.deviceType || 'N/A');
-            $('#deviceBrand').text(invoiceData.deviceBrand || 'N/A');
-            $('#deviceModel').text(invoiceData.deviceModel || 'N/A');
-            $('#deviceSerial').text(invoiceData.deviceSerial || 'N/A');
-
-            // Warranty Information
-            const warrantyMonths = invoiceData.warrantyMonths || '0';
-            $('#warrantyMonths').text(warrantyMonths === '0' ? 'N/A' : warrantyMonths + ' months');
-
-            if (warrantyMonths !== '0' && invoiceData.warrantyStart) {
-                $('#warrantyStart').text(new Date(invoiceData.warrantyStart).toLocaleDateString());
-                $('#warrantyEnd').text(new Date(invoiceData.warrantyEnd).toLocaleDateString());
-            } else {
-                $('#warrantyStart').text('N/A');
-                $('#warrantyEnd').text('N/A');
-            }
-
-            // Service Information
-            $('#serviceDescription').text(invoiceData.serviceDescription || 'N/A');
-            $('#partsUsed').text(invoiceData.partsUsed || 'N/A');
-            $('#labourCharge').text(invoiceData.labourCharge || 0);
-            $('#partsCost').text(invoiceData.partsCost || 0);
-            $('#visitCharge').text(invoiceData.visitCharge || 0);
-
-            // Financial Calculations
-            const subtotal = (invoiceData.labourCharge || 0) + (invoiceData.partsCost || 0);
-            const visitCharge = invoiceData.visitCharge || 0;
-            const discount = invoiceData.discount || 0;
-            const gstAmount = subtotal * 0.18;
-
-            $('#subtotal').text(subtotal.toFixed(2));
-            $('#visitChargeTotal').text(visitCharge.toFixed(2));
-            $('#discount').text(discount.toFixed(2));
-            $('#gstAmount').text(gstAmount.toFixed(2));
-            $('#finalAmount').text(invoiceData.finalAmount || '0.00');
-        }
-
-        function printInvoice() {
-            const printContent = document.getElementById('invoiceContent').innerHTML;
-            const originalContent = document.body.innerHTML;
-
-            document.body.innerHTML = `
-            <html>
-                <head>
-                    <title>Invoice - ${parsedInv.human_readable_invoice_id}</title>
-                    <link href="/css/sb-admin-2.css" rel="stylesheet">
-                    <link href="/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-                    <style>
-                        body { margin: 0; padding: 20px; }
-                        .invoice-modal-container { box-shadow: none !important; }
-                        @media print {
-                            body { margin: 0; }
-                            .btn { display: none !important; }
-                        }
-                        ${document.querySelector('style').innerHTML}
-                    </style>
-                </head>
-                <body>
-                    <div class="invoice-modal-container">
-                        ${printContent}
-                    </div>
-                </body>
-            </html>
-        `;
-
-            window.print();
-
-            setTimeout(() => {
-                document.body.innerHTML = originalContent;
-                location.reload();
-            }, 100);
-        }
-
-        function downloadInvoicePDF() {
-            // This would typically integrate with a PDF generation service
-            // For now, we'll trigger the print dialog
-            alert('PDF download functionality would be implemented here. For now, please use the Print option.');
-            printInvoice();
-        }
-
-        $(document).ready(function () {
-            // Populate the invoice data
-            populateInvoiceData(parsedInv);
-
-            // Event handlers
-            $('#printInvoiceBtn').on('click', printInvoice);
-            $('#downloadInvoiceBtn').on('click', downloadInvoicePDF);
-        });
-    </script>
+    <script src="/js/serach-functionality.js"></script>
 </body>
-
 </html>

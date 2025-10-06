@@ -246,7 +246,7 @@
                                                         </td>
                                                         <td>
                                                             <div class="action-buttons">
-                                                                <button class="btn btn-sm btn-primary view-issue-btn"
+                                                                <button class="btn btn-sm btn-info view-issue-btn"
                                                                     title="View Details"
                                                                     data-issue-id="<%= issue.human_readable_id %>">
                                                                     <i class="fas fa-eye"></i>
@@ -259,8 +259,11 @@
 
 
                                                                 <button class="btn btn-sm btn-success schedule-issue-btn" title="Schedule" id="schedule-issue-btn" data-issue-id="<%= issue._id %>">
-                                                                    <i class="fas fa-edit"></i>
+                                                                    <i class="fas fa-calendar"></i>
                                                                 </button>
+                                                                <a href="/edit-issue/<%= issue.human_readable_id %>" class="btn btn-sm btn-primary " title="Edit">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </a>
                                                                 <!-- Change this button below to assign to technician  -->
                                                                 <button
                                                                     class="btn btn-sm btn-info assign-to-technician-btn"
